@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Soukai Hello World</title>
+    </head>
+    <body>
+        <script type="module" src="./main.js"></script>
+        <main>
+            <h1>Solid Hello World<br /><small>(REST API)</small></h1>
+
+            <div id="loading">
+                <p>Loading...</p>
+            </div>
+
+            <div id="auth-guest" hidden>
+                <p>Hi there!</p>
+                <p>
+                    This page is a showcase of a simple
+                    <a href="https://solidproject.org/" target="_blank">Solid application</a>
+                    built using JavaScript, CSS and HTML. You can look at the source code and learn how to use it in
+                    <a href="https://github.com/0dataapp/hello/tree/main/solid/solid-rest-api" target="_blank"
+                        >the repository</a
+                    >.
+                </p>
+
+                <p>
+                    If you want to see other examples, you can find them here:
+                    <a href="../">Solid Hello World Examples</a>.
+                </p>
+
+                <button id="login-button" type="button" onclick="login()">Log in with Solid</button>
+
+                <p>
+                    <small
+                        >If you don't have one, you can
+                        <a href="https://solidproject.org/users/get-a-pod">get a Solid Pod</a>.</small
+                    >
+                </p>
+            </div>
+
+            <div id="auth-user" hidden>
+                <p>Hello, <span id="username"></span>!</p>
+                <button id="logout-button" type="button" onclick="logout()">Log out</button> <br /><br />
+
+                <input type="text" id="FullName" placeholder="Please enter your full name" /> <br />
+                <input type="text" id="ProfessionalTitle" placeholder="Please enter your professional title" /> <br />
+                <input type="text" id="Summary" placeholder="Please enter a brief summary about yourself" /> <br />
+                <input type="text" id="Email" placeholder="Please enter your email address" /> <br />
+                <input type="text" id="ContactNumber" placeholder="Please enter your contact number" /> <br />
+                <input type="text" id="Location" placeholder="Please enter your location" /> <br />
+                <input type="text" id="WebsiteLink" placeholder="Please enter your website link" />
+                <button type="button" onclick="createInformation()">Save Information</button>
+
+                <ul id="information"></ul>
+            </div>
+        </main>
+    </body>
+</html>
