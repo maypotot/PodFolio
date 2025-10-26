@@ -45,6 +45,7 @@
                 <p>Hello, <span id="username"></span>!</p>
                 <button id="logout-button" type="button" onclick="logout()">Log out</button> <br /><br />
 
+                <h1>Personal Information</h1>
                 <input type="text" id="FullName" placeholder="Please enter your full name" /> <br />
                 <input type="text" id="ProfessionalTitle" placeholder="Please enter your professional title" /> <br />
                 <input type="text" id="Summary" placeholder="Please enter a brief summary about yourself" /> <br />
@@ -63,7 +64,48 @@
                 <input type="text" id="ThesisTitle" placeholder="Please enter your thesis title" />
                 <button type="button" onclick="createInformation()">Save Information</button>
 
+                
+                <h1>Experience</h1>
+                <input type="text" id="PositionTitle" placeholder="Please enter your position title" /> <br />
+                <input type="text" id="Organization" placeholder="Please enter your organization" /> <br />
+                <input type="text" id="Duration" placeholder="Please enter your duration" /> <br />
+                <input type="text" id="Description" placeholder="Please enter your description" /> <br />
+                <button type="button" onclick="createExperience()">Save Experience</button>
+                
+                <h1>Projects</h1>
+                <input type="text" id="ProjectName" placeholder="Please enter your project name" /> <br />
+                <input type="text" id="ProjectSummary" placeholder="Please enter your project summary" /> <br />
+                <input type="text" id="Tools" placeholder="Please enter your project tools that you ussed" /> <br />
+                <input type="text" id="ProjectLink" placeholder="Please enter your project link" /> <br />
+                <button type="button" onclick="createProject()">Save Project</button>
+                
+                <h1>Award</h1>
+                <input type="text" id="AwardTitle" placeholder="Please enter your award title" /> <br />
+                <input type="text" id="AwardDate" placeholder="Please enter your award date" /> <br />
+                <input type="text" id="AwardOrganization" placeholder="Please enter your award organization" /> <br />
+                <button type="button" onclick="createAward()">Save Award</button>
+                
+                <h1>Training</h1>
+                <input type="text" id="TrainingTitle" placeholder="Please enter your training title" /> <br />
+                <input type="text" id="TrainingOrganization" placeholder="Please enter your training organization" /> <br />
+                <input type="text" id="YearEarned" placeholder="Please enter the year you earned the training" /> <br />
+                <input type="text" id="YearExpire" placeholder="Please enter the year the training expires" /> <br />
+                <button type="button" onclick="createTraining()">Save Training</button>
+                
+                <h1>References</h1>
+                <input type="text" id="ReferenceName" placeholder="Please enter your reference name" /> <br />
+                <input type="text" id="ReferencePosition" placeholder="Please enter your reference position" /> <br />
+                <input type="text" id="ReferenceEmail" placeholder="Please enter your reference email" /> <br />
+                <input type="text" id="ReferenceContactNumber" placeholder="Please enter your reference contact number" /> <br />
+                <button type="button" onclick="createReference()">Save Reference</button>
+
                 <ul id="information"></ul>
+                <ul id="experience"></ul>
+                <ul id="projects"></ul>
+                <ul id="awards"></ul>
+                <ul id="trainings"></ul>
+                <ul id="references"></ul>
+
             </div>
         </main>
     </body>

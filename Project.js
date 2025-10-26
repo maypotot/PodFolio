@@ -4,23 +4,23 @@ import { SolidModel } from 'soukai-solid';
 const STATUS_COMPLETED = 'https://schema.org/CompletedActionStatus';
 const STATUS_POTENTIAL = 'https://schema.org/PotentialActionStatus';
 
-export default class Experience extends SolidModel {
+export default class Project extends SolidModel {
     static rdfContext = 'https://schema.org/';
     static rdfsClass = 'foaf:Person';
     static fields = {
-        PositionTitle: {
+        ProjectName: {
             required: true,
             type: FieldType.String,
         },
-        Organization: {
+        Tools: {
             required: true,
             type: FieldType.String,
         },
-        Duration: {
+        Summary: {
             required: true,
             type: FieldType.String,
         },
-        Description: {
+        ProjectLink: {
             required: true,
             type: FieldType.String,
         },

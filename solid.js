@@ -1,11 +1,20 @@
 import { fetch, getDefaultSession, handleIncomingRedirect, login, logout } from '@inrupt/solid-client-authn-browser';
 
 import User from './User';
-import TasksList from './TasksList';
 import InformationList from './InformationList';
+import ExperienceList from './ExperienceList';
+import ProjectList from './ProjectList';
+import AwardList from './AwardList';
+import TrainingList from './TrainingList';
+import ReferenceList from './ReferenceList'
 
 let list, user;
 let infoList;
+let experienceList;
+let projectList;
+let awardList;
+let trainingList;
+let referenceList;
 
 export async function restoreSession() {
     // This function uses Inrupt's authentication library to restore a previous session. If you were
@@ -64,51 +73,7 @@ export async function performLogout() {
     await logout();
 }
 
-export async function performTaskCreation(description) {
-    // Data discovery mechanisms are still being defined in Solid, but so far it is clear that
-    // applications should not hard-code the url of their containers like we are doing in this
-    // example.
-    //
-    // In a real application, you should use one of these two alternatives:
-    //
-    // - The Type index. This is the one that most applications are using in practice today:
-    //   https://soukai.js.org/guide/advanced/interoperability.html#type-indexes
-    //
-    // - SAI, or Solid App Interoperability. This one is still being defined:
-    //   https://solid.github.io/data-interoperability-panel/specification/
-
-    if (!list) {
-        list = await TasksList.at(user.storageUrl).create({ url: `${user.storageUrl}tasks/` });
-    }
-
-    const task = list.relatedTasks.create({ description });
-    return task;
-}
-
-export async function performTaskUpdate(taskUrl, done) {
-    const task = list?.tasks.find((task) => task.url === taskUrl);
-
-    await task.toggle(done);
-}
-
-export async function performTaskDeletion(taskUrl) {
-    await list?.relatedTasks.delete(taskUrl);
-}
-
-export async function loadTasks() {
-    // In a real application, you shouldn't hard-code the path to the container like we're doing here.
-    // Read more about this in the comments on the performTaskCreation function.
-    list = await TasksList.find(`${user.storageUrl}tasks/`);
-
-    if (!list) {
-        return [];
-    }
-
-    await list.loadRelation('tasks');
-
-    return list.tasks;
-}
-
+// Creation
 export async function performInformationCreation(info) {
     if (!infoList) {
         infoList = await InformationList.at(user.storageUrl).create({ url: `${user.storageUrl}information/` });
@@ -118,6 +83,52 @@ export async function performInformationCreation(info) {
     return information;
 }
 
+export async function performExperienceCreation(exp) {
+    if (!experienceList) {
+        experienceList = await ExperienceList.at(user.storageUrl).create({ url: `${user.storageUrl}experience/` });
+    }
+
+    const experience = experienceList.relatedExperience.create(exp);
+    return experience;
+}
+
+export async function performProjectCreation(project) {
+    if (!projectList) {
+        projectList = await ProjectList.at(user.storageUrl).create({ url: `${user.storageUrl}projects/` });
+    }
+
+    const newProject = projectList.relatedProjects.create(project);
+    return newProject;
+}
+
+export async function performAwardCreation(award) {
+    if (!awardList) {
+        awardList = await AwardList.at(user.storageUrl).create({ url: `${user.storageUrl}awards/` });
+    }
+
+    const newAward = awardList.relatedAward.create(award);
+    return newAward;
+}
+
+export async function performTrainingCreation(training) {
+    if (!trainingList) {
+        trainingList = await TrainingList.at(user.storageUrl).create({ url: `${user.storageUrl}training/` });
+    }
+
+    const newTraining = trainingList.relatedTraining.create(training);
+    return newTraining;
+}
+
+export async function performReferenceCreation(reference) {
+    if (!referenceList) {
+        referenceList = await ReferenceList.at(user.storageUrl).create({ url: `${user.storageUrl}references/` });
+    }
+
+    const newReference = referenceList.relatedReference.create(reference);
+    return newReference;
+}
+
+// Loading
 export async function loadInformation() {
     infoList = await InformationList.find(`${user.storageUrl}information/`);
 
@@ -130,16 +141,176 @@ export async function loadInformation() {
     return infoList.information;
 }
 
-export async function performUpdateFullName(infoUrl, inputName) {
-    const info = infoList?.information.find((info) => info.url === infoUrl);
+export async function loadExperience() {
+    experienceList = await ExperienceList.find(`${user.storageUrl}experience/`);
 
-    await info.update({ FullName: inputName });
+    if (!experienceList) {
+        return [];
+    }
+
+    await experienceList.loadRelation('experience');
+
+    return experienceList.experience;
 }
 
+export async function loadProject() {
+    projectList = await ProjectList.find(`${user.storageUrl}projects/`);
+
+    if (!projectList) {
+        return [];
+    }
+
+    await projectList.loadRelation('projects');
+
+    return projectList.projects;
+}
+
+export async function loadAward() {
+    awardList = await AwardList.find(`${user.storageUrl}awards/`);
+
+    if (!awardList) {
+        return [];
+    }
+
+    await awardList.loadRelation('award');
+
+    return awardList.award;
+}
+
+export async function loadTraining() {
+    trainingList = await TrainingList.find(`${user.storageUrl}training/`);
+
+    if (!trainingList) {
+        return [];
+    }
+
+    await trainingList.loadRelation('training');
+
+    return trainingList.training;
+}
+
+export async function loadReference() {
+    referenceList = await ReferenceList.find(`${user.storageUrl}references/`);
+
+    if (!referenceList) {
+        return [];
+    }
+
+    await referenceList.loadRelation('reference');
+
+    return referenceList.reference;
+}
+
+// Updating Information
+export async function performUpdateInformation(infoUrl, inputInfo) {
+    const info = infoList?.information.find((info) => info.url === infoUrl);
+
+    await info.update({ FullName: inputInfo.FullName
+        , ProfessionalTitle: inputInfo.ProfessionalTitle
+        , Summary: inputInfo.Summary
+        , Email: inputInfo.Email
+        , ContactNumber: inputInfo.ContactNumber
+        , Location: inputInfo.Location
+        , WebsiteLink: inputInfo.WebsiteLink
+        , ProfessionalSummary: inputInfo.ProfessionalSummary
+        , School: inputInfo.School
+        , Degree: inputInfo.Degree
+        , Program: inputInfo.Program
+        , StartDate: inputInfo.StartDate
+        , EndDate: inputInfo.EndDate
+        , RelevantCoursework: inputInfo.RelevantCoursework
+        , Honors: inputInfo.Honors
+        , ThesisTitle: inputInfo.ThesisTitle
+     });
+}
+
+
+export async function performUpdateExperience(expUrl, inputExp) {
+    const exp = experienceList?.experience.find((exp) => exp.url === expUrl);
+
+    await exp.update({ 
+        PositionTitle: inputExp.PositionTitle,
+        Organization: inputExp.Organization,
+        Duration: inputExp.Duration,
+        Description: inputExp.Description
+     });
+}
+
+export async function performUpdateProject(projectUrl, inputProject) {
+    const proj = projectList?.projects.find((project) => project.url === projectUrl);
+
+    await proj.update({ 
+        ProjectName: inputProject.ProjectName,
+        Tools: inputProject.Tools,
+        Summary: inputProject.ProjectSummary,
+        ProjectLink: inputProject.ProjectLink
+     });
+}
+
+export async function performUpdateAward(awardUrl, inputAward) {
+    const award = awardList?.award.find((award) => award.url === awardUrl);
+
+    await award.update({ 
+        AwardTitle: inputAward.AwardTitle,
+        Date: inputAward.Date,
+        Organization: inputAward.Organization
+     });
+}
+
+export async function performUpdateTraining(trainingUrl, inputTraining) {
+    const training = trainingList?.training.find((training) => training.url === trainingUrl);
+
+    await training.update({ 
+        TrainingTitle: inputTraining.TrainingTitle,
+        Organization: inputTraining.Organization,
+        YearEarned: inputTraining.YearEarned,
+        YearExpire: inputTraining.YearExpire
+     });
+}
+
+export async function performUpdateReference(referenceUrl, inputReference) {
+    const reference = referenceList?.reference.find((reference) => reference.url === referenceUrl);
+
+    await reference.update({ 
+        Name: inputReference.Name,
+        Position: inputReference.Position,
+        Email: inputReference.Email,
+        ContactNumber: inputReference.ContactNumber
+     });
+}
+
+// Deletion
 export async function performInformationDeletion(infoUrl) {
     await infoList?.relatedInformation.delete(infoUrl);
     alert('Information deleted successfully. Please refresh the page to see the changes.');
 }
+
+export async function performExperienceDeletion(expUrl) {
+    await experienceList?.relatedExperience.delete(expUrl);
+    alert('Experience deleted successfully. Please refresh the page to see the changes.');
+}
+
+export async function performProjectDeletion(projectUrl) {
+    await projectList?.relatedProjects.delete(projectUrl);
+    alert('Project deleted successfully. Please refresh the page to see the changes.');
+}
+
+export async function performAwardDeletion(awardUrl) {
+    await awardList?.relatedAward.delete(awardUrl);
+    alert('Award deleted successfully. Please refresh the page to see the changes.');
+}
+
+export async function performTrainingDeletion(trainingUrl) {
+    await trainingList?.relatedTraining.delete(trainingUrl);
+    alert('Training deleted successfully. Please refresh the page to see the changes.');
+}
+
+export async function performReferenceDeletion(referenceUrl) {
+    await referenceList?.relatedReference.delete(referenceUrl);
+    alert('Reference deleted successfully. Please refresh the page to see the changes.');
+}
+
+
 
 export function getAuthenticatedFetch() {
     return fetch;
