@@ -36,6 +36,44 @@ export default class PersonalInformation extends SolidModel {
             required: true,
             type: FieldType.String,
         },
+        ProfessionalSummary: {
+            required: false,
+            type: FieldType.String,
+        },
+
+        School: {
+            required: true,
+            type: FieldType.String,
+        },
+        Degree: {
+            required: true,
+            type: FieldType.String,
+        },
+        Program: {
+            required: true,
+            type: FieldType.String,
+        },
+        StartDate: {
+            required: true,
+            type: FieldType.String,
+        },
+        EndDate: {
+            required: true,
+            type: FieldType.String,
+        },
+        RelevantCoursework: {
+            required: false,
+            type: FieldType.String,
+        },
+        Honors: {
+            required: false,
+            type: FieldType.String,
+        },
+        ThesisTitle: {
+            required: false,
+            type: FieldType.String,
+        },
+
     };
 
 }

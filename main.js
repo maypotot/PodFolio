@@ -78,8 +78,17 @@ async function createInformation() {
     const ContactNumber = document.getElementById('ContactNumber').value;
     const Location = document.getElementById('Location').value;
     const WebsiteLink = document.getElementById('WebsiteLink').value;
+    const ProfessionalSummary = document.getElementById('ProfessionalSummary').value;
+    const School = document.getElementById('School').value;
+    const Degree = document.getElementById('Degree').value;
+    const Program = document.getElementById('Program').value;
+    const StartDate = document.getElementById('StartDate').value;
+    const EndDate = document.getElementById('EndDate').value;
+    const RelevantCoursework = document.getElementById('RelevantCoursework').value;
+    const Honors = document.getElementById('Honors').value;
+    const ThesisTitle = document.getElementById('ThesisTitle').value;
 
-    if (!FullName || !ProfessionalTitle || !Summary || !Email || !ContactNumber || !Location || !WebsiteLink) {
+    if (!FullName || !ProfessionalTitle || !Summary || !Email || !ContactNumber || !Location || !WebsiteLink || !School || !Degree || !Program || !StartDate || !EndDate) {
         alert('Please fill in all fields');
         return;
     }
@@ -91,7 +100,16 @@ async function createInformation() {
         Email,
         ContactNumber,
         Location,
-        WebsiteLink
+        WebsiteLink,
+        ProfessionalSummary,
+        School,
+        Degree,
+        Program,
+        StartDate,
+        EndDate,
+        RelevantCoursework,
+        Honors,
+        ThesisTitle
     });
 
     appendInformation(information);
@@ -171,6 +189,20 @@ function appendInformation(info) {
         <span>${info.ContactNumber}</span>
         <span>${info.Location}</span>
         <span>${info.WebsiteLink}</span>
+
+        <h4>Professional Summary</h4>
+        <span>${info.ProfessionalSummary}</span>
+
+
+        <h4>Education</h4>
+        <span>${info.School}</span>
+        <span>${info.Degree}</span>
+        <span>${info.Program}</span>
+        <span>${info.StartDate}</span>
+        <span>${info.EndDate}</span>
+        <span>${info.RelevantCoursework}</span>
+        <span>${info.Honors}</span>
+        <span>${info.ThesisTitle}</span>
     `;
 
     document.getElementById('information').appendChild(infoItem);
