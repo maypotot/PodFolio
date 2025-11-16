@@ -1,4 +1,5 @@
 import { fetch, getDefaultSession, handleIncomingRedirect, login, logout } from '@inrupt/solid-client-authn-browser';
+import { saveFileInContainer, getSourceUrl, getFile} from "@inrupt/solid-client";
 
 import User from './User';
 import InformationList from './InformationList';
@@ -6,7 +7,9 @@ import ExperienceList from './ExperienceList';
 import ProjectList from './ProjectList';
 import AwardList from './AwardList';
 import TrainingList from './TrainingList';
-import ReferenceList from './ReferenceList'
+import ReferenceList from './ReferenceList';
+import ImageList from './ImageList';
+
 
 let list, user;
 let infoList;
@@ -15,6 +18,7 @@ let projectList;
 let awardList;
 let trainingList;
 let referenceList;
+let imageList;
 
 export async function restoreSession() {
     // This function uses Inrupt's authentication library to restore a previous session. If you were
@@ -128,6 +132,35 @@ export async function performReferenceCreation(reference) {
     return newReference;
 }
 
+async function uploadImage(file) {
+  try {
+    const savedFile = await saveFileInContainer(
+      `${user.storageUrl}images/`,           // Container URL
+      file,                         // File 
+      { slug: file.name, contentType: file.type, fetch: fetch }
+    );
+    console.log(`File saved at ${getSourceUrl(savedFile)}`);
+    return getSourceUrl(savedFile);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function performImageCreation(image) {
+    if (!imageList) {
+        imageList = await ImageList.at(user.storageUrl).create({ url: `${user.storageUrl}images/` });
+    }
+    const imageUrl = await uploadImage(image)
+    alert("Image created successfully");
+
+    const returnFile = await getFile(
+      imageUrl,               // File in Pod to Read
+      { fetch: fetch }       // fetch from authenticated session
+    );
+
+    return returnFile;
+}
+
 // Loading
 export async function loadInformation() {
     infoList = await InformationList.find(`${user.storageUrl}information/`);
@@ -199,6 +232,18 @@ export async function loadReference() {
     await referenceList.loadRelation('reference');
 
     return referenceList.reference;
+}
+
+
+export async function loadImage() {
+    imageList = await ImageList.find(`${user.storageUrl}images/`);
+
+    if (!imageList) {
+        return [];
+    }
+
+    await imageList.loadRelation('image');
+    return imageList.image;
 }
 
 // Updating Information
@@ -279,6 +324,14 @@ export async function performUpdateReference(referenceUrl, inputReference) {
      });
 }
 
+export async function performUpdateImage(imageUrl, inputImage) {
+    const image = imageList?.image.find((image) => image.url === imageUrl);
+
+    await image.update({ 
+        Link: inputImage.Link,
+     });
+}
+
 // Deletion
 export async function performInformationDeletion(infoUrl) {
     await infoList?.relatedInformation.delete(infoUrl);
@@ -308,6 +361,11 @@ export async function performTrainingDeletion(trainingUrl) {
 export async function performReferenceDeletion(referenceUrl) {
     await referenceList?.relatedReference.delete(referenceUrl);
     alert('Reference deleted successfully. Please refresh the page to see the changes.');
+}
+
+export async function performImageDeletion(imageUrl) {
+    await imageList?.relatedImage.delete(imageUrl);
+    alert('Image deleted successfully. Please refresh the page to see the changes.');
 }
 
 

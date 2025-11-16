@@ -12,6 +12,7 @@
     "vite": "^7.1.7"
   },
   "dependencies": {
+    "@inrupt/solid-client": "^3.0.0",
     "@inrupt/solid-client-authn-browser": "^3.1.0",
     "soukai": "^0.6.2",
     "soukai-solid": "^0.6.2"

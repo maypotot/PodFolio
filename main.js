@@ -30,7 +30,12 @@ import {
     performReferenceCreation,
     performReferenceDeletion,
     performUpdateReference,
-    loadReference
+    loadReference,
+    performImageCreation,
+    performUpdateImage,
+    performImageDeletion,
+    loadImage,
+    
 } from './solid';
 
 async function main() {
@@ -85,6 +90,11 @@ async function main() {
 
     for (const reference of references) {
         appendReference(reference);
+    }
+    
+    const images = await loadImage();
+    for (const image of images) {
+        appendImage(image);
     }
 }
 
@@ -253,6 +263,21 @@ async function createReference() {
     });
 
     appendReference(reference);
+}
+
+
+async function createImage() {
+    const fileInput = document.getElementById('ImageFile');
+    const File = fileInput.files[0];
+
+    if (!File) {
+        alert('Please fill in all fields');
+        return;
+    }
+
+    const image = await performImageCreation(File);
+
+    appendImage(image);
 }
 
 function appendInformation(info) {
@@ -491,6 +516,13 @@ function appendReference(reference) {
     document.getElementById('references').appendChild(referenceItem);
 }
 
+function appendImage(image) {
+
+    const imageDisplay = document.getElementById('imageDisplay');
+    imageDisplay.src = URL.createObjectURL(image);
+    imageDisplay.style.display = 'block';
+}
+
 
 function updateInformation(infoUrl) {
     const FullName = document.getElementById('FullName').value;
@@ -608,6 +640,15 @@ function updateReference(referenceUrl) {
     alert("Reference has been updated. Please refresh to see changes.")
 }
 
+
+function updateImage(imageUrl) {
+    const ImageLink = document.getElementById('ImageLink').value;
+    performUpdateImage(imageUrl, {
+        Link: ImageLink,
+    });
+    alert("Image has been updated. Please refresh to see changes.")
+}
+
 function deleteInformation(infoUrl) {
     performInformationDeletion(infoUrl);
 }
@@ -632,6 +673,10 @@ function deleteReference(referenceUrl) {
     performReferenceDeletion(referenceUrl);
 }
 
+function deleteImage(imageUrl) {
+    performImageDeletion(imageUrl);
+}
+
 main();
 
 window.login = login;
@@ -654,4 +699,7 @@ window.deleteTraining = deleteTraining;
 window.createReference = createReference;
 window.updateReference = updateReference;
 window.deleteReference = deleteReference;
+window.createImage = createImage;
+window.updateImage = updateImage;
+window.deleteImage = deleteImage;
 window.onunhandledrejection = (error) => alert(`Error: ${error.reason?.message}`);
