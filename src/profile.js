@@ -2,22 +2,23 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./main.css"; 
 
-function HomeFeed() {
+function Profile() {
   return (
     <main className= "homefeed">
       <header className = "app-header">
         <div className="header-section">
             <Link to="/homefeed">
-              <img src="/logo.png" alt="App Logo" className="header-logo" />
+            <img src="/logo.png" alt="App Logo" className="header-logo" />
             </Link>
-          <input
-              type="text"
-              placeholder="Search jobs..."
-              className = "search-input"
-            />
-          <button className="search-button">
-              Search
-          </button>
+                <input
+                    type="text"
+                    placeholder="Search jobs..."
+                    className = "search-input"
+                  />
+                <button className="search-button">
+                    Search
+                </button>
+            
         </div>
         <div className="header-section">
             <img src="/Spongebob.webp" alt="User Avatar" className="avatar-icon"/>
@@ -37,7 +38,7 @@ function HomeFeed() {
           </div>
           <div className="left-panel-section">
             <h3>Explore panel</h3>
-            <Link className= "panel-options" to="/profile">
+            <Link className= "panel-options" to="/homefeed">
                 <button className="panel-buttons">
                   <img src="/user.png" alt="user" className="button-icons-black"/> 
                 </button>
@@ -68,19 +69,25 @@ function HomeFeed() {
           </div>
         </div>
         <div className="main-feed">
-            <h1>Job Listings</h1>
+            <div className="profile-details">
+                <h1>Profile</h1>
+                <img src="/Spongebob.webp" alt="User Avatar" className="profile-picture"/>
+                <h5>Spongebob Squarepants</h5>
+                <p>BS Computer Science at University of the Philippines Diliman</p>
+            </div>
+            <div className="tags-section">
+                <div className="tag-group">
+                    <div className="tag-header">
+                        <h3 className="tag-title">Resumes</h3>
+                        <Link to="/create-resume">
+                        <button className="add-tag-button">+ Add Resume</button>
+                        </Link>
+                    </div>
+                    <div className="tag-list">
+                        <p className="tag-item">Web Development.<img src="/pencil.png" alt="edit" className="edit-icon"></img></p>
+                    </div>
 
-            <div className="job-listing">
-              <img src="/Figma.png" alt="Figma logo" className="company-image"/>
-
-              <div className="job-info">
-                <h2>Software Engineer</h2>
-                <h4>Figma</h4>
-                <p className="job-description">Build core features for Figma’s collaborative design platform and help deliver fast, reliable, user-focused experiences across the web.</p>
-                <Link to="#" className="apply-link">Apply Now</Link>
-
-              </div>
-
+                </div>
             </div>
         </div>
     
@@ -89,5 +96,5 @@ function HomeFeed() {
   );
 }
 
-export default HomeFeed;
+export default Profile;
 

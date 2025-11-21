@@ -2,7 +2,12 @@ import { useState } from "react";
 import "./App.css";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import HomeFeed from "./homefeed";
+import Profile from "./profile";
+import CreateResume from "./create_resume";
+import ViewResume from "./view_resume";
+
 import { useNavigate } from "react-router-dom";
+
 
 function Home() {
   return (
@@ -74,6 +79,9 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/homefeed" element={<HomeFeed />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/create-resume" element={<CreateResume/>}/>
+        <Route path="/view-resume" element={<ViewResume/>}/>
       </Routes>
     </Router>
   )
