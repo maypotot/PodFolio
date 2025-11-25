@@ -12,11 +12,11 @@ export default class Project extends SolidModel {
             required: true,
             type: FieldType.String,
         },
-        Tools: {
+        Summary: {
             required: true,
             type: FieldType.String,
         },
-        Summary: {
+        Tools: {
             required: true,
             type: FieldType.String,
         },

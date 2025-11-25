@@ -1,5 +1,5 @@
 import { fetch, getDefaultSession, handleIncomingRedirect, login, logout } from '@inrupt/solid-client-authn-browser';
-import { saveFileInContainer, getSourceUrl, getFile} from "@inrupt/solid-client";
+import { saveFileInContainer, getSourceUrl, getFile, getSolidDataset, getThingAll, removeThing, deleteFile} from "@inrupt/solid-client";
 
 import User from './User';
 import InformationList from './InformationList';
@@ -150,15 +150,24 @@ export async function performImageCreation(image) {
     if (!imageList) {
         imageList = await ImageList.at(user.storageUrl).create({ url: `${user.storageUrl}images/` });
     }
+    
+    
     const imageUrl = await uploadImage(image)
     alert("Image created successfully");
+    
+    let myImageList = await getSolidDataset(`${user.storageUrl}images/`, { fetch: fetch });
+    let items = getThingAll(myImageList);
+    let itemListPromises = [];
 
-    const returnFile = await getFile(
-      imageUrl,               // File in Pod to Read
-      { fetch: fetch }       // fetch from authenticated session
-    );
+    items.forEach( (item) => {
+        itemListPromises.push(getFile(item.url, { fetch: fetch }))
+        // deleteFile(item.url, { fetch: fetch})
+    });
 
-    return returnFile;
+    const itemList = await Promise.all(itemListPromises);
+
+    return itemList
+
 }
 
 // Loading
@@ -363,9 +372,20 @@ export async function performReferenceDeletion(referenceUrl) {
     alert('Reference deleted successfully. Please refresh the page to see the changes.');
 }
 
-export async function performImageDeletion(imageUrl) {
-    await imageList?.relatedImage.delete(imageUrl);
-    alert('Image deleted successfully. Please refresh the page to see the changes.');
+export async function performImageDeletion() {
+    
+    
+    let myImageList = await getSolidDataset(`${user.storageUrl}images/`, { fetch: fetch });
+    let items = getThingAll(myImageList);
+    items.shift();
+    let itemListPromises = [];
+
+    items.forEach( (item) => {
+        // itemListPromises.push(getFile(item.url, { fetch: fetch }))
+        deleteFile(item.url, { fetch: fetch})
+    });
+
+
 }
 
 

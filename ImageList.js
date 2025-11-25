@@ -1,9 +1,9 @@
 import { SolidContainer } from 'soukai-solid';
 
-import Image from './Image';
+import ImageModel from './Image';
 
 export default class ImageList extends SolidContainer {
     imageRelationship() {
-        return this.contains(Image);
+        return this.contains(ImageModel);
     }
 }

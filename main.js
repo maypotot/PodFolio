@@ -1,5 +1,6 @@
 import { bootSolidModels, SolidEngine } from 'soukai-solid';
 import { setEngine } from 'soukai';
+import { getPodUrlAll, getSolidDataset, getFile } from "@inrupt/solid-client";
 
 import {
     restoreSession,
@@ -37,6 +38,7 @@ import {
     loadImage,
     
 } from './solid';
+
 
 async function main() {
     bootSolidModels();
@@ -91,11 +93,7 @@ async function main() {
     for (const reference of references) {
         appendReference(reference);
     }
-    
-    const images = await loadImage();
-    for (const image of images) {
-        appendImage(image);
-    }
+
 }
 
 function login() {
@@ -185,7 +183,7 @@ async function createExperience() {
 
 async function createProject() {
     const ProjectName = document.getElementById('ProjectName').value;
-    const ProjectSummary = document.getElementById('ProjectSummary').value;
+    const Summary = document.getElementById('ProjectSummary').value;
     const Tools = document.getElementById('Tools').value;
     const ProjectLink = document.getElementById('ProjectLink').value;
 
@@ -196,7 +194,7 @@ async function createProject() {
 
     const project = await performProjectCreation({
         ProjectName,
-        ProjectSummary,
+        Summary,
         Tools,
         ProjectLink
     });
@@ -274,10 +272,8 @@ async function createImage() {
         alert('Please fill in all fields');
         return;
     }
-
-    const image = await performImageCreation(File);
-
-    appendImage(image);
+    const items = await performImageCreation(File)
+    appendImage(items)
 }
 
 function appendInformation(info) {
@@ -428,6 +424,7 @@ function appendAward(award) {
         </button>
         <br /> <br />
 
+        <h4>Award Title</h4>
         <span>${award.AwardTitle}</span><br /> <br />
 
         <h4>Date</h4>
@@ -516,11 +513,44 @@ function appendReference(reference) {
     document.getElementById('references').appendChild(referenceItem);
 }
 
-function appendImage(image) {
+async function appendImage(itemList) {
+    itemList.shift();
 
-    const imageDisplay = document.getElementById('imageDisplay');
-    imageDisplay.src = URL.createObjectURL(image);
-    imageDisplay.style.display = 'block';
+    let num = 0;
+    itemList.forEach((item) => {
+        
+        console.log(item);
+        const imageItem = document.createElement('li');
+        imageItem.innerHTML = `
+            <h3>Reference</h3>
+
+            <button
+                type="button"
+                onclick="deleteImage('${item.url}', this.parentElement, this)"
+            >
+                Delete
+            </button>
+            <br /> <br />
+            <img id="imageDisplay${num}" src="" alt="Uploaded Image" />
+
+        `;
+        document.getElementById('images').appendChild(imageItem);
+        const imageDisplay = document.getElementById(`imageDisplay${num}`);
+        imageDisplay.src = URL.createObjectURL(item);
+        imageDisplay.style.display = 'block';
+        num = num + 1;
+        console.log(num)
+    });
+
+
+
+    
+
+    
+
+
+
+    
 }
 
 
@@ -673,8 +703,8 @@ function deleteReference(referenceUrl) {
     performReferenceDeletion(referenceUrl);
 }
 
-function deleteImage(imageUrl) {
-    performImageDeletion(imageUrl);
+function deleteImage() {
+    performImageDeletion();
 }
 
 main();

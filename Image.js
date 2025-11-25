@@ -4,15 +4,14 @@ import { SolidModel } from 'soukai-solid';
 const STATUS_COMPLETED = 'https://schema.org/CompletedActionStatus';
 const STATUS_POTENTIAL = 'https://schema.org/PotentialActionStatus';
 
-export default class Image extends SolidModel {
+export default class ImageModel extends SolidModel {
     static rdfContext = 'https://schema.org/';
-    static rdfsClasses = ['schema:Image'];
+    static rdfProperty = 'schema:image';
 
     static fields = {
-        Link: {
+        ImageFile: {
             required: true,
             type: FieldType.Key,
-            rdfProperty: 'schema:image',
         },
     };
 
