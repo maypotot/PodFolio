@@ -22,9 +22,11 @@ function ViewResume() {
               </div>
               <div className="header-section">
                   <img src="/Spongebob.webp" alt="User Avatar" className="avatar-icon"/>
-                  <button className="header-buttons">
-                      <img src="/notifications-icon.png" alt="Notifications" className="button-icons"/>
-                  </button>
+                  <Link to="/in-perms">
+                    <button className="header-buttons">
+                        <img src="/notifications-icon.png" alt="Notifications" className="button-icons"/>
+                    </button>
+                  </Link>
                   <button className="header-buttons">
                       <img src="/settings-icon.png" alt="Settings" className="button-icons"/>
                   </button>
@@ -35,8 +37,10 @@ function ViewResume() {
         <div className="resume">
           <div className="tag-header">
             <h1>Resume Preview</h1>
+            <Link to="/config-perms">
+              <button className="complete-button">Configure Permissions</button>
+            </Link>
           </div>
-
             <h1 className="full-name">{resumeData.name}</h1>
 
           {/* Personal Information */}

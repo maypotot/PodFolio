@@ -5,6 +5,9 @@ import HomeFeed from "./homefeed";
 import Profile from "./profile";
 import CreateResume from "./create_resume";
 import ViewResume from "./view_resume";
+import ConfigPerms from "./config_perms";
+import InPerms from "./perms"
+import EmployerLogin from "./employer_login";
 
 import { useNavigate } from "react-router-dom";
 
@@ -21,7 +24,7 @@ function Home() {
           <button>Log In</button>
         </Link>
       </div>
-      <Link to="#">
+      <Link to="/employer-login">
         <p className="plink">Are you an employer? Sign up as an Employer</p>
       </Link>
     </main>
@@ -82,6 +85,9 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/create-resume" element={<CreateResume/>}/>
         <Route path="/view-resume" element={<ViewResume/>}/>
+        <Route path="/in-perms" element={<InPerms/>}/>
+        <Route path="/config-perms" element={<ConfigPerms/>}/>
+        <Route path="/employer-login" element={<EmployerLogin/>}/>
       </Routes>
     </Router>
   )

@@ -21,9 +21,11 @@ function HomeFeed() {
         </div>
         <div className="header-section">
             <img src="/Spongebob.webp" alt="User Avatar" className="avatar-icon"/>
-            <button className="header-buttons">
-                <img src="/notifications-icon.png" alt="Notifications" className="button-icons"/>
-            </button>
+            <Link to="/in-perms">
+                                <button className="header-buttons">
+                                    <img src="/notifications-icon.png" alt="Notifications" className="button-icons"/>
+                                </button>
+                              </Link>
             <button className="header-buttons">
                 <img src="/settings-icon.png" alt="Settings" className="button-icons"/>
             </button>
