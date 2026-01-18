@@ -2,6 +2,28 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./main.css"; 
 
+import { restoreSession } from "./solid.js";
+
+import { 
+  loadInformation,
+  loadAward,
+  loadExperience,
+  loadImage,
+  loadReference,
+  loadProject,
+  loadTraining,
+ } from "./solid.js";
+
+import { 
+  createInformation,
+  createWebsite,
+  createProject,
+  createExperience,
+  createSkill,
+ } from "./main.js";
+ 
+const user = await restoreSession();
+
 function CreateResume() {
   return (
     <main className= "create-resume">
@@ -34,7 +56,7 @@ function CreateResume() {
             <div className="tag-header">
               <h1>New Resume</h1>
               <Link to="/view-resume"> 
-              <button className="complete-button">Complete Resume</button>
+              <button className="complete-button" onClick={createInformation}>Complete Resume</button>
               </Link>
             </div>
             <div className="tags-section">
@@ -48,6 +70,28 @@ function CreateResume() {
                     type="text"
                     placeholder="Juan de la Cruz"
                     className = "resume-input"
+                    id = "FullName"
+                  />
+                </div>
+                
+                <div className="resume-field">
+                  <h3 className="tag-title">Professional Title</h3>
+                  <input
+                    type="text"
+                    placeholder="Dr."
+                    className = "resume-input"
+                    id = "ProfessionalTitle"
+                  />
+                </div>
+
+                <div className="resume-field">
+                  <h3 className="tag-title">Summary</h3>
+                  <textarea
+                    type="text"
+                    placeholder="Summary of your profile"
+                    className = "resume-input"
+                      rows={5}
+                    id = "Summary"
                   />
                 </div>
 
@@ -57,6 +101,7 @@ function CreateResume() {
                     type="text"
                     placeholder="juandelacruz@gmail.com"
                     className = "resume-input"
+                    id = "Email"
                   />
                 </div>
 
@@ -64,8 +109,9 @@ function CreateResume() {
                   <h3 className="tag-title">Contact Number</h3>
                   <input
                     type="text"
-                    placeholder="09998887777"
+                    placeholder="09171234567"
                     className = "resume-input"
+                    id = "ContactNumber"
                   />
                 </div>
 
@@ -75,6 +121,7 @@ function CreateResume() {
                     type="text"
                     placeholder="Quezon City, Philippines"
                     className = "resume-input"
+                    id = "Location"
                   />
                 </div>
 
@@ -84,16 +131,20 @@ function CreateResume() {
                     type="text"
                     placeholder="github.com"
                     className = "resume-input"
+                    id = "WebsiteLink"
                   />
-                  <input
+                  <button className="add-tag-button" onClick={createWebsite}> Add Website</button>
+                </div>
+
+                
+                <div className="resume-field">
+                  <h3 className="tag-title">Professional Summary</h3>
+                  <textarea
                     type="text"
-                    placeholder="facebook.com"
+                    placeholder="Professional summary goes here"
                     className = "resume-input"
-                  />
-                  <input
-                    type="text"
-                    placeholder="linkedin.com"
-                    className = "resume-input"
+                      rows={5}
+                    id = "ProfessionalSummary"
                   />
                 </div>
 
@@ -103,22 +154,65 @@ function CreateResume() {
                 <h2>Education</h2>
 
                 <div className="resume-field">
-                  <h3 className="tag-title">Degree</h3>
-                  <input
-                    type="text"
-                    placeholder="BS Computer Science"
-                    className = "resume-input"
-                  />
-                </div>
-
-                <div className="resume-field">
                   <h3 className="tag-title">Academic Institution</h3>
                   <input
                     type="text"
                     placeholder="University of the Philippines Diliman"
                     className = "resume-input"
+                    id = "School"
                   />
                 </div>
+
+                <div className="resume-field">
+                  <h3 className="tag-title">Degree</h3>
+                  <input
+                    type="text"
+                    placeholder="BS Computer Science"
+                    className = "resume-input"
+                    id = "Degree"
+                  />
+                </div>
+
+                <div className="resume-field">
+                  <h3 className="tag-title">Program</h3>
+                  <input
+                    type="text"
+                    placeholder="BS Computer Science"
+                    className = "resume-input"
+                    id = "Program"
+                  />
+                </div>
+                
+                <div className="resume-field">
+                  <h3 className="tag-title">Start Date</h3>
+                  <input
+                    type="text"
+                    placeholder="January 2016"
+                    className = "resume-input"
+                    id = "StartDate"
+                  />
+                </div>
+
+                <div className="resume-field">
+                  <h3 className="tag-title">End Date</h3>
+                  <input
+                    type="text"
+                    placeholder="January 2020"
+                    className = "resume-input"
+                    id = "EndDate"
+                  />
+                </div>
+                
+                <div className="resume-field">
+                  <h3 className="tag-title">Relevant Coursework</h3>
+                  <input
+                    type="text"
+                    placeholder="Link to coursework or list here"
+                    className = "resume-input"
+                    id = "RelevantCoursework"
+                  />
+                </div>
+
 
                 <div className="resume-field">
                   <h3 className="tag-title">Honors/Awards</h3>
@@ -126,6 +220,17 @@ function CreateResume() {
                     type="text"
                     placeholder="Summa Cum Laude"
                     className = "resume-input"
+                    id = "Honors"
+                  />
+                </div>
+
+                <div className="resume-field">
+                  <h3 className="tag-title">Thesis Title</h3>
+                  <input
+                    type="text"
+                    placeholder="Title of your thesis"
+                    className = "resume-input"
+                    id = "ThesisTitle"
                   />
                 </div>
 
@@ -135,19 +240,10 @@ function CreateResume() {
                     type="text"
                     placeholder="Javascript"
                     className = "skills-input"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Phython"
-                    className = "skills-input"
-                  />
-                  <input
-                    type="text"
-                    placeholder="SQL"
-                    className = "skills-input"
+                    id = "Skill"
                   />
 
-                  <button className="add-tag-button"> Add Skill</button>
+                  <button className="add-tag-button" onClick={createSkill}> Add Skill</button>
                 </div>
 
               </div>
@@ -157,7 +253,7 @@ function CreateResume() {
                 <h2>Projects</h2>
 
                 <div className="projects">
-                  <h3 className="project-list">Project 1</h3>
+                  <h3 className="project-list">Project</h3>
 
                   <div className="resume-field">
                     <h3 className="tag-title">Project Title</h3>
@@ -165,15 +261,17 @@ function CreateResume() {
                       type="text"
                       placeholder="Snake Game"
                       className = "resume-input"
+                      id = "ProjectName"
                     />
                   </div>
 
                   <div className="resume-field">
-                    <h3 className="tag-title">Date Created</h3>
+                    <h3 className="tag-title">Tools</h3>
                     <input
                       type="text"
-                      placeholder="May 2022"
+                      placeholder="Python, React"
                       className = "resume-input"
+                      id = "Tools"
                     />
                   </div>
 
@@ -183,40 +281,24 @@ function CreateResume() {
                       placeholder="Insert project Description here"
                       className="resume-description"
                       rows={5}
+                      id = "ProjectSummary"
                     />
                   </div>
-                </div>
-
-                <div className="projects">
-                  <h3 className="project-list">Project 2</h3>
-
+                  
                   <div className="resume-field">
-                    <h3 className="tag-title">Project Title</h3>
-                    <input
-                      type="text"
-                      placeholder="Snake Game"
-                      className = "resume-input"
-                    />
-                  </div>
-
-                  <div className="resume-field">
-                    <h3 className="tag-title">Date Created</h3>
-                    <input
-                      type="text"
-                      placeholder="May 2022"
-                      className = "resume-input"
-                    />
-                  </div>
-
-                  <div className="resume-field">
-                    <h3 className="tag-title">Project Description</h3>
+                    <h3 className="tag-title">Project Link</h3>
                     <textarea
-                      placeholder="Insert project Description here"
+                      placeholder="Insert project Link here"
                       className="resume-description"
                       rows={5}
+                      id = "ProjectLink"
                     />
                   </div>
+                  
+                  <button className="add-tag-button" onClick={createProject}> Add Project</button>
+
                 </div>
+
 
               </div>
 
@@ -224,7 +306,7 @@ function CreateResume() {
                 <h2>Experience</h2>
 
                 <div className="projects">
-                  <h3 className="project-list">Experience 1</h3>
+                  <h3 className="project-list">Experience</h3>
 
                   <div className="resume-field">
                     <h3 className="tag-title">Job Title</h3>
@@ -232,6 +314,7 @@ function CreateResume() {
                       type="text"
                       placeholder="Project Manager"
                       className = "resume-input"
+                      id = "PositionTitle"
                     />
                   </div>
 
@@ -241,6 +324,7 @@ function CreateResume() {
                       type="text"
                       placeholder="May 2022 - December 2022"
                       className = "resume-input"
+                      id = "Duration"
                     />
                   </div>
 
@@ -250,6 +334,7 @@ function CreateResume() {
                       type="text"
                       placeholder="Accenture"
                       className = "resume-input"
+                      id = "Organization"
                     />
                   </div>
 
@@ -259,6 +344,7 @@ function CreateResume() {
                       type="text"
                       placeholder="Quezon City"
                       className = "resume-input"
+                      id= "ExperienceLocation"
                     />
                   </div>
 
@@ -268,57 +354,10 @@ function CreateResume() {
                       placeholder="Insert responsibilities and accomplishments here"
                       className="resume-description"
                       rows={5}
+                      id = "Description"
                     />
                   </div>
-                </div>
-
-                <div className="projects">
-                  <h3 className="project-list">Experience 2</h3>
-
-                  <div className="resume-field">
-                    <h3 className="tag-title">Job Title</h3>
-                    <input
-                      type="text"
-                      placeholder="Project Manager"
-                      className = "resume-input"
-                    />
-                  </div>
-
-                  <div className="resume-field">
-                    <h3 className="tag-title">Duration</h3>
-                    <input
-                      type="text"
-                      placeholder="May 2022 - December 2022"
-                      className = "resume-input"
-                    />
-                  </div>
-
-                  <div className="resume-field">
-                    <h3 className="tag-title">Company Name</h3>
-                    <input
-                      type="text"
-                      placeholder="Accenture"
-                      className = "resume-input"
-                    />
-                  </div>
-
-                  <div className="resume-field">
-                    <h3 className="tag-title">Location</h3>
-                    <input
-                      type="text"
-                      placeholder="Quezon City"
-                      className = "resume-input"
-                    />
-                  </div>
-
-                  <div className="resume-field">
-                    <h3 className="tag-title">Responsibilities/Accomplishments</h3>
-                    <textarea
-                      placeholder="Insert responsibilities and accomplishments here"
-                      className="resume-description"
-                      rows={5}
-                    />
-                  </div>
+                  <button className="add-tag-button" onClick={createExperience}> Add Experience</button>
                 </div>
 
               </div>

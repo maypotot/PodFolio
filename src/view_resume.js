@@ -1,9 +1,89 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import resumeData from "./sample_resume.json"; // import the JSON file
 import "./main.css";
 
+import { 
+  loadInformation,
+  loadAward,
+  loadExperience,
+  loadImage,
+  loadReference,
+  loadProject,
+  loadTraining,
+  loadWebsite,
+  loadSkill
+ } from "./solid.js";
+import { 
+  appendInformation,
+  appendAward,
+  appendExperience,
+  appendReference,
+  appendProject,
+  appendTraining
+ } from "./main.js";
+
+async function loadResumeData() {
+  const information = await loadInformation();
+
+
+  const info = information[0];
+
+
+  
+  let fullname = document.getElementById('FullName');
+  let title = document.getElementById('ProfessionalTitle');
+  let summary = document.getElementById('Summary');
+  let email = document.getElementById('Email');
+  let contact = document.getElementById('ContactNumber');
+  let location = document.getElementById('Location'); 
+  let profsummary = document.getElementById('ProfessionalSummary');
+  let school = document.getElementById('School');
+  let degree = document.getElementById('Degree');
+  let honors = document.getElementById('Honors');
+  let program = document.getElementById('Program');
+  let startdate = document.getElementById('StartDate');
+  let enddate = document.getElementById('EndDate');
+  let coursework = document.getElementById('RelevantCourseWork');
+  let thesistitle = document.getElementById('ThesisTitle');
+  
+  
+  
+  
+  fullname.textContent = info.FullName;
+  title.textContent = "Professional Title: " + info.ProfessionalTitle;
+  summary.textContent = "Summary: " + info.Summary;
+  email.textContent = "Email: " + info.Email;
+  contact.textContent = "Contact Number: " + info.ContactNumber;
+  location.textContent = "Location: " + info.Location;
+  profsummary.textContent = "Professional Summary: " + info.ProfessionalSummary;
+  school.textContent = "Institution: " + info.School;
+  degree.textContent = "Degree: " + info.Degree;
+  honors.textContent = "Honors: " + info.Honors;
+  program.textContent = "Program: " + info.Program;
+  startdate.textContent = "Start Date: " + info.StartDate;
+  enddate.textContent = "End Date: " + info.EndDate;
+  coursework.textContent = "Relevant Course Work: " + info.RelevantCourseWork;
+  thesistitle.textContent = "Thesis Title: " + info.ThesisTitle;
+
+
+  
+  const skills = await loadSkill();
+  
+  const skillsListElement = document.getElementById('SkillsList');
+  skillsListElement.innerHTML = ''; // Clear existing list items
+  for (const skill of skills) {
+    const listItem = document.createElement('li');
+    listItem.textContent = skill.Skill;
+    skillsListElement.appendChild(listItem);
+  }
+  alert("All info loaded.");
+
+}
+
+
 function ViewResume() {
+
   return (
     <main className="view-resume">
       <header className = "app-header">
@@ -37,36 +117,43 @@ function ViewResume() {
         <div className="resume">
           <div className="tag-header">
             <h1>Resume Preview</h1>
+            <button onClick={loadResumeData}>Reload Resume</button>
             <Link to="/config-perms">
               <button className="complete-button">Configure Permissions</button>
             </Link>
           </div>
-            <h1 className="full-name">{resumeData.name}</h1>
+            <h1 className="full-name" id="FullName">{resumeData.name}</h1>
 
           {/* Personal Information */}
           <div className="resume-section">
             <h2>Personal Information</h2>
-            <p><strong>Email:</strong> {resumeData.email}</p>
-            <p><strong>Contact Number:</strong> {resumeData.contact}</p>
-            <p><strong>Location:</strong> {resumeData.location}</p>
-            <p><strong>Websites:</strong> {resumeData.websites.join(", ")}</p>
+            <p id="ProfessionalTitle"></p>
+            <p id="Summary"></p>
+            <p id="Email"></p>
+            <p id="ContactNumber"></p>
+            <p id="Location"></p>
+            <p id="ProfessionalSummary"></p>
+            <p id="Websites"></p>
           </div>
 
           {/* Education */}
           <div className="resume-section">
             <h2>Education</h2>
-            <p><strong>Degree:</strong> {resumeData.education.degree}</p>
-            <p><strong>Institution:</strong> {resumeData.education.institution}</p>
-            <p><strong>Honors/Awards:</strong> {resumeData.education.honors}</p>
+            <p id="Degree"><strong>Degree:</strong> {resumeData.education.degree}</p>
+            <p id="School"><strong>Institution:</strong> {resumeData.education.institution}</p>
+            <p id="Honors"></p>
+            <p id="Program"></p>
+            <p id="StartDate"></p>
+            <p id="EndDate"></p>
+            <p id="RelevantCourseWork"></p>
+            <p id="ThesisTitle"></p>
           </div>
 
           {/* Skills */}
           <div className="resume-section">
             <h2>Skills</h2>
-            <ul>
-              {resumeData.skills.map((skill, index) => (
-                <li key={index}>{skill}</li>
-              ))}
+            <ul id="SkillsList">
+              
             </ul>
           </div>
 

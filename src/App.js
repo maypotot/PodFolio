@@ -11,6 +11,10 @@ import EmployerLogin from "./employer_login";
 
 import { useNavigate } from "react-router-dom";
 
+import { login } from "./main.js";
+import { restoreSession } from "./solid.js";
+
+const user = await restoreSession();
 
 function Home() {
   return (
@@ -20,9 +24,13 @@ function Home() {
         <Link to="/signup">
           <button>Sign Up</button>
         </Link>
-        <Link to="/login">
-          <button>Log In</button>
-        </Link>
+        { !user ? (
+          <button onClick={login}>Log In</button>
+        ) : (
+          <Link to="/homefeed">
+            <button>Go to Home</button>
+          </Link>
+        )}
       </div>
       <Link to="/employer-login">
         <p className="plink">Are you an employer? Sign up as an Employer</p>
