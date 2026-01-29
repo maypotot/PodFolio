@@ -1,0 +1,49 @@
+{
+  "name": "Juan de la Cruz",
+  "email": "juandelacruz@gmail.com",
+  "contact": "09998887777",
+  "location": "Quezon City, Philippines",
+  "websites": [
+    "github.com/juandelacruz",
+    "facebook.com/juandelacruz",
+    "linkedin.com/in/juandelacruz"
+  ],
+  "education": {
+    "degree": "BS Computer Science",
+    "institution": "University of the Philippines Diliman",
+    "honors": "Summa Cum Laude"
+  },
+  "skills": [
+    "JavaScript",
+    "Python",
+    "SQL"
+  ],
+  "projects": [
+    {
+      "title": "Snake Game",
+      "date": "May 2022",
+      "description": "A simple snake game built with JavaScript."
+    },
+    {
+      "title": "Personal Portfolio Website",
+      "date": "July 2022",
+      "description": "Developed a responsive personal portfolio site using React."
+    }
+  ],
+  "experience": [
+    {
+      "title": "Project Manager",
+      "duration": "May 2022 - December 2022",
+      "company": "Accenture",
+      "location": "Quezon City",
+      "responsibilities": "Managed a team of 5 developers, oversaw project timelines, and coordinated with stakeholders."
+    },
+    {
+      "title": "Software Engineer Intern",
+      "duration": "January 2022 - April 2022",
+      "company": "IBM",
+      "location": "Taguig",
+      "responsibilities": "Assisted in backend development using Python and SQL, wrote unit tests, and contributed to API design."
+    }
+  ]
+}

@@ -1,0 +1,491 @@
+
+button{
+  background-color: #5E8821;
+}
+
+button:hover{
+  background-color: #4CAF50;
+}
+.header-section{
+    display: flex;
+    align-items: center;
+    margin-right: 15px;
+}
+
+
+.header-logo{
+  height: 45px;
+}
+
+
+
+html, body {
+  height: 100vh;
+  width: 100vw;
+  padding: 0;
+  margin: 0 !important;
+  font-family: "Inter", sans-serif;
+  max-width: none;
+  justify-content: space-between;
+}
+
+
+
+.homefeed {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0 !important;
+  padding: 0;
+}
+
+
+.search-input {
+  width: 400px;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-left: 20px;
+}
+
+.resume-input {
+  width: 400px;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.skills-input {
+  width: 200px;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+
+.header-buttons {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background-color: #F0baba;
+  align-items: center;
+  display: flex;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    margin-left: 10px;
+}
+
+.panel-buttons {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background-color: #bae7f0;
+  align-items: center;
+  display: flex;
+    justify-content: center;
+    padding: 0;
+    border: none;
+}
+
+.search-button {
+        font-weight: bold;
+width: 70px;
+  height: 40px;
+  border-radius: 10px;
+  background-color: #F0baba;
+  align-items: center;
+  display: flex;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    margin-left: 10px;
+    color:black;
+}
+
+.button-icons{
+    height: 30px;
+    filter: invert(1);
+}
+
+.button-icons-black{
+    height: 20px;
+}
+
+.avatar-icon {
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+}
+
+.user-icon {
+    margin-top: 20px;
+    height: 100px;
+    width: 100px;
+    border-radius: 50%;
+    display: block;
+    margin: 0 auto;
+}
+
+.content {
+  width: 100%;
+  min-height: 92vh;
+  background-color: rgb(226, 226, 226);
+  display: flex;
+}
+
+.left-panel {
+    width: 15%;
+    height: 92vh;
+    background-color: #ffffff;
+    padding: 15px;
+    padding-top: 50px;
+    box-sizing: border-box;
+    margin: 0;
+    align-items: left;
+    display: flex;  
+    flex-direction: column  ;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    justify-content: space-between;
+}
+
+.user-name {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.app-header {
+  width: 100vw;
+  height: 8vh;
+  background-color: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 15px;
+  box-sizing: border-box;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.main-feed {
+    width: 90%;
+    margin-left: 3%;
+    margin-right: 3%;
+    margin-top: 3%;
+    padding: 30px;
+    padding-top: 0px;
+    display: inline;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+}
+
+.resume {
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 3%;
+    padding: 30px;
+    padding-top: 0px;
+    display: inline;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+}
+
+h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #B03232;
+}
+
+.full-name{
+  font-size: 2.3rem;
+  color: #000000;
+}
+
+.log-out-button {
+    color: black;
+    font-weight: bold;
+    width: auto;
+    padding: 10px;
+    height: 40px;
+    border-radius: 10px;
+    background-color: #F0baba;
+    align-items: center;
+    display: block;
+    justify-content: center;
+    border: none;
+    margin: 50px 0px;
+    font-style: normal;
+}
+
+a {
+    text-decoration: none;
+}
+
+h3 {
+  margin-top: 3vh;
+  font-size: 1rem;
+  color: #FF5A60
+}
+
+.panel-options {
+  color: black;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;   
+  gap: 10px;   
+}
+
+.job-listing {
+    border-radius: 20px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: rgba(169, 222, 249, 0.24);
+    display: flex;
+}
+
+.incoming-perms {
+    border-radius: 20px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: rgba(169, 222, 249, 0.24);
+    display: flex;
+}
+
+.company-image{
+    height: 100px;
+    border-radius: 20%;
+    margin-right: 20px;
+}
+
+h2 {
+    margin-top: 0%;
+    font-size: 1.5rem;
+    color: #333333;
+    margin-bottom: 0px;
+}
+
+h4 {
+    margin-top: 0;
+    font-size: 1rem;
+    font-weight: normal;
+    color: #555555;
+    margin-bottom: 10px;
+}
+
+h5 {
+    margin-top: 10px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #000000;
+    margin-bottom: 10px;
+}
+
+.job-description {
+    margin-top: 0;
+    font-size: 1rem;
+    color: #666666;
+    margin-bottom: 0;
+}
+
+.apply-link{
+  color: #1a73e8;
+  text-decoration: none;
+}
+
+.apply-link:hover {
+  text-decoration: underline;
+}
+
+.profile-picture {
+    height: 150px;
+    width: 150px;
+    border-radius: 50%;
+    margin: 0 auto;
+}
+
+.tags-section{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tag-group {
+    margin-top: 20px;
+    width: 40%;
+
+}
+
+.tag-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333333;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+.tag-header {
+    justify-content: space-between  ;
+    display: flex;
+}
+
+.add-tag-button {
+    width: 150px;
+    height: 40px;
+    padding: 10px 10px;
+}
+
+.config-button {
+    width: auto;
+    height: 40px;
+    text-align: center;
+    padding: 10px 10px;
+}
+
+.tag-item {
+    display: inline-block;
+    background-color: #e0e0e0;
+    width: auto;
+    border-radius: 8px;
+    padding: 10px 10px;
+    font-size: 0.9rem;
+    border: #484848 1px solid;
+}
+
+.edit-icon {
+    height: 15px;
+    margin-left: 10px;
+}
+
+.complete-button {
+    font-size: 1rem;
+    margin-top: 40px;
+    width: auto;
+    height: 50px;
+    padding: 10px 10px;
+}
+
+.resume-section {
+  margin-bottom: 50px;
+  flex: 1 1 calc(50% - 20px); /* make each section take up ~50% width */
+  box-sizing: border-box;
+}
+
+.resume-field{
+  margin-left: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.resume-field-2{
+  margin-top: 2%;
+  display: flex;
+  flex-direction: column;
+}
+
+.insert-picture {
+  margin-top: 10px;
+  margin-left: 20px;
+  height: 100px;
+  width: 100px;
+  background-color: #d0d0d0;
+  color: #484848;
+  border-radius: 10px;
+  border: 1px solid #696969; /* fixed syntax */
+  
+  display: flex;               /* enable flex */
+  justify-content: center;     /* horizontal centering */
+  align-items: center;         /* vertical centering */
+  text-align: center;          /* optional, for multi-line text */
+}
+
+.projects{
+  margin-bottom: 50px;
+}
+
+.project-list{
+  color: #333333;
+  margin-top: 10px;
+  margin-bottom: 0;
+  margin-left: 10px;
+}
+
+.resume-description {
+  width: 400px;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  resize: none;       /* optional: disable manual resizing */
+}
+
+/* Container for each field row */
+.field-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 12px 0;
+  padding: 8px 0;
+  border-bottom: 1px solid #bebebe;
+}
+
+/* Container for Allow / Deny buttons */
+.field-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+/* Allow All button */
+.allow-all {
+  background-color: #4CAF50; /* green */
+  color: white;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Allow button */
+.allow-btn {
+  background-color: #4CAF50; /* green */
+  color: white;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Deny button */
+.deny-btn {
+  background-color: #555555; /* dark gray */
+  color: white;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Make buttons vertically aligned consistently */
+.field-buttons button {
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Add blue bg */
+.config{
+  margin: 10px;
+  background-color: #bfdbff86;
+  padding: 30px;
+  border-radius: 20px;
+}
