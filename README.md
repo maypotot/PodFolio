@@ -2,7 +2,12 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+```
+npm install
+npm install @inrupt/solid-client-authn-browser
+npm install soukai
+npm install soukai-solid
+```
 
 In the project directory, you can run:
 
