@@ -8,10 +8,11 @@ import ViewResume from "./view_resume";
 import ConfigPerms from "./config_perms";
 import InPerms from "./perms"
 import EmployerLogin from "./employer_login";
+import Auth from "./auth.js";
 
 import { useNavigate } from "react-router-dom";
 
-import { login } from "./main.js";
+import { login, logout } from "./main.js";
 import { restoreSession } from "./solid.js";
 
 const user = await restoreSession();
@@ -31,6 +32,7 @@ function Home() {
             <button>Go to Home</button>
           </Link>
         )}
+          <button onClick={logout}>Logout</button>
       </div>
       <Link to="/employer-login">
         <p className="plink">Are you an employer? Sign up as an Employer</p>
@@ -96,6 +98,7 @@ function App() {
         <Route path="/in-perms" element={<InPerms/>}/>
         <Route path="/config-perms" element={<ConfigPerms/>}/>
         <Route path="/employer-login" element={<EmployerLogin/>}/>
+        <Route path="/auth" element={<Auth/>}/>
       </Routes>
     </Router>
   )

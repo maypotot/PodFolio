@@ -32,38 +32,6 @@ async function restoreInfo() {
       appendInformation(info);
   }
 
-
-  const experience = await loadExperience();
-
-  for (const exp of experience) {
-      appendExperience(exp);
-  }
-
-
-  const projects = await loadProject();
-
-  for (const proj of projects) {
-      appendProject(proj);
-  }
-
-  const awards = await loadAward();
-
-  for (const award of awards) {
-      appendAward(award);
-  }
-
-  const trainings = await loadTraining();
-
-  for (const training of trainings) {
-      appendTraining(training);
-  }
-
-  const references = await loadReference();
-
-  for (const reference of references) {
-      appendReference(reference);
-  }
-
 }
 
 function HomeFeed() {
@@ -139,14 +107,10 @@ function HomeFeed() {
             <Link to="/view-resume">
               <button className="complete-button">View Resume</button>
             </Link>
-              
-            <ul id="information"></ul>
-            <ul id="experience"></ul>
-            <ul id="projects"></ul>
-            <ul id="awards"></ul>
-            <ul id="trainings"></ul>
-            <ul id="references"></ul>
-            <ul id="images"></ul>
+            <Link to="/auth">
+              <button className="complete-button">Authorization Test</button>
+            </Link>
+
 
 
             <div className="job-listing">

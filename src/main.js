@@ -96,14 +96,10 @@ export function login() {
     performLogin(loginUrl);
 }
 
-async function logout() {
-    document.getElementById('logout-button').setAttribute('disabled', '');
+export async function logout() {
 
     await performLogout();
-
-    document.getElementById('auth-guest').removeAttribute('hidden');
-    document.getElementById('auth-user').setAttribute('hidden', '');
-    document.getElementById('logout-button').removeAttribute('disabled');
+    alert("You have been logged out.")
 }
 
 
@@ -124,10 +120,6 @@ export async function createInformation() {
     const Honors = document.getElementById('Honors').value;
     const ThesisTitle = document.getElementById('ThesisTitle').value;
 
-    // if (!FullName || !ProfessionalTitle || !Summary || !Email || !ContactNumber || !Location || !WebsiteLink || !School || !Degree || !Program || !StartDate || !EndDate) {
-    //     alert('Please fill in all fields');
-    //     return;
-    // }
 
     const information = await performInformationCreation({
         FullName,
