@@ -120,6 +120,12 @@ export async function createInformation() {
     const Honors = document.getElementById('Honors').value;
     const ThesisTitle = document.getElementById('ThesisTitle').value;
 
+    const user = await restoreSession();
+
+    const podInformation = await loadInformation();
+
+    alert(podInformation.length)
+    console.log(podInformation)
 
     const information = await performInformationCreation({
         FullName,
