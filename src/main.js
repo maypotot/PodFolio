@@ -119,7 +119,15 @@ export async function createInformation() {
     const RelevantCoursework = document.getElementById('RelevantCoursework').value;
     const Honors = document.getElementById('Honors').value;
     const ThesisTitle = document.getElementById('ThesisTitle').value;
+    
+    const user = await restoreSession();
 
+    const podInformation = await loadInformation();
+    alert(podInformation.length)
+    // if (!FullName || !ProfessionalTitle || !Summary || !Email || !ContactNumber || !Location || !School || !Degree || !Program || !StartDate || !EndDate) {
+    //     alert('Please fill in all fields');
+    //     return;
+    // }
 
     const information = await performInformationCreation({
         FullName,
