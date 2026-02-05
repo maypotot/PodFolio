@@ -11,6 +11,10 @@ export default class Website extends SolidModel {
         WebsiteLink: {
             required: true,
             type: FieldType.String,
+        },
+        ResumeIndex: {
+            required: true,
+            type: FieldType.Number,
         }
     };
 

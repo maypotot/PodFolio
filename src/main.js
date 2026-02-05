@@ -41,6 +41,7 @@ import {
     performSkillCreation
     
 } from './solid';
+import Website from './Website';
 
 
 async function main() {
@@ -123,11 +124,13 @@ export async function createInformation() {
     const user = await restoreSession();
 
     const podInformation = await loadInformation();
-    alert(podInformation.length)
-    // if (!FullName || !ProfessionalTitle || !Summary || !Email || !ContactNumber || !Location || !School || !Degree || !Program || !StartDate || !EndDate) {
-    //     alert('Please fill in all fields');
-    //     return;
-    // }
+
+    let podInfoLength = 0;
+    for (let podInfo in podInformation){
+        podInfoLength = podInfoLength + podInformation[podInfo].resources.length;
+    }
+    console.log("Information Resume Index:")
+    console.log(podInfoLength)
 
     const information = await performInformationCreation({
         FullName,
@@ -144,7 +147,8 @@ export async function createInformation() {
         EndDate,
         RelevantCoursework,
         Honors,
-        ThesisTitle
+        ThesisTitle,
+        ResumeIndex: podInfoLength
     });
     alert("Information has been created")
 }
@@ -161,12 +165,22 @@ export async function createExperience() {
         return;
     }
 
+    const user = await restoreSession();
+
+    const podInformation = await loadInformation();
+
+    let podInfoLength = 0;
+    for (let podInfo in podInformation){
+        podInfoLength = podInfoLength + podInformation[podInfo].resources.length;
+    }
+
     const experience = await performExperienceCreation({
         PositionTitle,
         Organization,
         Duration,
         Description,
-        ExperienceLocation
+        ExperienceLocation,
+        ResumeIndex: podInfoLength
     });
     alert("Experience has been created")
 }
@@ -182,11 +196,22 @@ export async function createProject() {
         return;
     }
 
+    const user = await restoreSession();
+
+    const podInformation = await loadInformation();
+
+    let podInfoLength = 0;
+    for (let podInfo in podInformation){
+        podInfoLength = podInfoLength + podInformation[podInfo].resources.length;
+    }
+
+
     const project = await performProjectCreation({
-        ProjectName,
-        Summary,
-        Tools,
-        ProjectLink
+        ProjectName: ProjectName,
+        Summary: Summary,
+        Tools: Tools,
+        ProjectLink: ProjectLink,
+        ResumeIndex: podInfoLength
     });
     alert("Project has been created")
 }
@@ -201,6 +226,16 @@ export async function createAward() {
         return;
     }
     
+    const user = await restoreSession();
+
+    const podInformation = await loadInformation();
+
+    let podInfoLength = 0;
+    for (let podInfo in podInformation){
+        podInfoLength = podInfoLength + podInformation[podInfo].information.length;
+    }
+
+
     const award = await performAwardCreation({
         AwardTitle,
         Date,
@@ -219,6 +254,16 @@ async function createTraining() {
         alert('Please fill in all fields');
         return;
     }
+
+    const user = await restoreSession();
+
+    const podInformation = await loadInformation();
+
+    let podInfoLength = 0;
+    for (let podInfo in podInformation){
+        podInfoLength = podInfoLength + podInformation[podInfo].information.length;
+    }
+
 
     const training = await performTrainingCreation({
         TrainingTitle,
@@ -239,6 +284,16 @@ async function createReference() {
         alert('Please fill in all fields');
         return;
     }
+
+    const user = await restoreSession();
+
+    const podInformation = await loadInformation();
+
+    let podInfoLength = 0;
+    for (let podInfo in podInformation){
+        podInfoLength = podInfoLength + podInformation[podInfo].information.length;
+    }
+
 
     const reference = await performReferenceCreation({
         Name,
@@ -267,7 +322,20 @@ export async function createWebsite() {
         alert('Please fill in all fields');
         return;
     }
-    const items = await performWebsiteCreation({WebsiteLink});
+
+    const user = await restoreSession();
+
+    const podInformation = await loadInformation();
+
+    let podInfoLength = 0;
+    for (let podInfo in podInformation){
+        podInfoLength = podInfoLength + podInformation[podInfo].resources.length;
+    }
+    console.log("Website Resume Index:")
+    console.log(podInfoLength)
+
+
+    const items = await performWebsiteCreation({WebsiteLink, WebsiteLink, ResumeIndex: podInfoLength});
     alert("Website has been created")   
 }
 
@@ -278,7 +346,18 @@ export async function createSkill() {
         alert('Please fill in all fields');
         return;
     }
-    const items = await performSkillCreation({Skill});
+
+    const user = await restoreSession();
+
+    const podInformation = await loadInformation();
+
+    let podInfoLength = 0;
+    for (let podInfo in podInformation){
+        podInfoLength = podInfoLength + podInformation[podInfo].resources.length;
+    }
+
+
+    const items = await performSkillCreation({Skill: Skill, ResumeIndex: podInfoLength});
     alert("Skill has been created")   
 }
 

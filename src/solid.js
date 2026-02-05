@@ -83,9 +83,11 @@ export async function performLogout() {
 
 // Creation
 export async function performInformationCreation(info) {
+    infoList = await InformationList.find(`${user.storageUrl}information/`);
     if (!infoList) {
         infoList = await InformationList.at(user.storageUrl).create({ url: `${user.storageUrl}information/` });
     }
+    console.log(infoList)
 
     const information = infoList.relatedInformation.create(info);
     return information;
@@ -194,15 +196,27 @@ export async function performImageCreation(image) {
 
 // Loading
 export async function loadInformation() {
-    infoList = await InformationList.find(`${user.storageUrl}information/`);
+    // infoList = await InformationList.find(new RegExp(`${user.storageUrl}.*information`));
+    // infoList = await InformationList.find(`${user.storageUrl}information/`);
+    let podInfo;
+    let podInfoList = [];
+    const allContainers = await InformationList.find(user.storageUrl);
+    infoList = allContainers.resourceUrls.filter(c => c.includes("information"));
+
 
     if (!infoList) {
         return [];
     }
+    
+    for (let url in infoList){
+        podInfo = await InformationList.find(infoList[url])
+        podInfoList.push(podInfo)
+    }
+    for (let info in podInfoList){
+        await podInfoList[info].loadRelation('information');
+    }
 
-    await infoList.loadRelation('information');
-
-    return infoList.information;
+    return podInfoList;
 }
 
 export async function loadExperience() {
