@@ -7,13 +7,15 @@ function EmployerLogin() {
   const [webid, setWebId] = useState("");
   const navigate = useNavigate();
 
-  function handleLogin(){
-    console.log("Logging in with WebID:", webid);
-    if (webid.trim() !== "") {
-      sessionStorage.setItem("webid", webid);
-      navigate("/homefeed");
-    }
+function handleLogin(e){
+  e.preventDefault();
+  console.log("Logging in with WebID:", webid);
+  if (webid.trim() !== "") {
+    sessionStorage.setItem("webid", webid);
+    navigate("/employer-homefeed");
   }
+}
+
 
 
   return (

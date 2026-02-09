@@ -1,0 +1,96 @@
+import React, { useState, useEffect } from "react";
+import { useParams, Link } from "react-router-dom";
+import "./main.css";
+
+const EMPLOYER_WEBID = "https://test-employer.solidcommunity.net/profile/card#me.";
+
+function JobApplicants() {
+  const { jobId } = useParams();
+  const [applicants, setApplicants] = useState([]);
+  const [requestModal, setRequestModal] = useState({ open: false, applicant: null });
+  const [summary, setSummary] = useState("");
+
+  useEffect(() => {
+    async function fetchApplicants() {
+      try {
+        const res = await fetch(`http://127.0.0.1:8000/api/jobs/${jobId}/applicants/`);
+        const data = await res.json();
+        setApplicants(data);
+      } catch (error) {
+        console.error("Failed to fetch applicants:", error);
+      }
+    }
+    fetchApplicants();
+  }, [jobId]);
+
+  async function handleSubmitRequest(applicant) {
+    try {
+      const payload = {
+        employer_webid: EMPLOYER_WEBID,
+        applicant_webid: applicant.applicant_webid,
+        job_application: applicant.id,
+        summary: summary,
+      };
+
+      const res = await fetch("http://127.0.0.1:8000/api/requests/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        alert("Request submitted!");
+        setRequestModal({ open: false, applicant: null });
+        setSummary("");
+      }
+    } catch (error) {
+      console.error("Failed to submit request:", error);
+    }
+  }
+
+  return (
+    <div className="main-feed">
+      <h1 className="employer-h1">Applicants</h1>
+      <Link to="/employer-homefeed" className="back-link">← Back to Dashboard</Link>
+
+      {applicants.length === 0 ? (
+        <p>No applicants yet.</p>
+      ) : (
+        <ul>
+          {applicants.map(app => (
+            <li key={app.id} style={{ borderBottom: "1px solid #ccc", padding: "10px 0" }}>
+              <p>Applicant WebID: {app.applicant_webid}</p>
+              <p>Resume: <a href={app.resume_pod_url} target="_blank" rel="noreferrer">View Resume</a></p>
+              <p>Submitted At: {new Date(app.submitted_at).toLocaleString()}</p>
+              <button onClick={() => setRequestModal({ open: true, applicant: app })}>
+                Request
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {/* Modal for entering request summary */}
+      {requestModal.open && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Request for {requestModal.applicant.applicant_webid}</h3>
+            <textarea
+              value={summary}
+              onChange={(e) => setSummary(e.target.value)}
+              placeholder="Enter summary of your request"
+              rows={4}
+              style={{ width: "100%" }}
+            />
+            <div style={{ marginTop: "10px" }}>
+              <button onClick={() => handleSubmitRequest(requestModal.applicant)}>Submit</button>
+              <button onClick={() => setRequestModal({ open: false, applicant: null })} style={{ marginLeft: "10px" }}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default JobApplicants;

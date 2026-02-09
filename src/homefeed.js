@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./main.css"; 
 
@@ -67,6 +67,21 @@ async function restoreInfo() {
 }
 
 function HomeFeed() {
+  const [jobs, setJobs] = React.useState([])
+
+  useEffect(() => {
+    async function fetchJobs() {
+      try {
+      const res = await fetch("http://127.0.0.1:8000/api/jobs/"); // local Django dev
+      const data = await res.json();
+      setJobs(data);
+    } catch (error) {
+      console.error("Failed to fetch jobs:", error);
+    }
+    }
+    fetchJobs()
+  }, [])
+
   return (
     <main className= "homefeed">
       <header className = "app-header">
@@ -148,19 +163,23 @@ function HomeFeed() {
             <ul id="references"></ul>
             <ul id="images"></ul>
 
-
-            <div className="job-listing">
-              <img src="/Figma.png" alt="Figma logo" className="company-image"/>
-
-              <div className="job-info">
-                <h2>Software Engineer</h2>
-                <h4>Figma</h4>
-                <p className="job-description">Build core features for Figma’s collaborative design platform and help deliver fast, reliable, user-focused experiences across the web.</p>
-                <Link to="#" className="apply-link">Apply Now</Link>
-
-              </div>
-
-            </div>
+            {jobs.length === 0 ? (
+              <p>No job listings available.</p>
+            ) : (
+              jobs.map((job) => (
+                <div key={job.id} className="job-listing">
+                  <img src={job.company_logo || "/Figma.png"} className="company-image"/>
+                  <div className="job-info">
+                    <h2>{job.title}</h2>
+                    <h4>{job.company}</h4>
+                    <p className="job-description">{job.description}</p>
+                    <Link to="#" className="apply-link">Apply Now</Link>
+                  </div>
+                </div>
+              
+              ))
+            )}
+           
         </div>
     
       </div>

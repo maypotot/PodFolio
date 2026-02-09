@@ -7,7 +7,11 @@ import CreateResume from "./create_resume";
 import ViewResume from "./view_resume";
 import ConfigPerms from "./config_perms";
 import InPerms from "./perms"
-import EmployerLogin from "./employer_login";
+import EmployerLogin from "./employer_login.js";
+import EmployerHomeFeed from "./employer-homefeed.js";
+import JobApplicants from "./employer-job-applicants.js";
+import EmployerLayout from "./employer-layout.js";
+
 
 import { useNavigate } from "react-router-dom";
 
@@ -96,6 +100,8 @@ function App() {
         <Route path="/in-perms" element={<InPerms/>}/>
         <Route path="/config-perms" element={<ConfigPerms/>}/>
         <Route path="/employer-login" element={<EmployerLogin/>}/>
+        <Route path="/employer-homefeed" element={<EmployerLayout><EmployerHomeFeed/></EmployerLayout>}/>
+        <Route path="/jobs/:jobId/applicants" element={<EmployerLayout><JobApplicants/></EmployerLayout>}/>
       </Routes>
     </Router>
   )
