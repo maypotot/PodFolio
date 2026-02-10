@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import resumeData from "./sample_resume.json"; // import the JSON file
 import "./main.css";
+import { restoreSession } from "./solid.js";
 
 import { 
   loadInformation,
@@ -24,11 +25,21 @@ import {
  } from "./main.js";
 
 async function loadResumeData() {
-  const information = await loadInformation();
+
+  const user = await restoreSession();
+  const podInformation = await loadInformation();
 
 
-  const info = information[0];
+  let info = {};
+    for (let i in podInformation){
+        for (let j in podInformation[i].information){
+            if (podInformation[i].information[j].ResumeIndex == document.getElementById('resumeIndex').value){
+                info = podInformation[i].information[j];
+            }
+        }
+    }
 
+  let resumeIndex = document.getElementById('resumeIndex').value;
 
   
   let fullname = document.getElementById('FullName');
@@ -117,6 +128,7 @@ function ViewResume() {
         <div className="resume">
           <div className="tag-header">
             <h1>Resume Preview</h1>
+            <input id="resumeIndex"></input>
             <button onClick={loadResumeData}>Reload Resume</button>
             <Link to="/config-perms">
               <button className="complete-button">Configure Permissions</button>

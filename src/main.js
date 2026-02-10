@@ -148,7 +148,7 @@ export async function createInformation() {
         RelevantCoursework,
         Honors,
         ThesisTitle,
-        ResumeIndex: podInfoLength
+        ResumeIndex: podInfoLength + 1
     });
     alert("Information has been created")
 }
@@ -180,7 +180,7 @@ export async function createExperience() {
         Duration,
         Description,
         ExperienceLocation,
-        ResumeIndex: podInfoLength
+        ResumeIndex: podInfoLength + 1
     });
     alert("Experience has been created")
 }
@@ -211,7 +211,7 @@ export async function createProject() {
         Summary: Summary,
         Tools: Tools,
         ProjectLink: ProjectLink,
-        ResumeIndex: podInfoLength
+        ResumeIndex: podInfoLength + 1
     });
     alert("Project has been created")
 }
@@ -335,7 +335,7 @@ export async function createWebsite() {
     console.log(podInfoLength)
 
 
-    const items = await performWebsiteCreation({WebsiteLink, WebsiteLink, ResumeIndex: podInfoLength});
+    const items = await performWebsiteCreation({WebsiteLink, WebsiteLink, ResumeIndex: podInfoLength + 1});
     alert("Website has been created")   
 }
 
@@ -357,7 +357,7 @@ export async function createSkill() {
     }
 
 
-    const items = await performSkillCreation({Skill: Skill, ResumeIndex: podInfoLength});
+    const items = await performSkillCreation({Skill: Skill, ResumeIndex: podInfoLength + 1});
     alert("Skill has been created")   
 }
 

@@ -2,6 +2,16 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./main.css"; 
 import { issueAccessRequest }  from "@inrupt/solid-client-access-grants";
+import { getDefaultSession } from "@inrupt/solid-client-authn-browser";
+import { 
+  getSolidDatasetWithAcl, 
+  getResourceAcl, 
+  createAclFromFallbackAcl, 
+  setAgentResourceAccess, 
+  saveAclFor,
+  hasResourceAcl,
+  hasAccessibleAcl
+} from "@inrupt/solid-client";
 
 import { restoreSession } from "./solid.js";
 
@@ -26,8 +36,8 @@ import {
 const user = await restoreSession();
 
 async function requestAccess(){
-
-    let resourceOwner = document.getElementById("targetID").value
+    const session = getDefaultSession();
+    let resourceRequestingID = document.getElementById("requestingID").value
     let resourceURL = document.getElementById("resourceURL").value
 
     // ExamplePrinter sets the requested access (if granted) to expire in 5 minutes.
@@ -35,16 +45,35 @@ async function requestAccess(){
 
     // Call `issueAccessRequest` to create an Access Request
     //
-    const requestVC = await issueAccessRequest(
-        {
-            "access":  { read: true },
-            "resources": resourceURL,
-            "resourceOwner": resourceOwner,
-            "expirationDate": accessExpiration,
-            "purpose": [ "https://example.com/purposes#print" ]
-        },
-        { fetch : user.fetch } // From the requestor's (i.e., ExamplePrinter's) authenticated session
+    console.log(session)
+    console.log(session.fetch)
+    // 1. Fetch the resource with its ACL
+    const myDatasetWithAcl = await getSolidDatasetWithAcl(resourceURL, { fetch: session.fetch });
+    console.log(myDatasetWithAcl)
+    // 2. Get the ACL (or create it if it doesn't exist)
+    let resourceAcl;
+    if (!hasResourceAcl(myDatasetWithAcl)) {
+      if (!hasAccessibleAcl(myDatasetWithAcl)) {
+        throw new Error("The current user does not have permission to change access rights to this Resource.");
+      }
+      // Create a new ACL based on the fallback
+      console.log("Creating ACL")
+      resourceAcl = createAclFromFallbackAcl(myDatasetWithAcl);
+    } else {
+      console.log("Getting ACL")
+      resourceAcl = getResourceAcl(myDatasetWithAcl);
+    }
+
+    // 3. Update the ACL to give access to a specific WebID
+    console.log("Updating ACL")
+    const updatedAcl = setAgentResourceAccess(
+      resourceAcl,
+      resourceRequestingID, // The person you want to give access to
+      { read: true, write: false, append: false, control: false }
     );
+    console.log("Saving ACL")
+    // 4. Save the changes
+    await saveAclFor(myDatasetWithAcl, updatedAcl, { fetch: session.fetch });
     alert("Request is finished")
 }
 
@@ -85,16 +114,31 @@ function Auth() {
           <div className="tag-header">
             <h1>Authorization</h1>
           </div>
-          <h2>Target ID</h2>
-          <input id="targetID"></input>
           <h2>Requesting ID</h2>
-          <input id="tequestingID"></input>
+          <input id="requestingID"></input>
           <h2>Resource URL</h2>
           <input id="resourceURL"></input>
           <br></br>
           <br></br>
           <button onClick={requestAccess}>Request data</button>
           <button onClick={checkID}>Check WebID</button>
+
+          
+          <br></br>
+          <br></br>
+          <br></br>
+          <br></br>
+          <h2>Target ID</h2>
+          <input id="targetID"></input>
+          <h2>Request Description</h2>
+          <textarea 
+            rows={5}
+            id="requestDescription"></textarea>
+          <br></br>
+          <br></br>
+          <button onClick={requestAccess}>Request data</button>
+          <button onClick={checkID}>Check WebID</button>
+
 
 
         </div>

@@ -89,6 +89,7 @@ export async function performInformationCreation(info) {
     }
     console.log(infoList)
 
+    await infoList.loadRelation('information');
     const information = infoList.relatedInformation.create(info);
     return information;
 }
