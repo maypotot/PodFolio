@@ -28,7 +28,7 @@ function JobApplicants() {
       const payload = {
         employer_webid: EMPLOYER_WEBID,
         applicant_webid: applicant.applicant_webid,
-        job_application: applicant.id,
+        job_application_id: applicant.id,
         summary: summary,
       };
 
@@ -42,6 +42,11 @@ function JobApplicants() {
         alert("Request submitted!");
         setRequestModal({ open: false, applicant: null });
         setSummary("");
+      }
+      else {
+        const errorData = await res.json();
+        console.error("Failed to submit request:", errorData);
+        alert("Failed to submit request: " + (errorData.detail || "Unknown error"));
       }
     } catch (error) {
       console.error("Failed to submit request:", error);

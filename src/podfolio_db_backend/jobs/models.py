@@ -31,7 +31,7 @@ class EmployerRequest(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Requested by {self.employer_webid} for applicant {self.applicant_webid}"
+        return f"Employer Request: {self.employer_webid} -> {self.applicant_webid}"
     
-    
+
     

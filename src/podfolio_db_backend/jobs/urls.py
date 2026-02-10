@@ -9,4 +9,6 @@ urlpatterns = [
     path("employer/applicants/<int:job_id>/", views.job_applicants),
     path("jobs/<int:job_id>/applicants/", views.job_applicants, name="job_applicants"),
     path("requests/", views.create_request, name="create_request"),
+    path("requests/", views.requests_by_student, name="requests_by_student"),  # Changed from "api/requests/"
+    path('requests/all/', views.all_requests, name='all_requests'),  # Changed from 'api/requests/all/'
 ]

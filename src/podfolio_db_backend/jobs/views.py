@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import JobPosting, JobApplication
+from .models import JobPosting, JobApplication, EmployerRequest
 from .serializers import JobPostingSerializer, JobApplicationSerializer, EmployerRequestSerializer
 from rest_framework import status
 
@@ -62,8 +62,36 @@ def apply_to_job(request):
 
 @api_view(['POST'])
 def create_request(request):
-    serializer = EmployerRequestSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        print("Received data:", request.data)
+        
+        serializer = EmployerRequestSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            print("Validation errors:", serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        print("Error creating request:", str(e))
+        import traceback
+        traceback.print_exc()
+        return Response(
+            {"error": str(e)}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+@api_view(['GET'])
+def requests_by_student(request):
+    student_webid = request.query_params.get('student_webid')
+    if not student_webid:
+        return Response({"error": "Missing student_webid"}, status=400)
+    requests = EmployerRequest.objects.filter(applicant_webid=student_webid)
+    serializer = EmployerRequestSerializer(requests, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def all_requests(request):
+    requests = EmployerRequest.objects.all()
+    serializer = EmployerRequestSerializer(requests, many=True)
+    return Response(serializer.data)
