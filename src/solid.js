@@ -2,15 +2,15 @@ import { fetch, getDefaultSession, handleIncomingRedirect, login, logout } from 
 import { saveFileInContainer, getSourceUrl, getFile, getSolidDataset, getThingAll, removeThing, deleteFile} from "@inrupt/solid-client";
 
 import User from './User';
-import InformationList from './InformationList';
-import ExperienceList from './ExperienceList';
-import ProjectList from './ProjectList';
-import AwardList from './AwardList';
-import TrainingList from './TrainingList';
-import ReferenceList from './ReferenceList';
-import ImageList from './ImageList';
-import WebsiteList from './WebsiteList';
-import SkillList from './SkillList';
+import InformationList from './solid/InformationList';
+import ExperienceList from './solid/ExperienceList';
+import ProjectList from './solid/ProjectList';
+import AwardList from './solid/AwardList';
+import TrainingList from './solid/TrainingList';
+import ReferenceList from './solid/ReferenceList';
+import ImageList from './solid/ImageList';
+import WebsiteList from './solid/WebsiteList';
+import SkillList from './solid/SkillList';
 
 
 let list, user;
@@ -87,7 +87,6 @@ export async function performInformationCreation(info) {
     if (!infoList) {
         infoList = await InformationList.at(user.storageUrl).create({ url: `${user.storageUrl}information/` });
     }
-    console.log(infoList)
 
     await infoList.loadRelation('information');
     const information = infoList.relatedInformation.create(info);
@@ -95,64 +94,78 @@ export async function performInformationCreation(info) {
 }
 
 export async function performExperienceCreation(exp) {
+    experienceList = await ExperienceList.find(`${user.storageUrl}experience/`);
     if (!experienceList) {
         experienceList = await ExperienceList.at(user.storageUrl).create({ url: `${user.storageUrl}experience/` });
     }
 
+    await experienceList.loadRelation('experience');
     const experience = experienceList.relatedExperience.create(exp);
     return experience;
 }
 
 export async function performProjectCreation(project) {
+    projectList = await ProjectList.find(`${user.storageUrl}projects/`);
     if (!projectList) {
         projectList = await ProjectList.at(user.storageUrl).create({ url: `${user.storageUrl}projects/` });
     }
 
+    await projectList.loadRelation('projects');
     const newProject = projectList.relatedProjects.create(project);
     return newProject;
 }
 
 export async function performAwardCreation(award) {
+    awardList = await AwardList.find(`${user.storageUrl}awards/`);
     if (!awardList) {
         awardList = await AwardList.at(user.storageUrl).create({ url: `${user.storageUrl}awards/` });
     }
 
+    await awardList.loadRelation('awards');
     const newAward = awardList.relatedAward.create(award);
     return newAward;
 }
 
 export async function performTrainingCreation(training) {
+    trainingList = await TrainingList.find(`${user.storageUrl}training/`);
     if (!trainingList) {
         trainingList = await TrainingList.at(user.storageUrl).create({ url: `${user.storageUrl}training/` });
     }
 
+    await trainingList.loadRelation('training');
     const newTraining = trainingList.relatedTraining.create(training);
     return newTraining;
 }
 
 export async function performReferenceCreation(reference) {
+    referenceList = await ReferenceList.find(`${user.storageUrl}references/`);
     if (!referenceList) {
         referenceList = await ReferenceList.at(user.storageUrl).create({ url: `${user.storageUrl}references/` });
     }
 
+    await referenceList.loadRelation('references');
     const newReference = referenceList.relatedReference.create(reference);
     return newReference;
 }
 
 export async function performWebsiteCreation(website) {
+    websiteList = await WebsiteList.find(`${user.storageUrl}websites/`);
     if (!websiteList) {
         websiteList = await WebsiteList.at(user.storageUrl).create({ url: `${user.storageUrl}websites/` });
     }
 
+    await websiteList.loadRelation('website');
     const newWebsite = websiteList.relatedWebsite.create(website);
     return newWebsite;
 }
 
 export async function performSkillCreation(skill) {
+    skillList = await SkillList.find(`${user.storageUrl}skills/`);
     if (!skillList) {
         skillList = await SkillList.at(user.storageUrl).create({ url: `${user.storageUrl}skills/` });
     }
 
+    await skillList.loadRelation('skill');
     const newSkill = skillList.relatedSkill.create(skill);
     return newSkill;
 }
@@ -197,8 +210,6 @@ export async function performImageCreation(image) {
 
 // Loading
 export async function loadInformation() {
-    // infoList = await InformationList.find(new RegExp(`${user.storageUrl}.*information`));
-    // infoList = await InformationList.find(`${user.storageUrl}information/`);
     let podInfo;
     let podInfoList = [];
     const allContainers = await InformationList.find(user.storageUrl);
@@ -221,97 +232,173 @@ export async function loadInformation() {
 }
 
 export async function loadExperience() {
-    experienceList = await ExperienceList.find(`${user.storageUrl}experience/`);
+    let podExperience;
+    let podExperienceList = [];
+    const allContainers = await ExperienceList.find(user.storageUrl);
+    experienceList = allContainers.resourceUrls.filter(c => c.includes("experience"));
 
     if (!experienceList) {
         return [];
     }
 
-    await experienceList.loadRelation('experience');
+    for (let url in experienceList) {
+        podExperience = await ExperienceList.find(experienceList[url]);
+        podExperienceList.push(podExperience);
+    }
+    for (let exp in podExperienceList) {
+        await podExperienceList[exp].loadRelation('experience');
+    }
 
-    return experienceList.experience;
+    return podExperienceList;
 }
 
 export async function loadProject() {
-    projectList = await ProjectList.find(`${user.storageUrl}projects/`);
+    let podProject;
+    let podProjectList = [];
+    const allContainers = await ProjectList.find(user.storageUrl);
+    projectList = allContainers.resourceUrls.filter(c => c.includes("projects"));
 
+    
     if (!projectList) {
         return [];
     }
 
-    await projectList.loadRelation('projects');
-
-    return projectList.projects;
+    for (let url in projectList) {
+        podProject = await ProjectList.find(projectList[url]);
+        podProjectList.push(podProject);
+    }
+    for (let proj in podProjectList) {
+        await podProjectList[proj].loadRelation('projects');
+    }
+    console.log("project list in solid.js:", podProjectList);
+    return podProjectList;
 }
 
 export async function loadAward() {
-    awardList = await AwardList.find(`${user.storageUrl}awards/`);
+    let podAward;
+    let podAwardList = [];
+    const allContainers = await AwardList.find(user.storageUrl);
+    awardList = allContainers.resourceUrls.filter(c => c.includes("awards"));
 
     if (!awardList) {
         return [];
     }
 
-    await awardList.loadRelation('award');
+    for (let url in awardList) {
+        podAward = await AwardList.find(awardList[url]);
+        podAwardList.push(podAward);
+    }
+    for (let award in podAwardList) {
+        await podAwardList[award].loadRelation('award');
+    }
 
-    return awardList.award;
+    return podAwardList;
 }
 
 export async function loadTraining() {
-    trainingList = await TrainingList.find(`${user.storageUrl}training/`);
+    let podTraining;
+    let podTrainingList = [];
+    const allContainers = await TrainingList.find(user.storageUrl);
+    trainingList = allContainers.resourceUrls.filter(c => c.includes("training"));
 
     if (!trainingList) {
         return [];
     }
 
-    await trainingList.loadRelation('training');
+    for (let url in trainingList) {
+        podTraining = await TrainingList.find(trainingList[url]);
+        podTrainingList.push(podTraining);
+    }
+    for (let training in podTrainingList) {
+        await podTrainingList[training].loadRelation('training');
+    }
 
-    return trainingList.training;
+    return podTrainingList;
 }
 
 export async function loadReference() {
-    referenceList = await ReferenceList.find(`${user.storageUrl}references/`);
+    let podReference;
+    let podReferenceList = [];
+    const allContainers = await ReferenceList.find(user.storageUrl);
+    referenceList = allContainers.resourceUrls.filter(c => c.includes("references"));
 
     if (!referenceList) {
         return [];
     }
 
-    await referenceList.loadRelation('reference');
+    for (let url in referenceList) {
+        podReference = await ReferenceList.find(referenceList[url]);
+        podReferenceList.push(podReference);
+    }
+    for (let reference in podReferenceList) {
+        await podReferenceList[reference].loadRelation('reference');
+    }
 
-    return referenceList.reference;
+    return podReferenceList;
 }
 
 
 export async function loadImage() {
-    imageList = await ImageList.find(`${user.storageUrl}images/`);
+    let podImage;
+    let podImageList = [];
+    const allContainers = await ImageList.find(user.storageUrl);
+    imageList = allContainers.resourceUrls.filter(c => c.includes("images"));
 
     if (!imageList) {
         return [];
     }
 
-    await imageList.loadRelation('image');
-    return imageList.image;
+    for (let url in imageList) {
+        podImage = await ImageList.find(imageList[url]);
+        podImageList.push(podImage);
+    }
+    for (let image in podImageList) {
+        await podImageList[image].loadRelation('image');
+    }
+
+    return podImageList;
 }
 
 export async function loadWebsite() {
-    websiteList = await WebsiteList.find(`${user.storageUrl}websites/`);
+    let podWebsite;
+    let podWebsiteList = [];
+    const allContainers = await WebsiteList.find(user.storageUrl);
+    websiteList = allContainers.resourceUrls.filter(c => c.includes("websites"));
 
     if (!websiteList) {
         return [];
     }
 
-    await websiteList.loadRelation('website');
-    return websiteList.website;
+    for (let url in websiteList) {
+        podWebsite = await WebsiteList.find(websiteList[url]);
+        podWebsiteList.push(podWebsite);
+    }
+    for (let website in podWebsiteList) {
+        await podWebsiteList[website].loadRelation('website');
+    }
+
+    return podWebsiteList;
 }
 
 export async function loadSkill() {
-    skillList = await SkillList.find(`${user.storageUrl}skills/`);
+    let podSkill;
+    let podSkillList = [];
+    const allContainers = await SkillList.find(user.storageUrl);
+    skillList = allContainers.resourceUrls.filter(c => c.includes("skills"));
 
     if (!skillList) {
         return [];
     }
 
-    await skillList.loadRelation('skill');
-    return skillList.skill;
+    for (let url in skillList) {
+        podSkill = await SkillList.find(skillList[url]);
+        podSkillList.push(podSkill);
+    }
+    for (let skill in podSkillList) {
+        await podSkillList[skill].loadRelation('skill');
+    }
+
+    return podSkillList;
 }
 
 // Updating Information

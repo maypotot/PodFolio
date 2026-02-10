@@ -41,7 +41,7 @@ import {
     performSkillCreation
     
 } from './solid';
-import Website from './Website';
+import Website from './solid/Website';
 
 
 async function main() {

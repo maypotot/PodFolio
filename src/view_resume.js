@@ -24,24 +24,15 @@ import {
   appendTraining
  } from "./main.js";
 
-async function loadResumeData() {
+let podInfolist = [];
+let podSkilllist = [];
+let podProjectlist = [];
+let podWebsiteList = [];
+let podExperienceList = [];
+let resumeIndex = 1;
 
-  const user = await restoreSession();
-  const podInformation = await loadInformation();
+function updateInfoText(info) {
 
-
-  let info = {};
-    for (let i in podInformation){
-        for (let j in podInformation[i].information){
-            if (podInformation[i].information[j].ResumeIndex == document.getElementById('resumeIndex').value){
-                info = podInformation[i].information[j];
-            }
-        }
-    }
-
-  let resumeIndex = document.getElementById('resumeIndex').value;
-
-  
   let fullname = document.getElementById('FullName');
   let title = document.getElementById('ProfessionalTitle');
   let summary = document.getElementById('Summary');
@@ -76,20 +67,158 @@ async function loadResumeData() {
   enddate.textContent = "End Date: " + info.EndDate;
   coursework.textContent = "Relevant Course Work: " + info.RelevantCourseWork;
   thesistitle.textContent = "Thesis Title: " + info.ThesisTitle;
+}
+
+function updateSkillText(skill) {
+
+  let skillsListElement = document.getElementById('SkillsList');
+  const listItem = document.createElement('li');
+  listItem.textContent = skill.Skill;
+  skillsListElement.appendChild(listItem);
+}
 
 
-  
-  const skills = await loadSkill();
-  
-  const skillsListElement = document.getElementById('SkillsList');
-  skillsListElement.innerHTML = ''; // Clear existing list items
-  for (const skill of skills) {
-    const listItem = document.createElement('li');
-    listItem.textContent = skill.Skill;
-    skillsListElement.appendChild(listItem);
+function updateProjectText(project) {
+  let projectsListElement = document.getElementById('ProjectsList');
+  const listItem = document.createElement('li');
+  listItem.innerHTML = `
+  <strong>Title:</strong> ${project.ProjectName}<br />
+  <strong>Summary:</strong> ${project.Summary}<br />
+  <strong>Tools:</strong> ${project.Tools}<br />
+  <strong>Project Link:</strong> ${project.ProjectLink}
+  `;
+  projectsListElement.appendChild(listItem);
+}
+
+function updateWebsiteText(website) {
+  let websitesListElement = document.getElementById('WebsitesList');
+  const listItem = document.createElement('li');
+  listItem.textContent = website.WebsiteLink;
+  websitesListElement.appendChild(listItem);
+}
+
+function updateExperienceText(experience) {
+  let experiencesListElement = document.getElementById('ExperienceList');
+  const listItem = document.createElement('li');
+  listItem.innerHTML = `
+  <strong>Title:</strong> ${experience.PositionTitle}<br />
+  <strong>Organization:</strong> ${experience.Organization}<br />
+  <strong>Duration:</strong> ${experience.Duration}<br />
+  <strong>Description:</strong> ${experience.Description}<br />
+  <strong>Location:</strong> ${experience.ExperienceLocation}<br />
+  `;
+  experiencesListElement.appendChild(listItem);
+}
+
+function updateResumeText() {
+
+  let skillsListElement = document.getElementById('SkillsList');
+  skillsListElement.innerHTML = '';
+  let projectsListElement = document.getElementById('ProjectsList');
+  projectsListElement.innerHTML = '';
+  let websitesListElement = document.getElementById('WebsitesList');
+  websitesListElement.innerHTML = '';
+  let experiencesListElement = document.getElementById('ExperienceList');
+  experiencesListElement.innerHTML = '';
+
+  for (let i in podInfolist){
+    if (podInfolist[i].ResumeIndex == resumeIndex){
+      updateInfoText(podInfolist[i]);
+      break
+    }
   }
+
+  for (let i in podSkilllist){
+    if (podSkilllist[i].ResumeIndex == resumeIndex){
+      updateSkillText(podSkilllist[i]);
+    }
+  }
+
+  for (let i in podProjectlist){
+    if (podProjectlist[i].ResumeIndex == resumeIndex){
+      updateProjectText(podProjectlist[i]);
+    }
+  }
+  
+  for (let i in podWebsiteList){
+    if (podWebsiteList[i].ResumeIndex == resumeIndex){
+      updateWebsiteText(podWebsiteList[i]);
+    }
+  }
+  
+  for (let i in podExperienceList){
+    if (podExperienceList[i].ResumeIndex == resumeIndex){
+      updateExperienceText(podExperienceList[i]);
+    }
+  }
+}
+
+async function loadResumeData() {
+
+  const user = await restoreSession();
+  const podInformation = await loadInformation();
+
+  for (let i in podInformation){
+    for (let j in podInformation[i].information){
+          podInfolist.push(podInformation[i].information[j]);
+    }
+  }
+
+  const podSkills = await loadSkill();
+
+  for (let i in podSkills){
+    for (let j in podSkills[i].skill){
+          podSkilllist.push(podSkills[i].skill[j]);
+    }
+  }
+  
+  const podProjects = await loadProject();
+
+  for (let i in podProjects){
+    for (let j in podProjects[i].projects){
+          podProjectlist.push(podProjects[i].projects[j]);
+    }
+  }
+  
+  const podWebsites = await loadWebsite();
+
+  for (let i in podWebsites){
+    for (let j in podWebsites[i].website){
+          podWebsiteList.push(podWebsites[i].website[j]);
+    }
+  }
+  const podExperiences = await loadExperience();
+
+  for (let i in podExperiences){
+    for (let j in podExperiences[i].experience){
+          podExperienceList.push(podExperiences[i].experience[j]);
+    }
+  }
+
+  console.log("experience list:", podExperienceList);
+
+  updateResumeText();
+
   alert("All info loaded.");
 
+}
+
+function nextResume() {
+  if (resumeIndex >= podInfolist.length) {
+    alert("No more resumes to display.");
+    return;
+  }
+  resumeIndex += 1;
+  updateResumeText();
+}
+
+function previousResume() {
+  if (resumeIndex <= 1) {
+    alert("No more resumes to display.");
+    return;
+  }
+  resumeIndex -= 1;
+  updateResumeText();
 }
 
 
@@ -128,8 +257,9 @@ function ViewResume() {
         <div className="resume">
           <div className="tag-header">
             <h1>Resume Preview</h1>
-            <input id="resumeIndex"></input>
             <button onClick={loadResumeData}>Reload Resume</button>
+            <button onClick={previousResume}>Previous Resume</button>
+            <button onClick={nextResume}>Next Resume</button>
             <Link to="/config-perms">
               <button className="complete-button">Configure Permissions</button>
             </Link>
@@ -151,14 +281,22 @@ function ViewResume() {
           {/* Education */}
           <div className="resume-section">
             <h2>Education</h2>
-            <p id="Degree"><strong>Degree:</strong> {resumeData.education.degree}</p>
-            <p id="School"><strong>Institution:</strong> {resumeData.education.institution}</p>
+            <p id="Degree"></p>
+            <p id="School"></p>
             <p id="Honors"></p>
             <p id="Program"></p>
             <p id="StartDate"></p>
             <p id="EndDate"></p>
             <p id="RelevantCourseWork"></p>
             <p id="ThesisTitle"></p>
+          </div>
+
+          {/* Websites */}
+          <div className="resume-section">
+            <h2>Websites</h2>
+            <ul id="WebsitesList">
+              
+            </ul>
           </div>
 
           {/* Skills */}
@@ -172,27 +310,17 @@ function ViewResume() {
           {/* Projects */}
           <div className="resume-section">
             <h2>Projects</h2>
-            {resumeData.projects.map((project, index) => (
-              <div key={index} className="projects">
-                <p><strong>Title:</strong> {project.title}</p>
-                <p><strong>Date Created:</strong> {project.date}</p>
-                <p><strong>Description:</strong> {project.description}</p>
-              </div>
-            ))}
+            <ul id="ProjectsList">
+              
+            </ul>
           </div>
 
           {/* Experience */}
           <div className="resume-section">
             <h2>Experience</h2>
-            {resumeData.experience.map((exp, index) => (
-              <div key={index} className="projects">
-                <p><strong>Job Title:</strong> {exp.title}</p>
-                <p><strong>Duration:</strong> {exp.duration}</p>
-                <p><strong>Company:</strong> {exp.company}</p>
-                <p><strong>Location:</strong> {exp.location}</p>
-                <p><strong>Responsibilities:</strong> {exp.responsibilities}</p>
-              </div>
-            ))}
+            <ul id="ExperienceList">
+              
+            </ul>
           </div>
 
           <Link to="/create-resume">
