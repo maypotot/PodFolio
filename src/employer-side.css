@@ -1,11 +1,11 @@
 
-button{
-  background-color: #5E8821;
-}
-
-button:hover{
-  background-color: #4CAF50;
-}
+/* button{ */
+  /* background-color: #5E8821; */
+/* } */
+/*  */
+/* button:hover{ */
+  /* background-color: #4CAF50; */
+/* } */
 .header-section{
     display: flex;
     align-items: center;
@@ -71,7 +71,7 @@ html, body {
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background-color: #F0baba;
+  background-color: #7DCB7D;
   align-items: center;
   display: flex;
     justify-content: center;
@@ -97,7 +97,7 @@ html, body {
 width: 70px;
   height: 40px;
   border-radius: 10px;
-  background-color: #F0baba;
+  background-color: #7DCB7D;
   align-items: center;
   display: flex;
     justify-content: center;
@@ -195,10 +195,10 @@ width: 70px;
     background-color: #ffffff;
 }
 
-h1 {
+.employer-h1 {
     font-size: 2rem;
     margin-bottom: 1rem;
-    color: #B03232;
+    color: #248024;
 }
 
 .full-name{
@@ -213,7 +213,7 @@ h1 {
     padding: 10px;
     height: 40px;
     border-radius: 10px;
-    background-color: #F0baba;
+    background-color: #7DCB7D;
     align-items: center;
     display: block;
     justify-content: center;
@@ -229,7 +229,7 @@ a {
 h3 {
   margin-top: 3vh;
   font-size: 1rem;
-  color: #FF5A60
+  color: #35B82F
 }
 
 .panel-options {
@@ -488,4 +488,66 @@ h5 {
   background-color: #bfdbff86;
   padding: 30px;
   border-radius: 20px;
+}
+
+/* Overlay dims the background */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5); /* dim background */
+  display: flex;
+  justify-content: center;  /* center horizontally */
+  align-items: center;      /* center vertically */
+  z-index: 1000;
+}
+
+/* Modal box itself */
+.modal-content {
+  background-color: #fff;
+  padding: 20px 25px;
+  border-radius: 12px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  position: relative;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+/* Optional: fade in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Style textarea inside modal */
+.modal-content textarea {
+  width: 100%;
+  padding: 8px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  resize: none;
+}
+
+/* Modal buttons */
+.modal-content button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.modal-content button:first-of-type {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.modal-content button:last-of-type {
+  background-color: #aaa;
+  color: white;
+  margin-left: 10px;
 }
