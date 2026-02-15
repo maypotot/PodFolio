@@ -3,25 +3,22 @@ import { Link } from "react-router-dom";
 import resumeData from "./sample_resume.json"; // import the JSON file
 import "./main.css";
 import { restoreSession } from "./solid.js";
+import { getThingAll, getFile } from "@inrupt/solid-client";
 
 import { 
   loadInformation,
-  loadAward,
   loadExperience,
   loadImage,
-  loadReference,
   loadProject,
-  loadTraining,
   loadWebsite,
   loadSkill
  } from "./solid.js";
 import { 
-  appendInformation,
-  appendAward,
-  appendExperience,
-  appendReference,
-  appendProject,
-  appendTraining
+  deleteInformation,
+  deleteExperience,
+  deleteSkill,
+  deleteProject,
+  deleteWebsite
  } from "./main.js";
 
 let podInfolist = [];
@@ -29,6 +26,8 @@ let podSkilllist = [];
 let podProjectlist = [];
 let podWebsiteList = [];
 let podExperienceList = [];
+let podImageList = [];
+let resumeIndexList = [];
 let resumeIndex = 1;
 
 function updateInfoText(info) {
@@ -69,16 +68,73 @@ function updateInfoText(info) {
   thesistitle.textContent = "Thesis Title: " + info.ThesisTitle;
 }
 
-function updateSkillText(skill) {
+function deleteResume(e) {
+  for (let i in podInfolist){
+    if (podInfolist[i].ResumeIndex == resumeIndex){
+      deleteInformation(podInfolist[i].url);
+    }
+  }
+}
+
+function deleteExperienceButton(e) {
+  const buttonId = e.target.id;
+
+  for (let i in podExperienceList){
+    if (i === buttonId){
+      deleteExperience(podExperienceList[i].url);
+    }
+  }
+}
+
+
+function deleteSkillsButton(e) {
+  const buttonId = e.target.id;
+
+  for (let i in podSkilllist){
+    if (i === buttonId){
+      deleteSkill(podSkilllist[i].url);
+    }
+  }
+}
+
+function deleteWebsiteButton(e) {
+  const buttonId = e.target.id;
+
+  for (let i in podWebsiteList){
+    if (i === buttonId){
+      deleteWebsite(podWebsiteList[i].url);
+    }
+  }
+}
+
+function deleteProjectButton(e) {
+  const buttonId = e.target.id;
+
+  for (let i in podProjectlist){
+    if (i === buttonId){
+      deleteProject(podProjectlist[i].url);
+    }
+  }
+}
+
+function updateSkillText(skill, num) {
 
   let skillsListElement = document.getElementById('SkillsList');
   const listItem = document.createElement('li');
   listItem.textContent = skill.Skill;
   skillsListElement.appendChild(listItem);
+
+  const deleteBtn = document.createElement('button');
+  deleteBtn.textContent = 'Delete Skill';
+  deleteBtn.id = num;
+  deleteBtn.onclick = deleteSkillsButton;
+  
+  listItem.appendChild(deleteBtn);
+  listItem.appendChild(document.createElement('br'));
 }
 
 
-function updateProjectText(project) {
+function updateProjectText(project, num) {
   let projectsListElement = document.getElementById('ProjectsList');
   const listItem = document.createElement('li');
   listItem.innerHTML = `
@@ -87,17 +143,36 @@ function updateProjectText(project) {
   <strong>Tools:</strong> ${project.Tools}<br />
   <strong>Project Link:</strong> ${project.ProjectLink}
   `;
+
+  
+  const deleteBtn = document.createElement('button');
+  deleteBtn.textContent = 'Delete Project';
+  deleteBtn.id = num;
+  deleteBtn.onclick = deleteProjectButton;
+  
+  listItem.appendChild(deleteBtn);
+
   projectsListElement.appendChild(listItem);
 }
 
-function updateWebsiteText(website) {
+function updateWebsiteText(website, num) {
   let websitesListElement = document.getElementById('WebsitesList');
   const listItem = document.createElement('li');
   listItem.textContent = website.WebsiteLink;
+
+  
+  const deleteBtn = document.createElement('button');
+  deleteBtn.textContent = 'Delete Website';
+  deleteBtn.id = num;
+  deleteBtn.onclick = deleteWebsiteButton;
+  
+  listItem.appendChild(deleteBtn);
+  listItem.appendChild(document.createElement('br'));
+
   websitesListElement.appendChild(listItem);
 }
 
-function updateExperienceText(experience) {
+function updateExperienceText(experience, num) {
   let experiencesListElement = document.getElementById('ExperienceList');
   const listItem = document.createElement('li');
   listItem.innerHTML = `
@@ -107,7 +182,21 @@ function updateExperienceText(experience) {
   <strong>Description:</strong> ${experience.Description}<br />
   <strong>Location:</strong> ${experience.ExperienceLocation}<br />
   `;
+  
+  const deleteBtn = document.createElement('button');
+  deleteBtn.textContent = 'Delete Experience';
+  deleteBtn.id = num;
+  deleteBtn.onclick = deleteExperienceButton;
+  
+  listItem.appendChild(deleteBtn);
+  listItem.appendChild(document.createElement('br'));
   experiencesListElement.appendChild(listItem);
+}
+
+function updateImageText(image) {
+  let imageElement = document.getElementById('ProfileImage');
+  imageElement.src = URL.createObjectURL(image.ImageFile);
+  console.log("Image URL: " + imageElement.src);
 }
 
 function updateResumeText() {
@@ -130,27 +219,37 @@ function updateResumeText() {
 
   for (let i in podSkilllist){
     if (podSkilllist[i].ResumeIndex == resumeIndex){
-      updateSkillText(podSkilllist[i]);
+      updateSkillText(podSkilllist[i], i);
     }
   }
 
   for (let i in podProjectlist){
     if (podProjectlist[i].ResumeIndex == resumeIndex){
-      updateProjectText(podProjectlist[i]);
+      updateProjectText(podProjectlist[i], i);
     }
   }
   
   for (let i in podWebsiteList){
     if (podWebsiteList[i].ResumeIndex == resumeIndex){
-      updateWebsiteText(podWebsiteList[i]);
+      updateWebsiteText(podWebsiteList[i], i);
     }
   }
   
   for (let i in podExperienceList){
     if (podExperienceList[i].ResumeIndex == resumeIndex){
-      updateExperienceText(podExperienceList[i]);
+      updateExperienceText(podExperienceList[i], i);
     }
   }
+  
+  // for (let i in podInfolist){
+  //   if (podInfolist[i].ResumeIndex == resumeIndex){
+  //     console.log(podInfolist[i].ResumeImage, podImageList[i].image.name)
+  //     if (podImageList[i].ResumeImage == podImageList[i].image.name){
+  //       updateImageText(podImageList[i]);
+  //     }
+  //     break
+  //   }
+  // }
 }
 
 async function loadResumeData() {
@@ -163,6 +262,10 @@ async function loadResumeData() {
           podInfolist.push(podInformation[i].information[j]);
     }
   }
+
+  resumeIndexList = Array.from(
+    new Set(podInfolist.map((info) => Number(info.ResumeIndex)).filter((value) => !Number.isNaN(value)))
+  );
 
   const podSkills = await loadSkill();
 
@@ -194,8 +297,37 @@ async function loadResumeData() {
           podExperienceList.push(podExperiences[i].experience[j]);
     }
   }
+  
+  const podImages = await loadImage();
 
-  console.log("experience list:", podExperienceList);
+  // for (let i in podImages){
+  //   let items = getThingAll(podImages[i]);
+  //   let itemListPromises = [];
+
+  //   items.forEach( (item) => {
+  //       itemListPromises.push(getFile(item.url, { fetch: fetch }))
+  //       // deleteFile(item.url, { fetch: fetch})
+  //   });
+  //   console.log("Pod images loaded:", itemListPromises);
+  // }
+
+  // for (let i in podImages){
+  //   for (let j in podImages[i].image){
+  //         podImageList.push(podImages[i].image[j]);
+  //   }
+  // }
+
+  console.log("Resume Index List:", resumeIndexList);
+  resumeIndex = resumeIndexList[0] || 1;
+
+  let listItem = document.getElementById('buttons');
+  const deleteBtn = document.createElement('button');
+  deleteBtn.textContent = 'Delete Resume';
+  deleteBtn.id = resumeIndex;
+  deleteBtn.onclick = deleteResume;
+  
+  listItem.appendChild(deleteBtn);
+  listItem.appendChild(document.createElement('br'));
 
   updateResumeText();
 
@@ -204,22 +336,29 @@ async function loadResumeData() {
 }
 
 function nextResume() {
-  if (resumeIndex >= podInfolist.length) {
+  const currentIndex = resumeIndexList.indexOf(resumeIndex);
+
+  if (currentIndex === -1 || currentIndex >= resumeIndexList.length - 1) {
     alert("No more resumes to display.");
     return;
   }
-  resumeIndex += 1;
+
+  resumeIndex = resumeIndexList[currentIndex + 1];
   updateResumeText();
 }
 
 function previousResume() {
-  if (resumeIndex <= 1) {
+  const currentIndex = resumeIndexList.indexOf(resumeIndex);
+
+  if (currentIndex <= 0) {
     alert("No more resumes to display.");
     return;
   }
-  resumeIndex -= 1;
+
+  resumeIndex = resumeIndexList[currentIndex - 1];
   updateResumeText();
 }
+
 
 
 function ViewResume() {
@@ -257,15 +396,18 @@ function ViewResume() {
         <div className="resume">
           <div className="tag-header">
             <h1>Resume Preview</h1>
-            <button onClick={loadResumeData}>Reload Resume</button>
-            <button onClick={previousResume}>Previous Resume</button>
-            <button onClick={nextResume}>Next Resume</button>
+            <ul id="buttons">
+              <button onClick={loadResumeData}>Reload Resume</button>
+              <button onClick={previousResume}>Previous Resume</button>
+              <button onClick={nextResume}>Next Resume</button>
+            </ul>
             <Link to="/config-perms">
               <button className="complete-button">Configure Permissions</button>
             </Link>
           </div>
             <h1 className="full-name" id="FullName">{resumeData.name}</h1>
 
+          <img src={null} alt="Profile" className="profile-image" id="ProfileImage"/>
           {/* Personal Information */}
           <div className="resume-section">
             <h2>Personal Information</h2>

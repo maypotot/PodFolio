@@ -1,27 +1,260 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./main.css";
+import { loadInformation, loadExperience, loadProject, loadWebsite, loadSkill, restoreSession } from "./solid.js";
+import { requestAccess, denyAccess, getAgentAccess } from "./auth.js";
 
 function InPerms() {
   const [requests, setRequests] = useState([]);
+  const [openRequestId, setOpenRequestId] = useState(null);
+  const [selectedPortfolioByReq, setSelectedPortfolioByReq] = useState({});
+  const [allowedSectionsByReq, setAllowedSectionsByReq] = useState({});
+  const [portfolioOptions, setPortfolioOptions] = useState([]);
+  const [infoItems, setInfoItems] = useState([]);
+  const [websiteItems, setWebsiteItems] = useState([]);
+  const [skillItems, setSkillItems] = useState([]);
+  const [projectItems, setProjectItems] = useState([]);
+  const [experienceItems, setExperienceItems] = useState([]);
+
+  const accessSections = ["Information", "Website", "Skills", "Project", "Experience"];
+
+  function toggleRequestOptions(requestId) {
+    setOpenRequestId((current) => (current === requestId ? null : requestId));
+  }
+
+  function selectPortfolio(requestId, portfolioIndex, webId) {
+    setSelectedPortfolioByReq((prev) => ({ ...prev, [requestId]: portfolioIndex }));
+    loadExistingAccess(requestId, webId, portfolioIndex);
+  }
+
+  function toggleSection(requestId, portfolioIndex, section) {
+    setAllowedSectionsByReq((prev) => {
+      const requestMap = prev[requestId] || {};
+      const current = requestMap[portfolioIndex] || [];
+      const exists = current.includes(section);
+
+      return {
+        ...prev,
+        [requestId]: {
+          ...requestMap,
+          [portfolioIndex]: exists
+            ? current.filter((item) => item !== section)
+            : [...current, section],
+        },
+      };
+    });
+  }
+
+  function getPortfolioLabel(indexValue) {
+    const match = portfolioOptions.find((option) => option.index === indexValue);
+    return match ? match.label : `Resume ${indexValue}`;
+  }
+
+  async function handleSectionAccess(requestId, webId, section) {
+    const selectedIndex = selectedPortfolioByReq[requestId];
+    if (!selectedIndex) {
+      alert("Select a portfolio first.");
+      return;
+    }
+
+    const current = allowedSectionsByReq[requestId]?.[selectedIndex] || [];
+    const alreadyAllowed = current.includes(section);
+
+    if (!alreadyAllowed) {
+      const sectionMap = {
+        Information: infoItems,
+        Website: websiteItems,
+        Skills: skillItems,
+        Project: projectItems,
+        Experience: experienceItems,
+      };
+
+      const sectionItems = sectionMap[section] || [];
+      const matchingItems = sectionItems.filter(
+        (item) => Number(item.ResumeIndex) === Number(selectedIndex)
+      );
+
+      if (matchingItems.length === 0) {
+        alert("No items found for this section and portfolio.");
+        return;
+      }
+
+      await Promise.all(
+        matchingItems.map((item) => requestAccess(webId, item.url))
+      );
+    } else {
+      const sectionMap = {
+        Information: infoItems,
+        Website: websiteItems,
+        Skills: skillItems,
+        Project: projectItems,
+        Experience: experienceItems,
+      };
+
+      const sectionItems = sectionMap[section] || [];
+      const matchingItems = sectionItems.filter(
+        (item) => Number(item.ResumeIndex) === Number(selectedIndex)
+      );
+
+      if (matchingItems.length === 0) {
+        alert("No items found for this section and portfolio.");
+        return;
+      }
+
+      await Promise.all(
+        matchingItems.map((item) => denyAccess(webId, item.url))
+      );
+    }
+
+    toggleSection(requestId, selectedIndex, section);
+  }
+
+  async function loadExistingAccess(requestId, webId, portfolioIndex) {
+    const sectionMap = {
+      Information: infoItems,
+      Website: websiteItems,
+      Skills: skillItems,
+      Project: projectItems,
+      Experience: experienceItems,
+    };
+
+    const allowedSections = [];
+
+    for (let i = 0; i < accessSections.length; i += 1) {
+      const section = accessSections[i];
+      const sectionItems = sectionMap[section] || [];
+      const matchingItems = sectionItems.filter(
+        (item) => Number(item.ResumeIndex) === Number(portfolioIndex)
+      );
+
+      if (matchingItems.length === 0) {
+        continue;
+      }
+
+      const accessList = await Promise.all(
+        matchingItems.map((item) => getAgentAccess(webId, item.url))
+      );
+
+      const hasRead = accessList.some((access) => access?.read === true);
+      if (hasRead) {
+        allowedSections.push(section);
+      }
+    }
+
+    setAllowedSectionsByReq((prev) => ({
+      ...prev,
+      [requestId]: {
+        ...(prev[requestId] || {}),
+        [portfolioIndex]: allowedSections,
+      },
+    }));
+  }
 
   useEffect(() => {
     async function fetchRequests() {
       try {
-        // Fetch all requests
-        const res = await fetch("http://127.0.0.1:8000/api/requests/all/"); // new endpoint for all requests
+        const res = await fetch("http://127.0.0.1:8000/api/requests/all/");
         const data = await res.json();
         console.log("Fetched requests:", data);
-
         setRequests(data);
-        
       } catch (error) {
         console.error("Failed to fetch requests:", error);
         setRequests([]);
       }
     }
 
+    async function fetchResumeOptions() {
+      try {
+        const user = await restoreSession();
+        if (!user) {
+          setPortfolioOptions([]);
+          setInfoItems([]);
+          setWebsiteItems([]);
+          setSkillItems([]);
+          setProjectItems([]);
+          setExperienceItems([]);
+          return;
+        }
+
+        const podInformation = await loadInformation();
+        const infoList = [];
+
+        for (let i in podInformation) {
+          for (let j in podInformation[i].information) {
+            infoList.push(podInformation[i].information[j]);
+          }
+        }
+
+        const podWebsites = await loadWebsite();
+        const websiteList = [];
+        for (let i in podWebsites) {
+          for (let j in podWebsites[i].website) {
+            websiteList.push(podWebsites[i].website[j]);
+          }
+        }
+
+        const podSkills = await loadSkill();
+        const skillList = [];
+        for (let i in podSkills) {
+          for (let j in podSkills[i].skill) {
+            skillList.push(podSkills[i].skill[j]);
+          }
+        }
+
+        const podProjects = await loadProject();
+        const projectList = [];
+        for (let i in podProjects) {
+          for (let j in podProjects[i].projects) {
+            projectList.push(podProjects[i].projects[j]);
+          }
+        }
+
+        const podExperiences = await loadExperience();
+        const experienceList = [];
+        for (let i in podExperiences) {
+          for (let j in podExperiences[i].experience) {
+            experienceList.push(podExperiences[i].experience[j]);
+          }
+        }
+
+        const resumeIndexes = Array.from(
+          new Set(infoList.map((info) => Number(info.ResumeIndex)).filter((value) => !Number.isNaN(value)))
+        ).sort((a, b) => a - b);
+
+        const nameByIndex = {};
+        for (let i = 0; i < infoList.length; i += 1) {
+          const indexValue = Number(infoList[i].ResumeIndex);
+          if (!Number.isNaN(indexValue) && !nameByIndex[indexValue]) {
+            nameByIndex[indexValue] = infoList[i].FullName;
+          }
+        }
+
+        const options = resumeIndexes.map((index) => {
+          const name = nameByIndex[index];
+          return {
+            index,
+            label: name ? `Resume ${index} - ${name}` : `Resume ${index}`,
+          };
+        });
+        setPortfolioOptions(options);
+        setInfoItems(infoList);
+        setWebsiteItems(websiteList);
+        setSkillItems(skillList);
+        setProjectItems(projectList);
+        setExperienceItems(experienceList);
+      } catch (error) {
+        console.error("Failed to load resumes:", error);
+        setPortfolioOptions([]);
+        setInfoItems([]);
+        setWebsiteItems([]);
+        setSkillItems([]);
+        setProjectItems([]);
+        setExperienceItems([]);
+      }
+    }
+
     fetchRequests();
+    fetchResumeOptions();
   }, []);
 
   return (
@@ -100,7 +333,48 @@ function InPerms() {
                     <p>Intended for: {req.applicant_webid}</p>
                     <p>Summary: {req.summary}</p>
                     <p>Job Application ID: {req.job_application?.id || "N/A"}</p>
-                    <Link to = {"/config-perms"}>Configure Permissions</Link>
+                    <button
+                      onClick={() => toggleRequestOptions(req.id)}
+                    >
+                      Configure Permissions
+                    </button>
+                    {openRequestId === req.id && (
+                      <div className="resume-section">
+                        <h4>Select portfolio</h4>
+                        <div>
+                          {portfolioOptions.length === 0 ? (
+                            <p>No resumes found.</p>
+                          ) : (
+                            portfolioOptions.map((option) => (
+                              <button
+                                key={option.index}
+                                onClick={() => selectPortfolio(req.id, option.index, req.employer_webid)}
+                              >
+                                {option.label}
+                              </button>
+                            ))
+                          )}
+                        </div>
+                        {selectedPortfolioByReq[req.id] && (
+                          <div>
+                            <p>Selected: {getPortfolioLabel(selectedPortfolioByReq[req.id])}</p>
+                            <h4>Allow access to</h4>
+                            <div>
+                              {accessSections.map((section) => (
+                                <button
+                                  key={section}
+                                  onClick={() => handleSectionAccess(req.id, req.employer_webid, section)}
+                                >
+                                  {allowedSectionsByReq[req.id]?.[selectedPortfolioByReq[req.id]]?.includes(section)
+                                    ? "Remove "
+                                    : "Allow "}{section}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </li>
               ))}

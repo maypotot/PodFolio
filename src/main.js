@@ -38,7 +38,9 @@ import {
     performImageDeletion,
     loadImage,
     performWebsiteCreation,
-    performSkillCreation
+    performSkillCreation,
+    performSkillDeletion,
+    performWebsiteDeletion
     
 } from './solid';
 import Website from './solid/Website';
@@ -103,6 +105,24 @@ export async function logout() {
     alert("You have been logged out.")
 }
 
+function getHighestResumeIndex(podInformation) {
+    let maxResumeIndex = 0;
+
+    for (let i in podInformation) {
+        const infoList = podInformation[i].information || [];
+
+        for (let j in infoList) {
+            const value = Number(infoList[j].ResumeIndex);
+
+            if (!Number.isNaN(value) && value > maxResumeIndex) {
+                maxResumeIndex = value;
+            }
+        }
+    }
+
+    return maxResumeIndex;
+}
+
 
 export async function createInformation() {
     const FullName = document.getElementById('FullName').value;
@@ -120,17 +140,15 @@ export async function createInformation() {
     const RelevantCoursework = document.getElementById('RelevantCoursework').value;
     const Honors = document.getElementById('Honors').value;
     const ThesisTitle = document.getElementById('ThesisTitle').value;
+
+    
+    // const fileInput = document.getElementById('ImageFile');
+    // const imageFile = fileInput.files[0];
     
     const user = await restoreSession();
 
     const podInformation = await loadInformation();
-
-    let podInfoLength = 0;
-    for (let podInfo in podInformation){
-        podInfoLength = podInfoLength + podInformation[podInfo].resources.length;
-    }
-    console.log("Information Resume Index:")
-    console.log(podInfoLength)
+    const maxResumeIndex = getHighestResumeIndex(podInformation);
 
     const information = await performInformationCreation({
         FullName,
@@ -148,7 +166,8 @@ export async function createInformation() {
         RelevantCoursework,
         Honors,
         ThesisTitle,
-        ResumeIndex: podInfoLength + 1
+        ResumeIndex: maxResumeIndex + 1,
+        
     });
     alert("Information has been created")
 }
@@ -168,11 +187,7 @@ export async function createExperience() {
     const user = await restoreSession();
 
     const podInformation = await loadInformation();
-
-    let podInfoLength = 0;
-    for (let podInfo in podInformation){
-        podInfoLength = podInfoLength + podInformation[podInfo].resources.length;
-    }
+    const maxResumeIndex = getHighestResumeIndex(podInformation);
 
     const experience = await performExperienceCreation({
         PositionTitle,
@@ -180,7 +195,7 @@ export async function createExperience() {
         Duration,
         Description,
         ExperienceLocation,
-        ResumeIndex: podInfoLength + 1
+        ResumeIndex: maxResumeIndex + 1
     });
     alert("Experience has been created")
 }
@@ -199,11 +214,7 @@ export async function createProject() {
     const user = await restoreSession();
 
     const podInformation = await loadInformation();
-
-    let podInfoLength = 0;
-    for (let podInfo in podInformation){
-        podInfoLength = podInfoLength + podInformation[podInfo].resources.length;
-    }
+    const maxResumeIndex = getHighestResumeIndex(podInformation);
 
 
     const project = await performProjectCreation({
@@ -211,7 +222,7 @@ export async function createProject() {
         Summary: Summary,
         Tools: Tools,
         ProjectLink: ProjectLink,
-        ResumeIndex: podInfoLength + 1
+        ResumeIndex: maxResumeIndex + 1
     });
     alert("Project has been created")
 }
@@ -304,7 +315,7 @@ async function createReference() {
 
 }
 
-async function createImage() {
+export async function createImage() {
     const fileInput = document.getElementById('ImageFile');
     const File = fileInput.files[0];
 
@@ -312,6 +323,18 @@ async function createImage() {
         alert('Please fill in all fields');
         return;
     }
+
+    
+    const user = await restoreSession();
+
+    const podInformation = await loadInformation();
+
+    let podInfoLength = 0;
+    for (let podInfo in podInformation){
+        podInfoLength = podInfoLength + podInformation[podInfo].information.length;
+    }
+
+
     const items = await performImageCreation(File);
 }
 
@@ -326,16 +349,10 @@ export async function createWebsite() {
     const user = await restoreSession();
 
     const podInformation = await loadInformation();
-
-    let podInfoLength = 0;
-    for (let podInfo in podInformation){
-        podInfoLength = podInfoLength + podInformation[podInfo].resources.length;
-    }
-    console.log("Website Resume Index:")
-    console.log(podInfoLength)
+    const maxResumeIndex = getHighestResumeIndex(podInformation);
 
 
-    const items = await performWebsiteCreation({WebsiteLink, WebsiteLink, ResumeIndex: podInfoLength + 1});
+    const items = await performWebsiteCreation({WebsiteLink, ResumeIndex: maxResumeIndex + 1});
     alert("Website has been created")   
 }
 
@@ -350,14 +367,10 @@ export async function createSkill() {
     const user = await restoreSession();
 
     const podInformation = await loadInformation();
-
-    let podInfoLength = 0;
-    for (let podInfo in podInformation){
-        podInfoLength = podInfoLength + podInformation[podInfo].resources.length;
-    }
+    const maxResumeIndex = getHighestResumeIndex(podInformation);
 
 
-    const items = await performSkillCreation({Skill: Skill, ResumeIndex: podInfoLength + 1});
+    const items = await performSkillCreation({Skill: Skill, ResumeIndex: maxResumeIndex + 1});
     alert("Skill has been created")   
 }
 
@@ -604,7 +617,6 @@ export async function appendImage(itemList) {
     let num = 0;
     itemList.forEach((item) => {
         
-        console.log(item);
         const imageItem = document.createElement('li');
         imageItem.innerHTML = `
             <h3>Reference</h3>
@@ -624,7 +636,6 @@ export async function appendImage(itemList) {
         imageDisplay.src = URL.createObjectURL(item);
         imageDisplay.style.display = 'block';
         num = num + 1;
-        console.log(num)
     });
 
 
@@ -764,28 +775,36 @@ function updateImage(imageUrl) {
     alert("Image has been updated. Please refresh to see changes.")
 }
 
-function deleteInformation(infoUrl) {
+export function deleteInformation(infoUrl) {
     performInformationDeletion(infoUrl);
 }
 
-function deleteExperience(experienceUrl) {
+export function deleteExperience(experienceUrl) {
     performExperienceDeletion(experienceUrl);
 }
 
-function deleteProject(projectUrl) {
+export function deleteProject(projectUrl) {
     performProjectDeletion(projectUrl);
 }
 
-function deleteAward(awardUrl) {
+export function deleteAward(awardUrl) {
     performAwardDeletion(awardUrl);
 }
 
-function deleteTraining(trainingUrl) {
+export function deleteTraining(trainingUrl) {
     performTrainingDeletion(trainingUrl);
 }
 
-function deleteReference(referenceUrl) {
+export function deleteReference(referenceUrl) {
     performReferenceDeletion(referenceUrl);
+}
+
+export function deleteWebsite(websiteUrl) {
+    performWebsiteDeletion(websiteUrl);
+}
+
+export function deleteSkill(skillUrl) {
+    performSkillDeletion(skillUrl);
 }
 
 function deleteImage() {

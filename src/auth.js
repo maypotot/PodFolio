@@ -37,46 +37,9 @@ import {
  
 const user = await restoreSession();
 
-async function requestAccess(){
-    const session = getDefaultSession();
-    let requestingID = document.getElementById("requestingID").value
-    let resourceURL = document.getElementById("resourceURL").value
+export async function requestAccess(requestingID, resourceURL) {
+  const session = getDefaultSession();
 
-    // // ExamplePrinter sets the requested access (if granted) to expire in 5 minutes.
-    // let accessExpiration = new Date( Date.now() +  5 * 60000 );
-
-    // // Call `issueAccessRequest` to create an Access Request
-    // //
-    // console.log(session)
-    // console.log(session.fetch)
-    // // 1. Fetch the resource with its ACL
-    // const myDatasetWithAcl = await getSolidDatasetWithAcl(resourceURL, { fetch: session.fetch });
-    // console.log(myDatasetWithAcl)
-    // // 2. Get the ACL (or create it if it doesn't exist)
-    // let resourceAcl;
-    // if (!hasResourceAcl(myDatasetWithAcl)) {
-    //   if (!hasAccessibleAcl(myDatasetWithAcl)) {
-    //     throw new Error("The current user does not have permission to change access rights to this Resource.");
-    //   }
-    //   // Create a new ACL based on the fallback
-    //   console.log("Creating ACL")
-    //   resourceAcl = createAclFromFallbackAcl(myDatasetWithAcl);
-    // } else {
-    //   console.log("Getting ACL")
-    //   resourceAcl = getResourceAcl(myDatasetWithAcl);
-    // }
-
-    // // 3. Update the ACL to give access to a specific WebID
-    // console.log("Updating ACL")
-    // const updatedAcl = setAgentResourceAccess(
-    //   resourceAcl,
-    //   resourceRequestingID, // The person you want to give access to
-    //   { read: true, write: false, append: false, control: false }
-    // );
-    // console.log("Saving ACL")
-    // // 4. Save the changes
-    // await saveAclFor(myDatasetWithAcl, updatedAcl, { fetch: session.fetch });
-    // alert("Request is finished")
 
     try {
     const updatedAccess = await universalAccess.setAgentAccess(
@@ -99,7 +62,50 @@ async function requestAccess(){
   } catch (error) {
     console.error("Error granting access:", error);
   }
-  alert("Request is finished")
+  return true;
+}
+
+export async function denyAccess(requestingID, resourceURL) {
+  const session = getDefaultSession();
+
+
+    try {
+    const updatedAccess = await universalAccess.setAgentAccess(
+      resourceURL, // The URL of the file/folder
+      requestingID,   // The WebID of the user to remove
+      { 
+        read: false, 
+        write: false, 
+        append: false, 
+        control: false 
+      },
+      { fetch: session.fetch }
+    );
+
+    if (updatedAccess === null) {
+      console.log("Could not update access (Server might not support this API or permission denied)");
+    } else {
+      console.log("Access removed for:", requestingID);
+    }
+  } catch (error) {
+    console.error("Error removing access:", error);
+  }
+  return true;
+}
+
+export async function getAgentAccess(requestingID, resourceURL) {
+  const session = getDefaultSession();
+
+  try {
+    return await universalAccess.getAgentAccess(
+      resourceURL,
+      requestingID,
+      { fetch: session.fetch }
+    );
+  } catch (error) {
+    console.error("Error reading access:", error);
+    return null;
+  }
 }
 
 async function checkID(){

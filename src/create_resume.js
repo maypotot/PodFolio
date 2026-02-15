@@ -20,8 +20,14 @@ import {
   createProject,
   createExperience,
   createSkill,
+  createImage,
  } from "./main.js";
  
+function uploadResume(experience) {
+  createImage()
+  createInformation()
+}
+
 const user = await restoreSession();
 
 function CreateResume() {
@@ -56,7 +62,7 @@ function CreateResume() {
             <div className="tag-header">
               <h1>New Resume</h1>
               <Link to="/view-resume"> 
-              <button className="complete-button" onClick={createInformation}>Complete Resume</button>
+              <button className="complete-button" onClick={uploadResume}>Complete Resume</button>
               </Link>
             </div>
             <div className="tags-section">
@@ -122,6 +128,16 @@ function CreateResume() {
                     placeholder="Quezon City, Philippines"
                     className = "resume-input"
                     id = "Location"
+                  />
+                </div>
+
+                <div className="resume-field">
+                  <h3 className="tag-title">Profile Image</h3>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className = "resume-input"
+                    id = "ImageFile"
                   />
                 </div>
 

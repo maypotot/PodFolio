@@ -1,6 +1,13 @@
 import { fetch, getDefaultSession, handleIncomingRedirect, login, logout } from '@inrupt/solid-client-authn-browser';
 import { saveFileInContainer, getSourceUrl, getFile, getSolidDataset, getThingAll, removeThing, deleteFile} from "@inrupt/solid-client";
 
+import {
+  getThing,
+  setThing,
+  addInteger, 
+  saveSolidDatasetAt,
+} from "@inrupt/solid-client";
+
 import User from './User';
 import InformationList from './solid/InformationList';
 import ExperienceList from './solid/ExperienceList';
@@ -23,6 +30,7 @@ let referenceList;
 let imageList;
 let websiteList;
 let skillList;
+
 
 export async function restoreSession() {
     // This function uses Inrupt's authentication library to restore a previous session. If you were
@@ -170,14 +178,15 @@ export async function performSkillCreation(skill) {
     return newSkill;
 }
 
-async function uploadImage(file) {
+async function uploadImage(image) {
   try {
     const savedFile = await saveFileInContainer(
       `${user.storageUrl}images/`,           // Container URL
-      file,                         // File 
-      { slug: file.name, contentType: file.type, fetch: fetch }
+      image,                         // File 
+      { slug: image , contentType: image.type, fetch: fetch }
     );
     console.log(`File saved at ${getSourceUrl(savedFile)}`);
+
     return getSourceUrl(savedFile);
   } catch (error) {
     console.error(error);
@@ -270,7 +279,6 @@ export async function loadProject() {
     for (let proj in podProjectList) {
         await podProjectList[proj].loadRelation('projects');
     }
-    console.log("project list in solid.js:", podProjectList);
     return podProjectList;
 }
 
@@ -489,18 +497,97 @@ export async function performUpdateImage(imageUrl, inputImage) {
 
 // Deletion
 export async function performInformationDeletion(infoUrl) {
-    await infoList?.relatedInformation.delete(infoUrl);
-    alert('Information deleted successfully. Please refresh the page to see the changes.');
+    let podInfo;
+    let podInformationList = [];
+    const allContainers = await InformationList.find(user.storageUrl);
+    infoList = allContainers.resourceUrls.filter(c => c.includes("information"));
+
+    if (!infoList) {
+        return [];
+    }
+
+    for (let url in infoList) {
+        podInfo = await InformationList.find(infoList[url]);
+        podInformationList.push(podInfo);
+    }
+    for (let info in podInformationList) {
+        await podInformationList[info].loadRelation('information');
+    }
+
+    for (let i in podInformationList) {
+        let information = podInformationList[i].information;
+        for (let j in information) {
+            console.log("Checking information with URL:", information[j].url);
+            if (information[j].url === infoUrl) {
+                await information[j].delete();
+            alert('Information deleted successfully. Please refresh the page to see the changes.');
+            return;
+            }
+        }
+    }
 }
 
 export async function performExperienceDeletion(expUrl) {
-    await experienceList?.relatedExperience.delete(expUrl);
-    alert('Experience deleted successfully. Please refresh the page to see the changes.');
+    let podExperience;
+    let podExperienceList = [];
+    const allContainers = await ExperienceList.find(user.storageUrl);
+    experienceList = allContainers.resourceUrls.filter(c => c.includes("experience"));
+
+    if (!experienceList) {
+        return [];
+    }
+
+    for (let url in experienceList) {
+        podExperience = await ExperienceList.find(experienceList[url]);
+        podExperienceList.push(podExperience);
+    }
+    for (let exp in podExperienceList) {
+        await podExperienceList[exp].loadRelation('experience');
+    }
+
+    for (let i in podExperienceList) {
+        let experiences = podExperienceList[i].experience;
+        for (let j in experiences) {
+            console.log("Checking experience with URL:", experiences[j].url);
+            if (experiences[j].url === expUrl) {
+                await experiences[j].delete();
+            alert('Experience deleted successfully. Please refresh the page to see the changes.');
+            return;
+            }
+        }
+    }
 }
 
 export async function performProjectDeletion(projectUrl) {
-    await projectList?.relatedProjects.delete(projectUrl);
-    alert('Project deleted successfully. Please refresh the page to see the changes.');
+    let podProject;
+    let podProjectList = [];
+    const allContainers = await ProjectList.find(user.storageUrl);
+    projectList = allContainers.resourceUrls.filter(c => c.includes("project"));
+
+    if (!projectList) {
+        return [];
+    }
+
+    for (let url in projectList) {
+        podProject = await ProjectList.find(projectList[url]);
+        podProjectList.push(podProject);
+    }
+    for (let exp in podProjectList) {
+        await podProjectList[exp].loadRelation('projects');
+    }
+
+    console.log("Checking projectlist:", podProjectList)
+    for (let i in podProjectList) {
+        let projects = podProjectList[i].projects;
+        for (let j in projects) {
+            console.log("Checking project with URL:", projects[j].url);
+            if (projects[j].url === projectUrl) {
+                await projects[j].delete();
+            alert('Project deleted successfully. Please refresh the page to see the changes.');
+            return;
+            }
+        }
+    }
 }
 
 export async function performAwardDeletion(awardUrl) {
@@ -516,6 +603,68 @@ export async function performTrainingDeletion(trainingUrl) {
 export async function performReferenceDeletion(referenceUrl) {
     await referenceList?.relatedReference.delete(referenceUrl);
     alert('Reference deleted successfully. Please refresh the page to see the changes.');
+}
+
+export async function performWebsiteDeletion(websiteUrl) {
+    let podWebsite;
+    let podWebsiteList = [];
+    const allContainers = await WebsiteList.find(user.storageUrl);
+    websiteList = allContainers.resourceUrls.filter(c => c.includes("website"));
+
+    if (!websiteList) {
+        return [];
+    }
+
+    for (let url in websiteList) {
+        podWebsite = await WebsiteList.find(websiteList[url]);
+        podWebsiteList.push(podWebsite);
+    }
+    for (let exp in podWebsiteList) {
+        await podWebsiteList[exp].loadRelation('website');
+    }
+
+    for (let i in podWebsiteList) {
+        let websites = podWebsiteList[i].website;
+        for (let j in websites) {
+            console.log("Checking website with URL:", websites[j].url);
+            if (websites[j].url === websiteUrl) {
+                await websites[j].delete();
+            alert('Website deleted successfully. Please refresh the page to see the changes.');
+            return;
+            }
+        }
+    }
+}
+
+export async function performSkillDeletion(skillUrl) {
+    let podSkill;
+    let podSkillList = [];
+    const allContainers = await SkillList.find(user.storageUrl);
+    skillList = allContainers.resourceUrls.filter(c => c.includes("skill"));
+
+    if (!skillList) {
+        return [];
+    }
+
+    for (let url in skillList) {
+        podSkill = await SkillList.find(skillList[url]);
+        podSkillList.push(podSkill);
+    }
+    for (let exp in podSkillList) {
+        await podSkillList[exp].loadRelation('skill');
+    }
+
+    for (let i in podSkillList) {
+        let skills = podSkillList[i].skill;
+        for (let j in skills) {
+            console.log("Checking skill with URL:", skills[j].url);
+            if (skills[j].url === skillUrl) {
+                await skills[j].delete();
+            alert('Skill deleted successfully. Please refresh the page to see the changes.');
+            return;
+            }
+        }
+    }
 }
 
 export async function performImageDeletion() {

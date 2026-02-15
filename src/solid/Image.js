@@ -13,6 +13,10 @@ export default class ImageModel extends SolidModel {
             required: true,
             type: FieldType.Key,
         },
+        ResumeIndex: {
+            required: true,
+            type: FieldType.Number,
+        }
     };
 
 }
