@@ -39,10 +39,10 @@ function EmployerHomeFeed() {
               
               {/* Links for editing the job and viewing applicants */}
               <Link to={`/jobs/${job.id}/edit`}>
-                <button>Edit Job</button>
+                <button className="employer-responsive-button">Edit Job</button>
               </Link>
               <Link to={`/jobs/${job.id}/applicants`}>
-                <button>View Applicants</button>
+                <button className="employer-responsive-button">View Applicants</button>
               </Link>
             </div>
           </div>

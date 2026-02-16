@@ -1,5 +1,17 @@
 from rest_framework import serializers
-from .models import JobPosting, JobApplication, EmployerRequest
+from .models import JobPosting, JobApplication, EmployerRequest, StudentAccount, EmployerAccount
+
+class StudentAccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudentAccount
+        fields = '__all__'
+        read_only_fields = ['id', 'created_at']
+
+class EmployerAccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmployerAccount
+        fields = '__all__'
+        read_only_fields = ['id', 'created_at']
 
 class JobPostingSerializer(serializers.ModelSerializer):
     class Meta:

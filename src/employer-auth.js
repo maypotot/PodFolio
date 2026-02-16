@@ -1,45 +1,32 @@
 import { useState, useEffect } from "react";
-import "./App.css";
-import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
-import HomeFeed from "./student-homefeed.js";
-import Profile from "./student-profile.js";
-import CreateResume from "./create_resume";
-import ViewResume from "./view_resume";
-import ConfigPerms from "./config_perms";
-import InPerms from "./perms"
-import EmployerHomeFeed from "./employer-homefeed.js";
-import JobApplicants from "./employer-job-applicants.js";
-import EmployerLayout from "./employer-layout.js";
-import { EmployerHome, EmployerSignup, EmployerLogin } from "./employer-auth.js"
-
-import { useNavigate } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
+import "./employer-side.css";
 import { login } from "./main.js";
 import { restoreSession } from "./solid.js";
 
-function Home() {
+function EmployerHome() {
   return (
     <main className="home">
-      <img src="/logo.png" alt="App Logo" className="logo" />
+      <img src="/logo-green-01.png" alt="App Logo" className="logo" />
       <div className="button-container">
-        <Link to="/signup">
-          <button>Sign Up</button>
+        <Link to="/employer-signup">
+          <button className="employer-button">Sign Up</button>
         </Link>
-        <Link to="/login">
-          <button>Log In</button>
+        <Link to="/employer-login">
+          <button className="employer-button">Log In</button>
         </Link>
       </div>
-      <Link to="/employer-home">
-        <p className="plink">Are you an employer? Sign up as an Employer</p>
+      <Link to="/">
+        <p className="plink">Are you a job seeker? Sign up as a Job Seeker</p>
       </Link>
     </main>
-  )
+  );
 }
 
-function Signup() {
+function EmployerSignup() {
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
+    companyName: "",
+    contactPerson: "",
     email: "",
     webid: ""
   });
@@ -59,7 +46,7 @@ function Signup() {
     setError("");
 
     // Validate form fields
-    if (!formData.firstName || !formData.lastName || !formData.email || !formData.webid) {
+    if (!formData.companyName || !formData.contactPerson || !formData.email || !formData.webid) {
       setError("Please fill in all required fields");
       return;
     }
@@ -68,14 +55,14 @@ function Signup() {
     const webidWithoutFragment = formData.webid.split('#')[0];
 
     try {
-      const response = await fetch("http://localhost:8000/api/students/signup/", {
+      const response = await fetch("http://localhost:8000/api/employers/signup/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          first_name: formData.firstName,
-          last_name: formData.lastName,
+          company_name: formData.companyName,
+          contact_person: formData.contactPerson,
           email: formData.email,
           webid: webidWithoutFragment  // Save without #me
         }),
@@ -85,9 +72,9 @@ function Signup() {
 
       if (response.ok) {
         setSuccess(true);
-        // Redirect to login after 2 seconds
+        // Redirect to employer login after 2 seconds
         setTimeout(() => {
-          navigate("/login");
+          navigate("/employer-login");
         }, 2000);
       } else {
         // Handle validation errors
@@ -101,14 +88,14 @@ function Signup() {
       }
     } catch (err) {
       setError("Network error. Please check your connection and try again.");
-      console.error("Signup error:", err);
+      console.error("Employer signup error:", err);
     }
   };
 
   return (
     <main className="home">
-      <img src="/logo.png" alt="App Logo" className="logo" />
-      <h2>Create Your Account</h2>
+      <img src="/logo-green-01.png" alt="App Logo" className="logo" />
+      <h2>Create Employer Account</h2>
       
       {success ? (
         <div className="success-message">
@@ -119,27 +106,27 @@ function Signup() {
           {error && <div className="error-message">{error}</div>}
           
           <div className="form-group">
-            <label htmlFor="firstName">First Name *</label>
+            <label htmlFor="companyName">Company Name *</label>
             <input
               type="text"
-              id="firstName"
-              name="firstName"
-              value={formData.firstName}
+              id="companyName"
+              name="companyName"
+              value={formData.companyName}
               onChange={handleChange}
-              placeholder="Enter your first name"
+              placeholder="Enter your company name"
               required
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="lastName">Last Name *</label>
+            <label htmlFor="contactPerson">Contact Person *</label>
             <input
               type="text"
-              id="lastName"
-              name="lastName"
-              value={formData.lastName}
+              id="contactPerson"
+              name="contactPerson"
+              value={formData.contactPerson}
               onChange={handleChange}
-              placeholder="Enter your last name"
+              placeholder="Enter contact person name"
               required
             />
           </div>
@@ -152,7 +139,7 @@ function Signup() {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="your.email@example.com"
+              placeholder="company@example.com"
               required
             />
           </div>
@@ -177,7 +164,7 @@ function Signup() {
           <button type="submit" className="signup-button">Sign Up</button>
           
           <div className="signup-links">
-            <Link to="/" className="back-link">← Back to Home</Link>
+            <Link to="/employer-home" className="back-link">← Back to Home</Link>
             <a 
               href="https://solidcommunity.net/" 
               target="_blank" 
@@ -190,52 +177,41 @@ function Signup() {
         </form>
       )}
     </main>
-  )
+  );
 }
 
-function Login() {
+function EmployerLogin() {
   const [webid, setWebId] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState(1); // Step 1: Check DB, Step 2: Solid Auth
+  const [step, setStep] = useState(1);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const navigate = useNavigate();
 
-  // Check if we're returning from Solid authentication
+  // Check if returning from Solid authentication
   useEffect(() => {
     async function checkSolidSession() {
       try {
-        // Get the WebID that was stored before Solid auth
-        const expectedWebId = sessionStorage.getItem("login_webid");
-        
-        // Check if there's a Solid session
+        const expectedWebId = sessionStorage.getItem("employer_login_webid");
         const solidUser = await restoreSession();
         
         if (solidUser && solidUser.webId && expectedWebId) {
-          console.log("Detected Solid session after redirect:", solidUser.webId);
-          console.log("Expected WebID:", expectedWebId);
+          console.log("Detected Solid session for employer:", solidUser.webId);
           
-          // Verify the Solid WebID matches the expected one
           const solidWebIdWithoutFragment = solidUser.webId.split('#')[0];
           const expectedWebIdWithoutFragment = expectedWebId.split('#')[0];
 
           if (solidWebIdWithoutFragment === expectedWebIdWithoutFragment) {
-            console.log("WebIDs match! Completing login...");
+            console.log("Employer WebIDs match! Completing login...");
             
-            // Store the full WebID in session storage
-            sessionStorage.setItem("webid", solidUser.webId);
+            sessionStorage.setItem("employer_webid", solidUser.webId);
+            sessionStorage.removeItem("employer_login_webid");
             
-            // Clear the temporary login WebID
-            sessionStorage.removeItem("login_webid");
-            
-            // Navigate to homefeed
-            console.log("Navigating to homefeed...");
-            navigate("/homefeed");
+            navigate("/employer-homefeed");
             return;
           } else {
-            console.log("WebIDs don't match");
-            setError("The Solid account you logged in with doesn't match. Please try again.");
-            sessionStorage.removeItem("login_webid");
+            setError("The Solid account doesn't match. Please try again.");
+            sessionStorage.removeItem("employer_login_webid");
             setStep(1);
           }
         }
@@ -253,8 +229,6 @@ function Login() {
     e.preventDefault();
     setError("");
     setLoading(true);
-
-    console.log("Checking WebID in database:", webid);
     
     if (webid.trim() === "") {
       setError("Please enter your WebID");
@@ -263,37 +237,29 @@ function Login() {
     }
 
     try {
-      // Strip fragment before checking database
       const webidWithoutFragment = webid.split('#')[0];
       
-      // Check if WebID exists in database
       const response = await fetch(
-        `http://localhost:8000/api/students/?webid=${encodeURIComponent(webidWithoutFragment)}`
+        `http://localhost:8000/api/employers/?webid=${encodeURIComponent(webidWithoutFragment)}`
       );
 
       if (response.ok) {
-        // WebID exists in database - proceed to Solid authentication
-        const studentData = await response.json();
-        console.log("WebID found in database:", studentData);
+        const employerData = await response.json();
+        console.log("Employer WebID found in database:", employerData);
         
-        // Store the WebID temporarily so we can verify it after Solid redirect
-        sessionStorage.setItem("login_webid", webid);
-        
-        // Move to step 2: Solid authentication
+        sessionStorage.setItem("employer_login_webid", webid);
         setStep(2);
         setLoading(false);
       } else if (response.status === 404) {
-        // WebID not found in database
-        setError("Account not found. Please sign up first.");
+        setError("Employer account not found. Please sign up first.");
         setLoading(false);
       } else {
-        // Other error
         setError("Error checking account. Please try again.");
         setLoading(false);
       }
     } catch (err) {
       console.error("Database check error:", err);
-      setError("Network error. Please check your connection and try again.");
+      setError("Network error. Please try again.");
       setLoading(false);
     }
   }
@@ -303,11 +269,8 @@ function Login() {
     setLoading(true);
 
     try {
-      // Trigger Solid authentication
-      console.log("Starting Solid authentication...");
+      console.log("Starting Solid authentication for employer...");
       await login();
-      // After login() triggers, Solid will redirect back to this page
-      // The useEffect will handle the rest
     } catch (err) {
       console.error("Solid authentication error:", err);
       setError("Solid authentication failed. Please try again.");
@@ -315,18 +278,16 @@ function Login() {
     }
   }
 
-  // DEBUGGING: Direct navigation to homefeed with WebID stored
   function handleDebugNavigation() {
-    // Store the WebID in sessionStorage before navigating
-    sessionStorage.setItem("webid", webid);
-    console.log("DEBUG: Stored WebID in sessionStorage:", webid);
-    navigate("/homefeed");
+    sessionStorage.setItem("employer_webid", webid);
+    console.log("DEBUG: Stored employer WebID:", webid);
+    navigate("/employer-homefeed");
   }
 
   if (checkingAuth) {
     return (
       <main className="home">
-        <img src="/logo.png" alt="App Logo" className="logo" />
+        <img src="/logo-green-01.png" alt="App Logo" className="logo" />
         <div className="login-form">
           <p>Checking authentication...</p>
         </div>
@@ -336,17 +297,16 @@ function Login() {
 
   return (
     <main className="home">
-      <img src="/logo.png" alt="App Logo" className="logo" />
-      <h2>Log In</h2>
+      <img src="/logo-green-01.png" alt="App Logo" className="logo" />
+      <h2>Employer Log In</h2>
       
       <div className="login-form">
         {error && <div className="error-message">{error}</div>}
         
         {step === 1 ? (
-          // Step 1: Enter WebID and check database
           <>
             <p className="login-info">
-              Enter your WebID to log in. We'll verify your account before connecting to your Solid Pod.
+              Enter your WebID to log in. We'll verify your employer account first.
             </p>
             
             <form onSubmit={handleCheckWebId}>
@@ -373,10 +333,9 @@ function Login() {
             </form>
           </>
         ) : (
-          // Step 2: Authenticate with Solid
           <>
             <div className="success-badge">
-              ✓ Account Found
+              ✓ Employer Account Found
             </div>
             
             <p className="login-info">
@@ -391,7 +350,6 @@ function Login() {
               {loading ? "Authenticating..." : "Authenticate with Solid"}
             </button>
 
-            {/* DEBUG BUTTON - Remove this in production */}
             <button 
               className="debug-button" 
               onClick={handleDebugNavigation}
@@ -408,14 +366,14 @@ function Login() {
                 marginTop: "0.5rem"
               }}
             >
-              DEBUG: Go to Homefeed (Skip Solid Auth)
+              DEBUG: Go to Employer Feed
             </button>
 
             <button 
               className="back-button" 
               onClick={() => {
                 setStep(1);
-                sessionStorage.removeItem("login_webid");
+                sessionStorage.removeItem("employer_login_webid");
               }}
               disabled={loading}
             >
@@ -425,38 +383,14 @@ function Login() {
         )}
         
         <div className="login-links">
-          <Link className="back-link" to="/">← Back to Home</Link>
-          <Link to="/signup" className="signup-link">
+          <Link className="back-link" to="/employer-home">← Back to Home</Link>
+          <Link to="/employer-signup" className="signup-link">
             Don't have an account? Sign up
           </Link>
         </div>
       </div>
     </main>
-  )
+  );
 }
 
-function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/homefeed" element={<HomeFeed />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/create-resume" element={<CreateResume/>}/>
-        <Route path="/view-resume" element={<ViewResume/>}/>
-        <Route path="/in-perms" element={<InPerms/>}/>
-        <Route path="/config-perms" element={<ConfigPerms/>}/>
-        <Route path="/employer-login" element={<EmployerLogin/>}/>
-        <Route path="/employer-homefeed" element={<EmployerLayout><EmployerHomeFeed/></EmployerLayout>}/>
-        <Route path="/jobs/:jobId/applicants" element={<EmployerLayout><JobApplicants/></EmployerLayout>}/>
-        <Route path="/employer-home" element={<EmployerHome />} />
-        <Route path="/employer-signup" element={<EmployerSignup />} />  
-        <Route path="/employer-login" element={<EmployerLogin />} />
-      </Routes>
-    </Router>
-  )
-}
-
-export default App;
+export { EmployerHome, EmployerSignup, EmployerLogin };

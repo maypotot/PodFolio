@@ -6,6 +6,40 @@
 /* button:hover{ */
   /* background-color: #4CAF50; */
 /* } */
+
+.employer-button {
+  width: 110px;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+  font-family: "Inter", sans-serif;
+  background-color: #5E8821;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.employer-responsive-button {
+  margin: 2%;
+  width: auto;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+  font-family: "Inter", sans-serif;
+  background-color: #5E8821;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.employer-responsive-button:hover {
+  background-color: #4CAF50;}
+.employer-button:hover {
+  background-color: #4CAF50;}
+
+
 .header-section{
     display: flex;
     align-items: center;
@@ -80,6 +114,10 @@ html, body {
     margin-left: 10px;
 }
 
+.herder-buttons:hover {
+  background-color: #5E8821;
+}
+
 .panel-buttons {
   width: 40px;
   height: 40px;
@@ -94,8 +132,8 @@ html, body {
 
 .search-button {
         font-weight: bold;
-width: 70px;
-  height: 40px;
+      width: 70px;
+    height: 40px;
   border-radius: 10px;
   background-color: #7DCB7D;
   align-items: center;
@@ -107,10 +145,15 @@ width: 70px;
     color:black;
 }
 
+.search-button:hover {
+  background-color: #5E8821;
+}
+
 .button-icons{
     height: 30px;
     filter: invert(1);
 }
+
 
 .button-icons-black{
     height: 20px;
@@ -220,6 +263,10 @@ width: 70px;
     border: none;
     margin: 50px 0px;
     font-style: normal;
+}
+
+.log-out-button:hover {
+  background-color: #5E8821;
 }
 
 a {
@@ -550,4 +597,297 @@ h5 {
   background-color: #aaa;
   color: white;
   margin-left: 10px;
+}
+
+
+.button-container {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.button-container button {
+  padding: 1rem 2rem;
+  background-color: #2E7D32;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.button-container button:hover {
+  background-color: #1B5E20;
+}
+
+.plink {
+  color: #2E7D32;
+  text-decoration: none;
+  font-size: 0.95rem;
+  text-align: center;
+  cursor: pointer;
+}
+
+.plink:hover {
+  text-decoration: underline;
+}
+
+/* Forms */
+.signup-form,
+.login-form {
+  max-width: 500px;
+  width: 100%;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.signup-form h2,
+.login-form h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #1B5E20;
+}
+
+/* Form groups */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+  box-sizing: border-box;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #2E7D32;
+}
+
+.webid-input {
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+.field-hint {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #666;
+  font-style: italic;
+}
+
+/* Buttons */
+.signup-button,
+.login-button {
+  width: 100%;
+  padding: 1rem;
+  background-color: #2E7D32;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 1rem;
+}
+
+.signup-button:hover:not(:disabled),
+.login-button:hover:not(:disabled) {
+  background-color: #1B5E20;
+}
+
+.signup-button:disabled,
+.login-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.solid-auth-button {
+  width: 100%;
+  padding: 1rem;
+  background-color: #388E3C;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 0.5rem;
+}
+
+.solid-auth-button:hover:not(:disabled) {
+  background-color: #2E7D32;
+}
+
+.solid-auth-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.back-button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #f5f5f5;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 0.5rem;
+}
+
+.back-button:hover:not(:disabled) {
+  background-color: #e0e0e0;
+}
+
+.back-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Debug button */
+.debug-button {
+  width: 100%;
+  padding: 1rem;
+  background-color: #FF9800;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background-color 0.3s;
+}
+
+.debug-button:hover {
+  background-color: #F57C00;
+}
+
+/* Messages */
+.error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #c62828;
+}
+
+.success-message {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  padding: 2rem;
+  border-radius: 4px;
+  text-align: center;
+  border-left: 4px solid #2e7d32;
+}
+
+.success-badge {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  padding: 0.75rem;
+  border-radius: 4px;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  border-left: 4px solid #2e7d32;
+}
+
+.login-info {
+  text-align: center;
+  color: #666;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+/* Links */
+.signup-links,
+.login-links {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  align-items: center;
+}
+
+.back-link {
+  color: #666;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.back-link:hover {
+  color: #333;
+  text-decoration: underline;
+}
+
+.signup-link {
+  color: #2E7D32;
+  text-decoration: none;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.signup-link:hover {
+  text-decoration: underline;
+}
+
+.solid-link {
+  color: #2E7D32;
+  text-decoration: none;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.solid-link:hover {
+  text-decoration: underline;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+  .home {
+    padding: 1rem;
+  }
+
+  .logo {
+    max-width: 150px;
+  }
+
+  .signup-form,
+  .login-form {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+
+  .button-container {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .button-container button {
+    width: 100%;
+  }
 }
