@@ -320,14 +320,6 @@ async function loadResumeData() {
   console.log("Resume Index List:", resumeIndexList);
   resumeIndex = resumeIndexList[0] || 1;
 
-  let listItem = document.getElementById('buttons');
-  const deleteBtn = document.createElement('button');
-  deleteBtn.textContent = 'Delete Resume';
-  deleteBtn.id = resumeIndex;
-  deleteBtn.onclick = deleteResume;
-  
-  listItem.appendChild(deleteBtn);
-  listItem.appendChild(document.createElement('br'));
 
   updateResumeText();
 
@@ -362,6 +354,9 @@ function previousResume() {
 
 
 function ViewResume() {
+  useEffect(() => {
+    loadResumeData();
+  }, []);
 
   return (
     <main className="view-resume">
@@ -397,9 +392,9 @@ function ViewResume() {
           <div className="tag-header">
             <h1>Resume Preview</h1>
             <ul id="buttons">
-              <button onClick={loadResumeData}>Reload Resume</button>
               <button onClick={previousResume}>Previous Resume</button>
               <button onClick={nextResume}>Next Resume</button>
+              <button onClick={deleteResume}>Delete Resume</button>
             </ul>
             <Link to="/config-perms">
               <button className="complete-button">Configure Permissions</button>

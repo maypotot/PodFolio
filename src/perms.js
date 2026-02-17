@@ -2,7 +2,81 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./main.css";
 import { loadInformation, loadExperience, loadProject, loadWebsite, loadSkill, restoreSession } from "./solid.js";
-import { requestAccess, denyAccess, getAgentAccess } from "./auth.js";
+import { getDefaultSession } from "@inrupt/solid-client-authn-browser";
+import { universalAccess } from "@inrupt/solid-client";
+
+async function requestAccess(requestingID, resourceURL) {
+  const session = getDefaultSession();
+
+  try {
+    const updatedAccess = await universalAccess.setAgentAccess(
+      resourceURL,
+      requestingID,
+      {
+        read: true,
+        write: false,
+        append: false,
+        control: false,
+      },
+      { fetch: session.fetch }
+    );
+
+    if (updatedAccess === null) {
+      console.log("Could not update access (Server might not support this API or permission denied)");
+    } else {
+      alert("Access granted for: " + requestingID);
+      console.log("Access granted for:", requestingID);
+    }
+  } catch (error) {
+    console.error("Error granting access:", error);
+  }
+
+  return true;
+}
+
+async function denyAccess(requestingID, resourceURL) {
+  const session = getDefaultSession();
+
+  try {
+    const updatedAccess = await universalAccess.setAgentAccess(
+      resourceURL,
+      requestingID,
+      {
+        read: false,
+        write: false,
+        append: false,
+        control: false,
+      },
+      { fetch: session.fetch }
+    );
+
+    if (updatedAccess === null) {
+      console.log("Could not update access (Server might not support this API or permission denied)");
+    } else {
+      alert("Access removed for: " + requestingID);
+      console.log("Access removed for:", requestingID);
+    }
+  } catch (error) {
+    console.error("Error removing access:", error);
+  }
+
+  return true;
+}
+
+async function getAgentAccess(requestingID, resourceURL) {
+  const session = getDefaultSession();
+
+  try {
+    return await universalAccess.getAgentAccess(
+      resourceURL,
+      requestingID,
+      { fetch: session.fetch }
+    );
+  } catch (error) {
+    console.error("Error reading access:", error);
+    return null;
+  }
+}
 
 function InPerms() {
   const [requests, setRequests] = useState([]);
@@ -284,7 +358,7 @@ function InPerms() {
         <div className="left-panel">
           <div className="left-panel-section">
             <img src="/Spongebob.webp" alt="User" className="user-icon"/>
-            <div className="user-name">Student User</div>
+            <div className="user-name" id="fart">Student User</div>
           </div>
           <div className="left-panel-section">
             <h3>Explore panel</h3>

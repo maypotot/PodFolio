@@ -118,12 +118,8 @@ function HomeFeed() {
         </div>
         <div className="main-feed">
             <h1>Job Listings</h1>
-            <button onClick={restoreInfo}>Refresh Info</button>
             <Link to="/view-resume">
               <button className="complete-button">View Resume</button>
-            </Link>
-            <Link to="/auth">
-              <button className="complete-button">Authorization Test</button>
             </Link>
 
 
