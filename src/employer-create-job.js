@@ -11,6 +11,8 @@ function EmployerCreateJob() {
     employment_type: "Full-time",
     is_active: true
   });
+  const [tags, setTags] = useState([]);
+  const [tagInput, setTagInput] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -47,6 +49,29 @@ function EmployerCreateJob() {
     });
   };
 
+  const handleTagInputChange = (e) => {
+    setTagInput(e.target.value);
+  };
+
+  const handleTagInputKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addTag();
+    }
+  };
+
+  const addTag = () => {
+    const trimmedTag = tagInput.trim();
+    if (trimmedTag && !tags.includes(trimmedTag)) {
+      setTags([...tags, trimmedTag]);
+      setTagInput("");
+    }
+  };
+
+  const removeTag = (tagToRemove) => {
+    setTags(tags.filter(tag => tag !== tagToRemove));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -75,7 +100,8 @@ function EmployerCreateJob() {
           location: formData.location,
           employment_type: formData.employment_type,
           is_active: formData.is_active,
-          company: companyName
+          company: companyName,
+          tags: tags  // Include tags in the request
         }),
       });
 
@@ -83,7 +109,6 @@ function EmployerCreateJob() {
 
       if (response.ok) {
         console.log("Job created successfully:", data);
-        // Redirect to employer home feed
         navigate("/employer-homefeed");
       } else {
         setError(data.error || "Failed to create job. Please try again.");
@@ -165,6 +190,50 @@ function EmployerCreateJob() {
                 <option value="Internship">Internship</option>
                 <option value="Temporary">Temporary</option>
               </select>
+            </div>
+
+            {/* Tags Input */}
+            <div className="form-group">
+              <label htmlFor="tags">Skills & Interests</label>
+              <div className="tag-input-container">
+                <input
+                  type="text"
+                  id="tags"
+                  value={tagInput}
+                  onChange={handleTagInputChange}
+                  onKeyDown={handleTagInputKeyDown}
+                  placeholder="Type a skill and press Enter (e.g., Web Development, UI/UX Design)"
+                />
+                <button 
+                  type="button" 
+                  className="add-tag-button"
+                  onClick={addTag}
+                >
+                  Add Tag
+                </button>
+              </div>
+              <small className="field-hint">
+                Add skills or interests related to this job. These will help students find your posting.
+              </small>
+              
+              {/* Display Tags */}
+              {tags.length > 0 && (
+                <div className="tags-display">
+                  {tags.map((tag, index) => (
+                    <span key={index} className="tag-chip">
+                      {tag}
+                      <button
+                        type="button"
+                        className="tag-remove"
+                        onClick={() => removeTag(tag)}
+                        aria-label={`Remove ${tag}`}
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="form-group checkbox-group">

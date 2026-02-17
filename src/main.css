@@ -1,6 +1,20 @@
-button{
-  background-color: #770000;
+.student-button {
+    font-size: 1rem;
+    width: auto;
+    height: 40px;
+    padding: 10px 10px;
+    background-color: #770000;
+    color: white;
+    font-family: "Inter", sans-serif;
+    border-radius: 8px;
+    border: none;
+    transition: background-color 0.3s ease;
+    margin-right: 3%;
 }
+
+
+.student-button:hover {
+  background-color: #F0baba;}
 
 .header-section{
     display: flex;
@@ -131,7 +145,6 @@ width: 70px;
   width: 100%;
   min-height: 92vh;
   background-color: rgb(226, 226, 226);
-  display: flex;
 }
 
 .left-panel {
@@ -180,7 +193,7 @@ width: 70px;
 }
 
 .resume {
-    width: 70%;
+    width: 100%;
     margin-left: auto;
     margin-right: auto;
     margin-top: 3%;
@@ -325,16 +338,28 @@ h5 {
 }
 
 .tag-header {
-    justify-content: space-between  ;
+    justify-content: center;
     display: flex;
 }
 
-.add-tag-button {
+
+
+.student-add-tag-button {
+    font-size: 1rem;
     width: 150px;
     height: 40px;
     padding: 10px 10px;
-    margin-right: 2%;
+    background-color: #770000;
+    color: white;
+    font-family: "Inter", sans-serif;
+    border-radius: 8px;
+    border: none;
+    transition: background-color 0.3s ease;
 }
+
+
+.student-add-tag-button:hover {
+  background-color: #F0baba;}
 
 .config-button {
     width: auto;
@@ -364,6 +389,11 @@ h5 {
     width: auto;
     height: 50px;
     padding: 10px 10px;
+    background-color: #770000;
+    color: white;
+    border-radius: 8px;
+    border: none;
+
 }
 
 .resume-section {
@@ -582,4 +612,253 @@ h5 {
 .bio-cancel-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* Add these styles to your main.css */
+
+/* Search form in header */
+.search-form {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  position: relative;
+}
+
+.search-clear-button {
+  position: absolute;
+  right: 90px; /* just left of the Search button */
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  border-radius: 50%;
+  transition: color 0.2s;
+}
+
+.search-clear-button:hover {
+  color: #333;
+}
+
+/* Search results info bar */
+.search-results-info {
+  background-color: #f0f7f0;
+  border-left: 4px solid #2E7D32;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.search-results-info p {
+  margin: 0;
+  color: #333;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.search-tag-highlight {
+  color: #2E7D32;
+  font-weight: 600;
+}
+
+.clear-search-inline {
+  background: none;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.8rem;
+  color: #666;
+  cursor: pointer;
+  margin-left: 0.5rem;
+  transition: all 0.2s;
+}
+
+.clear-search-inline:hover {
+  background-color: #eee;
+  color: #333;
+}
+
+/* Tag suggestions row */
+.tag-suggestions {
+  margin-bottom: 1.5rem;
+}
+
+.tag-suggestions-label {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tag-suggestion-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tag-suggestion-chip {
+  padding: 0.4rem 0.9rem;
+  background-color: #f5f5f5;
+  color: #444;
+  border: 1px solid #ddd;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.tag-suggestion-chip:hover {
+  background-color: #e8f5e9;
+  border-color: #2E7D32;
+  color: #2E7D32;
+}
+
+.tag-suggestion-chip--active {
+  background-color: #2E7D32;
+  color: white;
+  border-color: #2E7D32;
+}
+
+.tag-suggestion-chip--active:hover {
+  background-color: #1B5E20;
+}
+
+/* Clickable tags on job cards */
+.job-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.job-tag-clickable {
+  padding: 0.35rem 0.75rem;
+  background-color: #e8f5e9;
+  color: #2E7D32;
+  border: 1px solid #a5d6a7;
+  border-radius: 14px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.job-tag-clickable:hover {
+  background-color: #2E7D32;
+  color: white;
+  border-color: #2E7D32;
+}
+
+.job-tag-clickable--active {
+  background-color: #2E7D32;
+  color: white;
+  border-color: #2E7D32;
+}
+
+/* No results message */
+.no-results {
+  text-align: center;
+  padding: 3rem 2rem;
+  background-color: #fafafa;
+  border-radius: 8px;
+  border: 1px dashed #ddd;
+}
+
+.no-results p {
+  color: #666;
+  font-size: 1rem;
+}
+
+/* Feed header row */
+.feed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.feed-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Add to main.css — Profile skill/interest tag styles */
+
+/* Tag input row on profile */
+.tag-input-container {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+/* Profile tag chips */
+.profile-tags-display {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+}
+
+.profile-tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.8rem;
+  background-color: #770000;
+  color: white;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.profile-tag-remove {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+  line-height: 1;
+}
+
+.profile-tag-remove:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Save confirmation message */
+.tag-save-message {
+  font-size: 0.85rem;
+  color: #4CAF50;
+  font-weight: 500;
+}
+
+/* field hint under inputs */
+.field-hint {
+  font-size: 0.8rem;
+  color: #888;
+  display: block;
+  margin-top: 0.25rem;
 }

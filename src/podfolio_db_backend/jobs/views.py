@@ -1,17 +1,15 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import JobPosting, JobApplication, EmployerRequest, StudentAccount, EmployerAccount
-from .serializers import JobPostingSerializer, JobApplicationSerializer, EmployerRequestSerializer, StudentAccountSerializer, EmployerAccountSerializer
+from .models import JobPosting, JobApplication, EmployerRequest, StudentAccount, EmployerAccount, SkillInterestTag, JobPostingTag, StudentSkillInterest
+from .serializers import JobPostingSerializer, JobApplicationSerializer, EmployerRequestSerializer, StudentAccountSerializer, EmployerAccountSerializer, SkillInterestTagSerializer
 from rest_framework import status
 from urllib.parse import unquote
 
-# Student Account Views
+# ─── Student Account Views ────────────────────────────────────────────────────
+
 @api_view(['POST'])
 def create_student_account(request):
-    """
-    Create a new student account
-    """
     try:
         serializer = StudentAccountSerializer(data=request.data)
         if serializer.is_valid():
@@ -19,120 +17,52 @@ def create_student_account(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        return Response(
-            {"error": str(e)}, 
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['GET'])
 def get_student_by_webid(request):
-    """
-    Get student account by WebID from query parameter
-    Handles WebID with or without #fragment
-    """
     try:
         webid = request.query_params.get('webid')
         if not webid:
-            return Response(
-                {"error": "WebID parameter is required"}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        # URL decode the webid
+            return Response({"error": "WebID parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
         webid = unquote(webid)
-        
-        print(f"Searching for student WebID: {webid}")
-        
-        # Try exact match first
         try:
             student = StudentAccount.objects.get(webid=webid)
-            serializer = StudentAccountSerializer(student)
-            return Response(serializer.data)
         except StudentAccount.DoesNotExist:
-            # If not found, try matching without fragment (#me part)
-            webid_without_fragment = webid.split('#')[0]
-            
-            print(f"Trying to match base URL: {webid_without_fragment}")
-            
-            # Search for any WebID that starts with the base URL
-            students = StudentAccount.objects.filter(webid__startswith=webid_without_fragment)
-            
-            if students.exists():
-                student = students.first()
-                serializer = StudentAccountSerializer(student)
-                return Response(serializer.data)
-            else:
-                print(f"No student found matching: {webid_without_fragment}")
-                return Response(
-                    {"error": "Student account not found", "searched_webid": webid}, 
-                    status=status.HTTP_404_NOT_FOUND
-                )
-                
+            webid_base = webid.split('#')[0]
+            students = StudentAccount.objects.filter(webid__startswith=webid_base)
+            if not students.exists():
+                return Response({"error": "Student account not found"}, status=status.HTTP_404_NOT_FOUND)
+            student = students.first()
+        return Response(StudentAccountSerializer(student).data)
     except Exception as e:
-        print(f"Error: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        return Response(
-            {"error": str(e)}, 
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['PATCH'])
 def update_student_bio(request):
-    """
-    Update student bio by WebID
-    """
     try:
         webid = request.query_params.get('webid')
         bio = request.data.get('bio')
-        
         if not webid:
-            return Response(
-                {"error": "WebID parameter is required"}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
+            return Response({"error": "WebID parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
         if bio is None:
-            return Response(
-                {"error": "Bio field is required"}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        # URL decode the webid
+            return Response({"error": "Bio field is required"}, status=status.HTTP_400_BAD_REQUEST)
         webid = unquote(webid)
-        webid_without_fragment = webid.split('#')[0]
-        
-        # Find student
-        students = StudentAccount.objects.filter(webid__startswith=webid_without_fragment)
-        
+        webid_base = webid.split('#')[0]
+        students = StudentAccount.objects.filter(webid__startswith=webid_base)
         if not students.exists():
-            return Response(
-                {"error": "Student account not found"}, 
-                status=status.HTTP_404_NOT_FOUND
-            )
-        
+            return Response({"error": "Student account not found"}, status=status.HTTP_404_NOT_FOUND)
         student = students.first()
         student.bio = bio
         student.save()
-        
-        serializer = StudentAccountSerializer(student)
-        return Response(serializer.data)
-        
+        return Response(StudentAccountSerializer(student).data)
     except Exception as e:
-        print(f"Error updating bio: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        return Response(
-            {"error": str(e)}, 
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-# Employer Account Views
+# ─── Employer Account Views ───────────────────────────────────────────────────
+
 @api_view(['POST'])
 def create_employer_account(request):
-    """
-    Create a new employer account
-    """
     try:
         serializer = EmployerAccountSerializer(data=request.data)
         if serializer.is_valid():
@@ -140,133 +70,226 @@ def create_employer_account(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        return Response(
-            {"error": str(e)}, 
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['GET'])
 def get_employer_by_webid(request):
-    """
-    Get employer account by WebID from query parameter
-    Handles WebID with or without #fragment
-    """
     try:
         webid = request.query_params.get('webid')
         if not webid:
-            return Response(
-                {"error": "WebID parameter is required"}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        # URL decode the webid
+            return Response({"error": "WebID parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
         webid = unquote(webid)
-        
-        print(f"Searching for employer WebID: {webid}")
-        
-        # Try exact match first
         try:
             employer = EmployerAccount.objects.get(webid=webid)
-            serializer = EmployerAccountSerializer(employer)
-            return Response(serializer.data)
         except EmployerAccount.DoesNotExist:
-            # If not found, try matching without fragment
-            webid_without_fragment = webid.split('#')[0]
-            
-            print(f"Trying to match base URL: {webid_without_fragment}")
-            
-            # Search for any WebID that starts with the base URL
-            employers = EmployerAccount.objects.filter(webid__startswith=webid_without_fragment)
-            
-            if employers.exists():
-                employer = employers.first()
-                serializer = EmployerAccountSerializer(employer)
-                return Response(serializer.data)
-            else:
-                print(f"No employer found matching: {webid_without_fragment}")
-                return Response(
-                    {"error": "Employer account not found", "searched_webid": webid}, 
-                    status=status.HTTP_404_NOT_FOUND
-                )
-                
+            webid_base = webid.split('#')[0]
+            employers = EmployerAccount.objects.filter(webid__startswith=webid_base)
+            if not employers.exists():
+                return Response({"error": "Employer account not found"}, status=status.HTTP_404_NOT_FOUND)
+            employer = employers.first()
+        return Response(EmployerAccountSerializer(employer).data)
     except Exception as e:
-        print(f"Error: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        return Response(
-            {"error": str(e)}, 
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-# Job Posting Views
+# ─── Tag Views ────────────────────────────────────────────────────────────────
+
+@api_view(['GET'])
+def list_all_tags(request):
+    from .serializers import SkillInterestTagSerializer
+    tags = SkillInterestTag.objects.all()
+    return Response(SkillInterestTagSerializer(tags, many=True).data)
+
+@api_view(['POST'])
+def get_or_create_tags(request):
+    try:
+        tag_names = request.data.get('tag_names', [])
+        result = []
+        for name in tag_names:
+            name = name.strip()
+            if name:
+                tag, _ = SkillInterestTag.objects.get_or_create(
+                    tag_name__iexact=name,
+                    defaults={'tag_name': name}
+                )
+                result.append({'id': tag.id, 'tag_name': tag.tag_name})
+        return Response(result)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# ─── Helper: sync tags for a job ─────────────────────────────────────────────
+
+def sync_job_tags(job, tag_names):
+    JobPostingTag.objects.filter(job=job).delete()
+    for name in tag_names:
+        name = name.strip()
+        if name:
+            tag, _ = SkillInterestTag.objects.get_or_create(
+                tag_name__iexact=name,
+                defaults={'tag_name': name}
+            )
+            JobPostingTag.objects.get_or_create(job=job, tag=tag)
+
+# ─── Helper: sync tags for a student ─────────────────────────────────────────
+
+def sync_student_tags(student_webid, tag_names):
+    StudentSkillInterest.objects.filter(student_webid=student_webid).delete()
+    for name in tag_names:
+        name = name.strip()
+        if name:
+            tag, _ = SkillInterestTag.objects.get_or_create(
+                tag_name__iexact=name,
+                defaults={'tag_name': name}
+            )
+            StudentSkillInterest.objects.get_or_create(student_webid=student_webid, tag=tag)
+
+# ─── Student Skill/Interest Views ─────────────────────────────────────────────
+
+@api_view(['GET'])
+def get_student_tags(request):
+    """Get all skill/interest tags for a student by webid"""
+    try:
+        webid = request.query_params.get('webid')
+        if not webid:
+            return Response({"error": "webid parameter is required"}, status=400)
+        webid = unquote(webid).split('#')[0]
+        student_tags = StudentSkillInterest.objects.filter(
+            student_webid=webid
+        ).select_related('tag')
+        return Response([{'id': st.tag.id, 'tag_name': st.tag.tag_name} for st in student_tags])
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
+@api_view(['POST'])
+def update_student_tags(request):
+    """Replace a student's tags with a new list of tag names"""
+    try:
+        webid = request.query_params.get('webid')
+        if not webid:
+            return Response({"error": "webid parameter is required"}, status=400)
+        webid = unquote(webid).split('#')[0]
+        tag_names = request.data.get('tags', [])
+        sync_student_tags(webid, tag_names)
+        # Return updated list
+        student_tags = StudentSkillInterest.objects.filter(
+            student_webid=webid
+        ).select_related('tag')
+        return Response([{'id': st.tag.id, 'tag_name': st.tag.tag_name} for st in student_tags])
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
+# ─── Student Search by Skill/Interest ────────────────────────────────────────
+
+@api_view(['GET'])
+def search_students_by_tag(request):
+    """
+    Search for students who have a given skill/interest tag.
+    GET /api/students/search/?q=python
+    Returns list of students with matching tag, including their full tag list.
+    """
+    try:
+        query = request.query_params.get('q', '').strip()
+        if not query:
+            return Response({"error": "q parameter is required"}, status=400)
+
+        # Find all student webids that have a tag matching the query (case-insensitive)
+        matching = StudentSkillInterest.objects.filter(
+            tag__tag_name__icontains=query
+        ).select_related('tag').values_list('student_webid', flat=True).distinct()
+
+        # Fetch the actual StudentAccount records
+        students = StudentAccount.objects.filter(webid__in=list(matching))
+
+        # Build response: student info + their full tag list
+        results = []
+        for student in students:
+            student_tags = StudentSkillInterest.objects.filter(
+                student_webid=student.webid
+            ).select_related('tag')
+            results.append({
+                'id': student.id,
+                'first_name': student.first_name,
+                'last_name': student.last_name,
+                'email': student.email,
+                'webid': student.webid,
+                'bio': student.bio,
+                'tags': [{'id': st.tag.id, 'tag_name': st.tag.tag_name} for st in student_tags],
+            })
+
+        return Response(results)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
+# ─── Job Posting Views ────────────────────────────────────────────────────────
+
 @api_view(['GET'])
 def list_job_postings(request):
-    """
-    List all active job postings (for students browsing jobs)
-    """
-    job_postings = JobPosting.objects.filter(is_active=True)
-    serializer = JobPostingSerializer(job_postings, many=True)
-    return Response(serializer.data)
+    jobs = JobPosting.objects.filter(is_active=True)
+    return Response(JobPostingSerializer(jobs, many=True).data)
 
-@api_view(["GET"])
+@api_view(['GET'])
 def employer_jobs(request):
-    """
-    Get jobs for a specific employer
-    If employer_webid query param is provided, filter by that employer
-    Otherwise, return all active jobs
-    """
     employer_webid = request.query_params.get('employer_webid')
-    
     if employer_webid:
-        # Decode the webid
         employer_webid = unquote(employer_webid)
         print(f"Filtering jobs for employer: {employer_webid}")
-        
-        # Filter jobs by this employer (both active and inactive)
-        job_postings = JobPosting.objects.filter(employer_webid=employer_webid)
-        print(f"Found {job_postings.count()} jobs for this employer")
+        jobs = JobPosting.objects.filter(employer_webid=employer_webid)
+        print(f"Found {jobs.count()} jobs")
     else:
-        # Return all active jobs
-        job_postings = JobPosting.objects.filter(is_active=True)
-    
-    serializer = JobPostingSerializer(job_postings, many=True)
-    return Response(serializer.data)
+        jobs = JobPosting.objects.filter(is_active=True)
+    return Response(JobPostingSerializer(jobs, many=True).data)
 
-@api_view(["POST"])
+@api_view(['POST'])
 def create_job(request):
-    """
-    Create a new job posting
-    """
-    serializer = JobPostingSerializer(data=request.data)
+    try:
+        data = request.data.copy()
+        tag_names = data.pop('tags', [])
 
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=201)
+        serializer = JobPostingSerializer(data=data)
+        if not serializer.is_valid():
+            print("Serializer errors:", serializer.errors)
+            return Response(serializer.errors, status=400)
 
-    return Response(serializer.errors, status=400)
+        job = serializer.save()
 
-@api_view(["PATCH"])
+        if tag_names:
+            sync_job_tags(job, tag_names)
+
+        return Response(JobPostingSerializer(job).data, status=201)
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return Response({"error": str(e)}, status=500)
+
+@api_view(['PATCH'])
 def update_job(request, job_id):
-    """
-    Update a job posting
-    """
     try:
         job = JobPosting.objects.get(id=job_id)
     except JobPosting.DoesNotExist:
         return Response({"error": "Job not found"}, status=404)
 
-    serializer = JobPostingSerializer(job, data=request.data, partial=True)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
+    try:
+        data = request.data.copy()
+        tag_names = data.pop('tags', None)
 
-    return Response(serializer.errors, status=400)
+        serializer = JobPostingSerializer(job, data=data, partial=True)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=400)
 
-@api_view(["DELETE"])
+        job = serializer.save()
+
+        if tag_names is not None:
+            sync_job_tags(job, tag_names)
+
+        return Response(JobPostingSerializer(job).data)
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return Response({"error": str(e)}, status=500)
+
+@api_view(['DELETE'])
 def delete_job(request, job_id):
-    """
-    Delete a job posting
-    """
     try:
         job = JobPosting.objects.get(id=job_id)
         job.delete()
@@ -274,64 +297,43 @@ def delete_job(request, job_id):
     except JobPosting.DoesNotExist:
         return Response({"error": "Job not found"}, status=404)
     except Exception as e:
-        print(f"Error deleting job: {str(e)}")
         return Response({"error": str(e)}, status=500)
 
 @api_view(['GET'])
 def job_applicants(request, job_id):
-    """
-    Returns all applicants for a given job posting ID
-    """
     applications = JobApplication.objects.filter(job_id=job_id)
-    serializer = JobApplicationSerializer(applications, many=True)
-    return Response(serializer.data)
+    return Response(JobApplicationSerializer(applications, many=True).data)
 
-@api_view(["POST"])
+@api_view(['POST'])
 def apply_to_job(request):
-    """
-    Apply to a job
-    """
     serializer = JobApplicationSerializer(data=request.data)
-
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=201)
-
     return Response(serializer.errors, status=400)
 
-# Request Views
+# ─── Request Views ────────────────────────────────────────────────────────────
+
 @api_view(['POST'])
 def create_request(request):
     try:
-        print("Received data:", request.data)
-        
         serializer = EmployerRequestSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            print("Validation errors:", serializer.errors)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        print("Error creating request:", str(e))
-        import traceback
-        traceback.print_exc()
-        return Response(
-            {"error": str(e)}, 
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['GET'])
 def requests_by_student(request):
     student_webid = request.query_params.get('student_webid')
     if not student_webid:
         return Response({"error": "Missing student_webid"}, status=400)
-    requests = EmployerRequest.objects.filter(applicant_webid=student_webid)
-    serializer = EmployerRequestSerializer(requests, many=True)
-    return Response(serializer.data)
+    reqs = EmployerRequest.objects.filter(applicant_webid=student_webid)
+    return Response(EmployerRequestSerializer(reqs, many=True).data)
 
 @api_view(['GET'])
 def all_requests(request):
-    requests = EmployerRequest.objects.all()
-    serializer = EmployerRequestSerializer(requests, many=True)
-    return Response(serializer.data)
+    reqs = EmployerRequest.objects.all()
+    return Response(EmployerRequestSerializer(reqs, many=True).data)

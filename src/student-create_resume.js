@@ -27,30 +27,6 @@ const user = await restoreSession();
 function CreateResume() {
   return (
     <main className= "create-resume">
-      <header className = "app-header">
-        <div className="header-section">
-            <Link to="/homefeed">
-              <img src="/logo.png" alt="App Logo" className="header-logo" />
-            </Link>
-          <input
-              type="text"
-              placeholder="Search jobs..."
-              className = "search-input"
-            />
-          <button className="search-button">
-              Search
-          </button>
-        </div>
-        <div className="header-section">
-            <img src="/Spongebob.webp" alt="User Avatar" className="avatar-icon"/>
-            <button className="header-buttons">
-                <img src="/notifications-icon.png" alt="Notifications" className="button-icons"/>
-            </button>
-            <button className="header-buttons">
-                <img src="/settings-icon.png" alt="Settings" className="button-icons"/>
-            </button>
-        </div>
-      </header>
       <div className="content">
         <div className="resume">
             <div className="tag-header">
@@ -133,7 +109,7 @@ function CreateResume() {
                     className = "resume-input"
                     id = "WebsiteLink"
                   />
-                  <button className="add-tag-button" onClick={createWebsite}> Add Website</button>
+                  <button className="student-add-tag-button" onClick={createWebsite}> Add Website</button>
                 </div>
 
                 
@@ -243,7 +219,7 @@ function CreateResume() {
                     id = "Skill"
                   />
 
-                  <button className="add-tag-button" onClick={createSkill}> Add Skill</button>
+                  <button className="student-add-tag-button" onClick={createSkill}> Add Skill</button>
                 </div>
 
               </div>
@@ -295,7 +271,7 @@ function CreateResume() {
                     />
                   </div>
                   
-                  <button className="add-tag-button" onClick={createProject}> Add Project</button>
+                  <button className="student-add-tag-button" onClick={createProject}> Add Project</button>
 
                 </div>
 
@@ -319,7 +295,7 @@ function CreateResume() {
                   </div>
 
                   <div className="resume-field">
-                    <h3 className="tag-title">Duration</h3>
+                    <h3 className= "tag-title">Duration</h3>
                     <input
                       type="text"
                       placeholder="May 2022 - December 2022"
@@ -357,7 +333,7 @@ function CreateResume() {
                       id = "Description"
                     />
                   </div>
-                  <button className="add-tag-button" onClick={createExperience}> Add Experience</button>
+                  <button className="student-add-tag-button" onClick={createExperience}> Add Experience</button>
                 </div>
 
               </div>

@@ -85,43 +85,13 @@ async function loadResumeData() {
 function ViewResume() {
 
   return (
-    <main className="view-resume">
-      <header className = "app-header">
-              <div className="header-section">
-                  <Link to="/homefeed">
-                    <img src="/logo.png" alt="App Logo" className="header-logo" />
-                  </Link>
-                <input
-                    type="text"
-                    placeholder="Search jobs..."
-                    className = "search-input"
-                  />
-                <button className="search-button">
-                    Search
-                </button>
-              </div>
-              <div className="header-section">
-                  <img src="/Spongebob.webp" alt="User Avatar" className="avatar-icon"/>
-                  <Link to="/in-perms">
-                    <button className="header-buttons">
-                        <img src="/notifications-icon.png" alt="Notifications" className="button-icons"/>
-                    </button>
-                  </Link>
-                  <button className="header-buttons">
-                      <img src="/settings-icon.png" alt="Settings" className="button-icons"/>
-                  </button>
-              </div>
-            </header>
-
-      <div className="content">
+    <main className="main-feed">
         <div className="resume">
-          <div className="tag-header">
             <h1>Resume Preview</h1>
-            <button onClick={loadResumeData}>Reload Resume</button>
+            <button className="student-button" onClick={loadResumeData}>Reload Resume</button>
             <Link to="/config-perms">
-              <button className="complete-button">Configure Permissions</button>
+              <button className="student-button">Configure Permissions</button>
             </Link>
-          </div>
             <h1 className="full-name" id="FullName">{resumeData.name}</h1>
 
           {/* Personal Information */}
@@ -184,10 +154,10 @@ function ViewResume() {
           </div>
 
           <Link to="/create-resume">
-            <button className="complete-button">Edit Resume</button>
+            <button className="student-button">Edit Resume</button>
           </Link>
         </div>
-      </div>
+      
     </main>
   );
 }

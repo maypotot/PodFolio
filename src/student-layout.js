@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import "./main.css";
 import { restoreSession } from "./solid.js";
 
-function StudentLayout({ children }) {
+function StudentLayout({ children, searchQuery, setSearchQuery, handleSearch, clearSearch }) {
   const [studentData, setStudentData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
@@ -11,30 +11,24 @@ function StudentLayout({ children }) {
   useEffect(() => {
     async function fetchData() {
       try {
-        // Restore Solid session
         const solidUser = await restoreSession();
         setUser(solidUser);
 
-        // Fetch student account data
         const webid = sessionStorage.getItem("webid");
         console.log("WebID from session:", webid);
         
         if (webid) {
-          // Strip fragment before querying
           const webidWithoutFragment = webid.split('#')[0];
           const studentRes = await fetch(
             `http://127.0.0.1:8000/api/students/?webid=${encodeURIComponent(webidWithoutFragment)}`
           );
-          
-          console.log("Student API response status:", studentRes.status);
           
           if (studentRes.ok) {
             const data = await studentRes.json();
             console.log("Student data received:", data);
             setStudentData(data);
           } else {
-            const errorData = await studentRes.json();
-            console.error("Failed to fetch student data:", studentRes.status, errorData);
+            console.error("Failed to fetch student data:", studentRes.status);
           }
         } else {
           console.log("No WebID found in sessionStorage");
@@ -48,7 +42,6 @@ function StudentLayout({ children }) {
     fetchData();
   }, []);
 
-  // Get display name from database or fallback
   const displayName = studentData 
     ? `${studentData.first_name} ${studentData.last_name}`
     : (user?.name || "User Name");
@@ -60,17 +53,43 @@ function StudentLayout({ children }) {
           <Link to="/homefeed">
             <img src="/logo.png" alt="App Logo" className="header-logo" />
           </Link>
-          <input
-            type="text"
-            placeholder="Search jobs..."
-            className="search-input"
-          />
-          <button className="student-search-button">
-            Search
-          </button>
+
+          {/* Search bar — wired to HomeFeed state if props provided */}
+          {setSearchQuery ? (
+            <form onSubmit={handleSearch} className="search-form">
+              <input
+                type="text"
+                placeholder="Search by skill or interest..."
+                className="search-input"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  className="search-clear-button"
+                  onClick={clearSearch}
+                  aria-label="Clear search"
+                >
+                  ✕
+                </button>
+              )}
+              <button type="submit" className="student-search-button">
+                Search
+              </button>
+            </form>
+          ) : (
+            // Fallback non-functional search bar for pages that don't pass props
+            <input
+              type="text"
+              placeholder="Search by skill or interest..."
+              className="search-input"
+            />
+          )}
         </div>
+
         <div className="header-section">
-          <img src="/Spongebob.webp" alt="User Avatar" className="avatar-icon"/>
+          <img src="/user-image.png" alt="User Avatar" className="avatar-icon"/>
           <Link to="/in-perms">
             <button className="student-header-buttons">
               <img src="/notifications-icon.png" alt="Notifications" className="button-icons"/>
@@ -82,7 +101,7 @@ function StudentLayout({ children }) {
       <div className="content">
         <div className="left-panel">
           <div className="left-panel-section">
-            <img src="/Spongebob.webp" alt="User" className="user-icon"/>
+            <img src="/user-image.png" alt="User" className="user-icon"/>
             <div className="user-name">{loading ? "Loading..." : displayName}</div>
           </div>
           <div className="left-panel-section">
@@ -118,7 +137,6 @@ function StudentLayout({ children }) {
           </div>
         </div>
         
-        {/* Render children (the page content) */}
         {children}
       </div>
     </main>

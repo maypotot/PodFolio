@@ -3,20 +3,24 @@ import "./App.css";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import HomeFeed from "./student-homefeed.js";
 import Profile from "./student-profile.js";
-import CreateResume from "./create_resume";
-import ViewResume from "./view_resume";
+import CreateResume from "./student-create_resume.js";
+import ViewResume from "./student-view-resume.js";
 import ConfigPerms from "./config_perms";
-import InPerms from "./perms"
+import InPerms from "./student-perms.js"
 import { EmployerHome, EmployerSignup, EmployerLogin } from "./employer-auth.js";
 import EmployerHomeFeed from "./employer-homefeed.js";
 import EmployerCreateJob from "./employer-create-job.js";
 import JobApplicants from "./employer-job-applicants.js";
 import EmployerLayout from "./employer-layout.js";
+import StudentSearch from "./employer-search-result.js";
 
 import { useNavigate } from "react-router-dom";
 
 import { login } from "./main.js";
 import { restoreSession } from "./solid.js";
+import StudentLayout from "./student-layout.js";
+
+let solidUser; // Global variable to hold the authenticated Solid user
 
 function Home() {
   return (
@@ -24,10 +28,10 @@ function Home() {
       <img src="/logo.png" alt="App Logo" className="logo" />
       <div className="button-container">
         <Link to="/signup">
-          <button className="student-button">Sign Up</button>
+          <button className="student-login-button">Sign Up</button>
         </Link>
         <Link to="/login">
-          <button className="student-button">Log In</button>
+          <button className="student-login-button">Log In</button>
         </Link>
       </div>
       <Link to="/employer-home">
@@ -210,17 +214,14 @@ function Login() {
         const expectedWebId = sessionStorage.getItem("login_webid");
         
         // Check if there's a Solid session
-        const solidUser = await restoreSession();
+        solidUser = await restoreSession();
         
-        if (solidUser && solidUser.webId && expectedWebId) {
+        if (solidUser) {
           console.log("Detected Solid session after redirect:", solidUser.webId);
           console.log("Expected WebID:", expectedWebId);
           
-          // Verify the Solid WebID matches the expected one
-          const solidWebIdWithoutFragment = solidUser.webId.split('#')[0];
-          const expectedWebIdWithoutFragment = expectedWebId.split('#')[0];
 
-          if (solidWebIdWithoutFragment === expectedWebIdWithoutFragment) {
+          if (solidUser.url === expectedWebId) {
             console.log("WebIDs match! Completing login...");
             
             // Store the full WebID in session storage
@@ -229,9 +230,8 @@ function Login() {
             // Clear the temporary login WebID
             sessionStorage.removeItem("login_webid");
             
-            // Navigate to homefeed
-            console.log("Navigating to homefeed...");
-            navigate("/homefeed");
+                        // Show connected state and wait for user action
+            setStep(3);
             return;
           } else {
             console.log("WebIDs don't match");
@@ -373,7 +373,25 @@ function Login() {
               </button>
             </form>
           </>
-        ) : (
+        ) : step === 3 ? (
+          // Step 3: Solid connected
+          <>
+            <div className="success-badge">
+              ✓ Solid Pod Connected
+            </div>
+
+            <p className="login-info">
+              Solid Pod has been connected. You can now continue to your homefeed.
+            </p>
+
+            <button
+              className="solid-auth-button"
+              onClick={() => navigate("/homefeed")}
+            >
+              Go to Homefeed
+            </button>
+          </>
+        ) : step === 2 ? (
           // Step 2: Authenticate with Solid
           <>
             <div className="success-badge">
@@ -423,6 +441,10 @@ function Login() {
               ← Use Different WebID
             </button>
           </>
+           ): (
+          <p className="login-info">
+            Unexpected state. Please refresh the page and try again.
+          </p>
         )}
         
         <div className="login-links">
@@ -446,9 +468,9 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/homefeed" element={<HomeFeed />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/create-resume" element={<CreateResume/>}/>
-        <Route path="/view-resume" element={<ViewResume/>}/>
-        <Route path="/in-perms" element={<InPerms/>}/>
+        <Route path="/create-resume" element={<StudentLayout><CreateResume/></StudentLayout>}/>
+        <Route path="/view-resume" element={<StudentLayout><ViewResume/></StudentLayout>}/>
+        <Route path="/in-perms" element={<StudentLayout><InPerms/></StudentLayout>}/>
         <Route path="/config-perms" element={<ConfigPerms/>}/>
         
         {/* Employer Routes */}
@@ -458,6 +480,7 @@ function App() {
         <Route path="/employer-homefeed" element={<EmployerLayout><EmployerHomeFeed/></EmployerLayout>}/>
         <Route path="/employer-create-job" element={<EmployerCreateJob/>}/>
         <Route path="/jobs/:jobId/applicants" element={<EmployerLayout><JobApplicants/></EmployerLayout>}/>
+        <Route path="/employer-student-search" element={<EmployerLayout><StudentSearch/></EmployerLayout>}/>
       </Routes>
     </Router>
   )

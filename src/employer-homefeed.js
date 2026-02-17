@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import "./main.css"; // or a separate employer CSS if needed
+import "./main.css";
 
 function EmployerHomeFeed() {
   const [jobs, setJobs] = useState([]);
@@ -11,8 +11,11 @@ function EmployerHomeFeed() {
     description: "",
     location: "",
     employment_type: "",
+    proposed_salary: "",
     is_active: true
   });
+  const [editTags, setEditTags] = useState([]);
+  const [editTagInput, setEditTagInput] = useState("");
   const [saveLoading, setSaveLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -24,43 +27,23 @@ function EmployerHomeFeed() {
 
   async function fetchJobs() {
     try {
-      // Get the logged-in employer's WebID from sessionStorage
       const employerWebId = sessionStorage.getItem("employer_webid");
-      
       if (!employerWebId) {
-        console.error("No employer WebID found in sessionStorage");
         setLoading(false);
         return;
       }
-
-      // Strip the fragment (#me) before sending to backend
       const webidWithoutFragment = employerWebId.split('#')[0];
-      
-      console.log("Fetching jobs for employer:", webidWithoutFragment);
-
-      // Fetch jobs for THIS employer only
       const res = await fetch(
         `http://127.0.0.1:8000/api/employer/jobs/?employer_webid=${encodeURIComponent(webidWithoutFragment)}`
       );
-      
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-      
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const data = await res.json();
-      console.log("Jobs fetched:", data);
-      
-      // Sort jobs: active first, then by most recent (created_at)
+
+      // Sort: active first, then by newest
       const sortedJobs = data.sort((a, b) => {
-        // First, sort by active status (active jobs first)
-        if (a.is_active !== b.is_active) {
-          return b.is_active - a.is_active; // true (1) comes before false (0)
-        }
-        
-        // Then, sort by created_at (most recent first)
+        if (a.is_active !== b.is_active) return b.is_active - a.is_active;
         return new Date(b.created_at) - new Date(a.created_at);
       });
-      
       setJobs(sortedJobs);
     } catch (error) {
       console.error("Failed to fetch jobs:", error);
@@ -76,31 +59,47 @@ function EmployerHomeFeed() {
       description: job.description,
       location: job.location,
       employment_type: job.employment_type,
+      proposed_salary: job.proposed_salary || "",
       is_active: job.is_active
     });
+    // Pre-fill tags from job data
+    setEditTags(job.tags ? job.tags.map(t => t.tag_name) : []);
+    setEditTagInput("");
     setError("");
     setShowDeleteConfirm(false);
   }
 
   function closeEditModal() {
     setEditingJob(null);
-    setEditFormData({
-      title: "",
-      description: "",
-      location: "",
-      employment_type: "",
-      is_active: true
-    });
+    setEditFormData({ title: "", description: "", location: "", employment_type: "", proposed_salary: "", is_active: true });
+    setEditTags([]);
+    setEditTagInput("");
     setError("");
     setShowDeleteConfirm(false);
   }
 
   function handleEditChange(e) {
     const { name, value, type, checked } = e.target;
-    setEditFormData({
-      ...editFormData,
-      [name]: type === 'checkbox' ? checked : value
-    });
+    setEditFormData({ ...editFormData, [name]: type === 'checkbox' ? checked : value });
+  }
+
+  function handleEditTagKeyDown(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addEditTag();
+    }
+  }
+
+  function addEditTag() {
+    const trimmedTag = editTagInput.trim();
+    if (trimmedTag && !editTags.map(t => t.toLowerCase()).includes(trimmedTag.toLowerCase())) {
+      setEditTags([...editTags, trimmedTag]);
+      setEditTagInput("");
+    }
+  }
+
+  function removeEditTag(tagToRemove) {
+    setEditTags(editTags.filter(tag => tag !== tagToRemove));
   }
 
   async function handleSaveEdit(e) {
@@ -113,30 +112,22 @@ function EmployerHomeFeed() {
         `http://127.0.0.1:8000/api/employer/jobs/${editingJob.id}/`,
         {
           method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(editFormData),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...editFormData,
+            proposed_salary: editFormData.proposed_salary || null,
+            tags: editTags
+          }),
         }
       );
 
       if (response.ok) {
         const updatedJob = await response.json();
-        console.log("Job updated successfully:", updatedJob);
-        
-        // Update the job in the local state
-        const updatedJobs = jobs.map(job => 
-          job.id === editingJob.id ? updatedJob : job
-        );
-        
-        // Re-sort the jobs after update
+        const updatedJobs = jobs.map(job => job.id === editingJob.id ? updatedJob : job);
         const sortedJobs = updatedJobs.sort((a, b) => {
-          if (a.is_active !== b.is_active) {
-            return b.is_active - a.is_active;
-          }
+          if (a.is_active !== b.is_active) return b.is_active - a.is_active;
           return new Date(b.created_at) - new Date(a.created_at);
         });
-        
         setJobs(sortedJobs);
         closeEditModal();
       } else {
@@ -144,7 +135,6 @@ function EmployerHomeFeed() {
         setError(errorData.error || "Failed to update job. Please try again.");
       }
     } catch (err) {
-      console.error("Error updating job:", err);
       setError("Network error. Please try again.");
     } finally {
       setSaveLoading(false);
@@ -154,29 +144,19 @@ function EmployerHomeFeed() {
   async function handleDeleteJob() {
     setError("");
     setDeleteLoading(true);
-
     try {
       const response = await fetch(
         `http://127.0.0.1:8000/api/employer/jobs/${editingJob.id}/delete/`,
-        {
-          method: "DELETE",
-        }
+        { method: "DELETE" }
       );
-
       if (response.ok) {
-        console.log("Job deleted successfully");
-        
-        // Remove the job from the local state
-        const updatedJobs = jobs.filter(job => job.id !== editingJob.id);
-        setJobs(updatedJobs);
-        
+        setJobs(jobs.filter(job => job.id !== editingJob.id));
         closeEditModal();
       } else {
         const errorData = await response.json();
         setError(errorData.error || "Failed to delete job. Please try again.");
       }
     } catch (err) {
-      console.error("Error deleting job:", err);
       setError("Network error. Please try again.");
     } finally {
       setDeleteLoading(false);
@@ -186,9 +166,7 @@ function EmployerHomeFeed() {
   if (loading) {
     return (
       <div className="main-feed">
-        <div className="feed-header">
-          <h1 className="employer-h1">Job Listings</h1>
-        </div>
+        <div className="feed-header"><h1 className="employer-h1">Job Listings</h1></div>
         <p>Loading jobs...</p>
       </div>
     );
@@ -212,10 +190,7 @@ function EmployerHomeFeed() {
         </div>
       ) : (
         jobs.map(job => (
-          <div 
-            key={job.id} 
-            className={`job-listing ${!job.is_active ? 'inactive-job' : ''}`}
-          >
+          <div key={job.id} className={`job-listing ${!job.is_active ? 'inactive-job' : ''}`}>
             <div className="job-info">
               <h2>{job.title}</h2>
               <h4>{job.company}</h4>
@@ -223,18 +198,27 @@ function EmployerHomeFeed() {
               <p className="job-meta">
                 <strong>Location:</strong> {job.location} | <strong>Type:</strong> {job.employment_type}
               </p>
+              {job.proposed_salary && (
+                <p className="job-meta">
+                  <strong>Salary:</strong> {job.proposed_salary}
+                </p>
+              )}
               <p className="job-meta">
-                <strong>Status:</strong> <span className={job.is_active ? 'status-active' : 'status-inactive'}>
+                <strong>Status:</strong>{" "}
+                <span className={job.is_active ? 'status-active' : 'status-inactive'}>
                   {job.is_active ? "Active" : "Inactive"}
                 </span>
               </p>
-              
-              {/* Links for editing the job and viewing applicants */}
+              {/* Display tags */}
+              {job.tags && job.tags.length > 0 && (
+                <div className="job-tags">
+                  {job.tags.map((tag, index) => (
+                    <span key={index} className="job-tag">{tag.tag_name}</span>
+                  ))}
+                </div>
+              )}
               <div className="job-actions">
-                <button 
-                  className="create-job-button"
-                  onClick={() => openEditModal(job)}
-                >
+                <button className="create-job-button" onClick={() => openEditModal(job)}>
                   Edit Job
                 </button>
                 <Link to={`/jobs/${job.id}/applicants`}>
@@ -277,7 +261,7 @@ function EmployerHomeFeed() {
                   name="description"
                   value={editFormData.description}
                   onChange={handleEditChange}
-                  rows={8}
+                  rows={6}
                   required
                 />
               </div>
@@ -311,6 +295,55 @@ function EmployerHomeFeed() {
                 </select>
               </div>
 
+              <div className="form-group">
+                <label htmlFor="edit-salary">
+                  Proposed Salary <span className="optional-label">(optional)</span>
+                </label>
+                <input
+                  type="text"
+                  id="edit-salary"
+                  name="proposed_salary"
+                  value={editFormData.proposed_salary}
+                  onChange={handleEditChange}
+                  placeholder="e.g., ₱50,000 - ₱70,000 per month"
+                />
+              </div>
+
+              {/* Tags */}
+              <div className="form-group">
+                <label>Skills & Interests</label>
+                <div className="tag-input-container">
+                  <input
+                    type="text"
+                    value={editTagInput}
+                    onChange={(e) => setEditTagInput(e.target.value)}
+                    onKeyDown={handleEditTagKeyDown}
+                    placeholder="Type a skill and press Enter"
+                  />
+                  <button type="button" className="add-tag-button" onClick={addEditTag}>
+                    Add
+                  </button>
+                </div>
+                <div className="tags-display">
+                  {editTags.length > 0 ? (
+                    editTags.map((tag, index) => (
+                      <span key={index} className="tag-chip">
+                        {tag}
+                        <button
+                          type="button"
+                          className="tag-remove"
+                          onClick={() => removeEditTag(tag)}
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))
+                  ) : (
+                    <span className="no-tags-hint">No tags added yet.</span>
+                  )}
+                </div>
+              </div>
+
               <div className="form-group checkbox-group">
                 <label className="checkbox-label">
                   <input
@@ -328,7 +361,7 @@ function EmployerHomeFeed() {
                 <div className="delete-confirmation">
                   <p className="delete-warning">⚠️ Are you sure you want to delete this job posting? This action cannot be undone.</p>
                   <div className="delete-actions">
-                    <button 
+                    <button
                       type="button"
                       className="delete-confirm-button"
                       onClick={handleDeleteJob}
@@ -336,7 +369,7 @@ function EmployerHomeFeed() {
                     >
                       {deleteLoading ? "Deleting..." : "Yes, Delete Job"}
                     </button>
-                    <button 
+                    <button
                       type="button"
                       className="delete-cancel-button"
                       onClick={() => setShowDeleteConfirm(false)}
@@ -347,7 +380,7 @@ function EmployerHomeFeed() {
                   </div>
                 </div>
               ) : (
-                <button 
+                <button
                   type="button"
                   className="delete-job-button"
                   onClick={() => setShowDeleteConfirm(true)}
@@ -358,19 +391,10 @@ function EmployerHomeFeed() {
               )}
 
               <div className="modal-actions">
-                <button 
-                  type="submit" 
-                  className="save-button"
-                  disabled={saveLoading || deleteLoading}
-                >
+                <button type="submit" className="save-button" disabled={saveLoading || deleteLoading}>
                   {saveLoading ? "Saving..." : "Save Changes"}
                 </button>
-                <button 
-                  type="button" 
-                  className="cancel-button"
-                  onClick={closeEditModal}
-                  disabled={saveLoading || deleteLoading}
-                >
+                <button type="button" className="cancel-button" onClick={closeEditModal} disabled={saveLoading || deleteLoading}>
                   Cancel
                 </button>
               </div>

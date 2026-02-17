@@ -41,6 +41,23 @@
   transition: background-color 0.3s ease;
 }
 
+.student-login-button {
+  width: 150px;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+  font-family: "Inter", sans-serif;
+  background-color: #770000;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+
+.student-login-button:hover {
+  background-color: #9c3535;}
+
 button:hover {
   background-color: #9c3535;}
 

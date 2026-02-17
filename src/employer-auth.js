@@ -4,6 +4,8 @@ import "./employer-side.css";
 import { login } from "./main.js";
 import { restoreSession } from "./solid.js";
 
+let solidUser; // Global variable to hold the authenticated Solid user
+
 function EmployerHome() {
   return (
     <main className="home">
@@ -192,26 +194,28 @@ function EmployerLogin() {
   useEffect(() => {
     async function checkSolidSession() {
       try {
-        const expectedWebId = sessionStorage.getItem("employer_login_webid");
-        const solidUser = await restoreSession();
-        
-        if (solidUser && solidUser.webId && expectedWebId) {
-          console.log("Detected Solid session for employer:", solidUser.webId);
-          
-          const solidWebIdWithoutFragment = solidUser.webId.split('#')[0];
-          const expectedWebIdWithoutFragment = expectedWebId.split('#')[0];
 
-          if (solidWebIdWithoutFragment === expectedWebIdWithoutFragment) {
+        const expectedWebId = sessionStorage.getItem("employer_login_webid");
+        solidUser = await restoreSession();
+        
+        if (solidUser) {
+          console.log("Detected Solid session for employer:", solidUser.webId);
+          console.log("Expected WebID:", expectedWebId);
+
+          if (solidUser.webId === expectedWebId) {
             console.log("Employer WebIDs match! Completing login...");
             
             sessionStorage.setItem("employer_webid", solidUser.webId);
+
             sessionStorage.removeItem("employer_login_webid");
             
-            navigate("/employer-homefeed");
+            setStep(3);
+
             return;
           } else {
-            setError("The Solid account doesn't match. Please try again.");
-            sessionStorage.removeItem("employer_login_webid");
+            console.log("WebIDs don't match");
+            setError("The Solid account you logged in with doesn't match. Please try again.");
+            sessionStorage.removeItem("login_webid");
             setStep(1);
           }
         }
@@ -229,6 +233,8 @@ function EmployerLogin() {
     e.preventDefault();
     setError("");
     setLoading(true);
+
+    console.log("Checking employer WebID in database:", webid);
     
     if (webid.trim() === "") {
       setError("Please enter your WebID");
@@ -249,6 +255,7 @@ function EmployerLogin() {
         
         sessionStorage.setItem("employer_login_webid", webid);
         setStep(2);
+
         setLoading(false);
       } else if (response.status === 404) {
         setError("Employer account not found. Please sign up first.");
@@ -332,7 +339,25 @@ function EmployerLogin() {
               </button>
             </form>
           </>
-        ) : (
+        ) : step === 3 ? (
+          // Step 3: Solid connected
+          <>
+            <div className="success-badge">
+              ✓ Solid Pod Connected
+            </div>
+
+            <p className="login-info">
+              Solid Pod has been connected. You can now continue to your homefeed.
+            </p>
+
+            <button
+              className="solid-auth-button"
+              onClick={() => navigate("/employer-homefeed")}
+            >
+              Go to Homefeed
+            </button>
+          </>
+        ) : step === 2 ? (
           <>
             <div className="success-badge">
               ✓ Employer Account Found
@@ -380,6 +405,10 @@ function EmployerLogin() {
               ← Use Different WebID
             </button>
           </>
+           ): (
+          <p className="login-info">
+            Unexpected state. Please refresh the page and try again.
+          </p>
         )}
         
         <div className="login-links">
