@@ -201,18 +201,42 @@ def get_employer_by_webid(request):
 # Job Posting Views
 @api_view(['GET'])
 def list_job_postings(request):
+    """
+    List all active job postings (for students browsing jobs)
+    """
     job_postings = JobPosting.objects.filter(is_active=True)
     serializer = JobPostingSerializer(job_postings, many=True)
     return Response(serializer.data)
 
 @api_view(["GET"])
 def employer_jobs(request):
-    job_postings = JobPosting.objects.filter(is_active=True)
+    """
+    Get jobs for a specific employer
+    If employer_webid query param is provided, filter by that employer
+    Otherwise, return all active jobs
+    """
+    employer_webid = request.query_params.get('employer_webid')
+    
+    if employer_webid:
+        # Decode the webid
+        employer_webid = unquote(employer_webid)
+        print(f"Filtering jobs for employer: {employer_webid}")
+        
+        # Filter jobs by this employer (both active and inactive)
+        job_postings = JobPosting.objects.filter(employer_webid=employer_webid)
+        print(f"Found {job_postings.count()} jobs for this employer")
+    else:
+        # Return all active jobs
+        job_postings = JobPosting.objects.filter(is_active=True)
+    
     serializer = JobPostingSerializer(job_postings, many=True)
     return Response(serializer.data)
 
 @api_view(["POST"])
 def create_job(request):
+    """
+    Create a new job posting
+    """
     serializer = JobPostingSerializer(data=request.data)
 
     if serializer.is_valid():
@@ -223,6 +247,9 @@ def create_job(request):
 
 @api_view(["PATCH"])
 def update_job(request, job_id):
+    """
+    Update a job posting
+    """
     try:
         job = JobPosting.objects.get(id=job_id)
     except JobPosting.DoesNotExist:
@@ -235,6 +262,21 @@ def update_job(request, job_id):
 
     return Response(serializer.errors, status=400)
 
+@api_view(["DELETE"])
+def delete_job(request, job_id):
+    """
+    Delete a job posting
+    """
+    try:
+        job = JobPosting.objects.get(id=job_id)
+        job.delete()
+        return Response({"message": "Job deleted successfully"}, status=200)
+    except JobPosting.DoesNotExist:
+        return Response({"error": "Job not found"}, status=404)
+    except Exception as e:
+        print(f"Error deleting job: {str(e)}")
+        return Response({"error": str(e)}, status=500)
+
 @api_view(['GET'])
 def job_applicants(request, job_id):
     """
@@ -246,6 +288,9 @@ def job_applicants(request, job_id):
 
 @api_view(["POST"])
 def apply_to_job(request):
+    """
+    Apply to a job
+    """
     serializer = JobApplicationSerializer(data=request.data)
 
     if serializer.is_valid():

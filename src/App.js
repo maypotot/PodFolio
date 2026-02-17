@@ -7,10 +7,11 @@ import CreateResume from "./create_resume";
 import ViewResume from "./view_resume";
 import ConfigPerms from "./config_perms";
 import InPerms from "./perms"
+import { EmployerHome, EmployerSignup, EmployerLogin } from "./employer-auth.js";
 import EmployerHomeFeed from "./employer-homefeed.js";
+import EmployerCreateJob from "./employer-create-job.js";
 import JobApplicants from "./employer-job-applicants.js";
 import EmployerLayout from "./employer-layout.js";
-import { EmployerHome, EmployerSignup, EmployerLogin } from "./employer-auth.js"
 
 import { useNavigate } from "react-router-dom";
 
@@ -23,10 +24,10 @@ function Home() {
       <img src="/logo.png" alt="App Logo" className="logo" />
       <div className="button-container">
         <Link to="/signup">
-          <button>Sign Up</button>
+          <button className="student-button">Sign Up</button>
         </Link>
         <Link to="/login">
-          <button>Log In</button>
+          <button className="student-button">Log In</button>
         </Link>
       </div>
       <Link to="/employer-home">
@@ -439,6 +440,7 @@ function App() {
   return (
     <Router>
       <Routes>
+        {/* Student Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
@@ -448,12 +450,14 @@ function App() {
         <Route path="/view-resume" element={<ViewResume/>}/>
         <Route path="/in-perms" element={<InPerms/>}/>
         <Route path="/config-perms" element={<ConfigPerms/>}/>
+        
+        {/* Employer Routes */}
+        <Route path="/employer-home" element={<EmployerHome/>}/>
+        <Route path="/employer-signup" element={<EmployerSignup/>}/>
         <Route path="/employer-login" element={<EmployerLogin/>}/>
         <Route path="/employer-homefeed" element={<EmployerLayout><EmployerHomeFeed/></EmployerLayout>}/>
+        <Route path="/employer-create-job" element={<EmployerCreateJob/>}/>
         <Route path="/jobs/:jobId/applicants" element={<EmployerLayout><JobApplicants/></EmployerLayout>}/>
-        <Route path="/employer-home" element={<EmployerHome />} />
-        <Route path="/employer-signup" element={<EmployerSignup />} />  
-        <Route path="/employer-login" element={<EmployerLogin />} />
       </Routes>
     </Router>
   )

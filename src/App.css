@@ -28,8 +28,8 @@
   margin-top: 0.5rem;
 }
 
-button {
-  width: 110px;
+.student-button {
+  width: 150px;
   padding: 0.8rem 1.5rem;
   font-size: 1rem;
   border-radius: 8px;
@@ -79,10 +79,10 @@ button:hover {
 }
 
 .back-link {
-  display: block; /* ensures it doesn't stretch full width */
+  display: block; 
   text-align: left;
   width: 100%;
-  margin-top: 1rem;      /* optional spacing from form */
+  margin-top: 1rem;      
 }
 
 html, body {
@@ -95,9 +95,8 @@ html, body {
   background-color: white;
 }
 
-/* Add these styles to your existing App.css */
 
-/* Login form styles */
+/* Login forms */
 .login-form {
   max-width: 400px;
   margin: 2rem auto;
