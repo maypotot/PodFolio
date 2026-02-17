@@ -17,6 +17,8 @@ import { useNavigate } from "react-router-dom";
 import { login } from "./main.js";
 import { restoreSession } from "./solid.js";
 
+let solidUser; // Global variable to hold the Solid user session
+
 function Home() {
   return (
     <main className="home">
@@ -207,19 +209,16 @@ function Login() {
       try {
         // Get the WebID that was stored before Solid auth
         const expectedWebId = sessionStorage.getItem("login_webid");
-        
+ 
         // Check if there's a Solid session
-        const solidUser = await restoreSession();
+        solidUser = await restoreSession();
+
         
-        if (solidUser && solidUser.webId && expectedWebId) {
+        if (solidUser) {
           console.log("Detected Solid session after redirect:", solidUser.webId);
           console.log("Expected WebID:", expectedWebId);
-          
-          // Verify the Solid WebID matches the expected one
-          const solidWebIdWithoutFragment = solidUser.webId.split('#')[0];
-          const expectedWebIdWithoutFragment = expectedWebId.split('#')[0];
 
-          if (solidWebIdWithoutFragment === expectedWebIdWithoutFragment) {
+          if (solidUser.url === expectedWebId) {
             console.log("WebIDs match! Completing login...");
             
             // Store the full WebID in session storage
@@ -228,9 +227,8 @@ function Login() {
             // Clear the temporary login WebID
             sessionStorage.removeItem("login_webid");
             
-            // Navigate to homefeed
-            console.log("Navigating to homefeed...");
-            navigate("/homefeed");
+            // Show connected state and wait for user action
+            setStep(3);
             return;
           } else {
             console.log("WebIDs don't match");
@@ -372,7 +370,25 @@ function Login() {
               </button>
             </form>
           </>
-        ) : (
+        ) : step === 3 ? (
+          // Step 3: Solid connected
+          <>
+            <div className="success-badge">
+              ✓ Solid Pod Connected
+            </div>
+
+            <p className="login-info">
+              Solid Pod has been connected. You can now continue to your homefeed.
+            </p>
+
+            <button
+              className="solid-auth-button"
+              onClick={() => navigate("/homefeed")}
+            >
+              Go to Homefeed
+            </button>
+          </>
+        ) : step === 2 ? (
           // Step 2: Authenticate with Solid
           <>
             <div className="success-badge">
@@ -422,6 +438,11 @@ function Login() {
               ← Use Different WebID
             </button>
           </>
+        ): (
+          // This case should not happen, but just in case
+          <p className="login-info">
+            Unexpected state. Please refresh the page and try again.
+          </p>
         )}
         
         <div className="login-links">
