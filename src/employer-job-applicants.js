@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import "./main.css";
+import "./employer-side.css";
 
 function JobApplicants() {
   const { jobId } = useParams();
@@ -69,9 +69,14 @@ function JobApplicants() {
           {applicants.map(app => (
             <li key={app.id} style={{ borderBottom: "1px solid #ccc", padding: "10px 0" }}>
               <p>Applicant WebID: {app.applicant_webid.split('#')[0]}</p>
-              <p>Resume: <a href={app.resume_pod_url} target="_blank" rel="noreferrer">View Resume</a></p>
+              Resume:{" "}
+                <Link 
+                  to="/employer-view-resume" 
+                >
+                  View Resume
+                </Link>
               <p>Submitted At: {new Date(app.submitted_at).toLocaleString()}</p>
-              <button onClick={() => setRequestModal({ open: true, applicant: app })}>
+              <button className="employer-add-tag-button" onClick={() => setRequestModal({ open: true, applicant: app })}>
                 Request
               </button>
             </li>

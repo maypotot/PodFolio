@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import JobPosting, JobApplication, EmployerRequest, StudentAccount, EmployerAccount, SkillInterestTag, JobPostingTag, StudentSkillInterest
-from .serializers import JobPostingSerializer, JobApplicationSerializer, EmployerRequestSerializer, StudentAccountSerializer, EmployerAccountSerializer, SkillInterestTagSerializer
+from .models import JobPosting, JobApplication, EmployerRequest, StudentAccount, EmployerAccount, SkillInterestTag, JobPostingTag, StudentSkillInterest, Resume
+from .serializers import JobPostingSerializer, JobApplicationSerializer, EmployerRequestSerializer, StudentAccountSerializer, EmployerAccountSerializer, SkillInterestTagSerializer, ResumeSerializer
 from rest_framework import status
 from urllib.parse import unquote
 
@@ -59,6 +59,176 @@ def update_student_bio(request):
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+@api_view(['PATCH'])
+def update_student_picture(request):
+    """
+    Update student profile picture.
+    Expects { "profile_picture": "data:image/jpeg;base64,..." }
+    """
+    try:
+        webid = request.query_params.get('webid')
+        profile_picture = request.data.get('profile_picture')
+        
+        if not webid:
+            return Response({"error": "WebID parameter is required"}, status=400)
+        if not profile_picture:
+            return Response({"error": "profile_picture field is required"}, status=400)
+        
+        webid = unquote(webid).split('#')[0]
+        students = StudentAccount.objects.filter(webid__startswith=webid)
+        if not students.exists():
+            return Response({"error": "Student account not found"}, status=404)
+        
+        student = students.first()
+        student.profile_picture = profile_picture
+        student.save()
+        
+        return Response(StudentAccountSerializer(student).data)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
+@api_view(['PATCH'])
+def update_student_name(request):
+    """
+    Update student name.
+    Expects { "first_name": "...", "last_name": "..." }
+    """
+    try:
+        webid = request.query_params.get('webid')
+        first_name = request.data.get('first_name')
+        last_name = request.data.get('last_name')
+        
+        if not webid:
+            return Response({"error": "WebID parameter is required"}, status=400)
+        if not first_name or not last_name:
+            return Response({"error": "first_name and last_name are required"}, status=400)
+        
+        webid = unquote(webid).split('#')[0]
+        students = StudentAccount.objects.filter(webid__startswith=webid)
+        if not students.exists():
+            return Response({"error": "Student account not found"}, status=404)
+        
+        student = students.first()
+        student.first_name = first_name.strip()
+        student.last_name = last_name.strip()
+        student.save()
+        
+        return Response(StudentAccountSerializer(student).data)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
+@api_view(['PATCH'])
+def update_student_email(request):
+    """
+    Update student email.
+    Expects { "email": "..." }
+    """
+    try:
+        webid = request.query_params.get('webid')
+        email = request.data.get('email')
+        
+        if not webid:
+            return Response({"error": "WebID parameter is required"}, status=400)
+        if not email:
+            return Response({"error": "email is required"}, status=400)
+        
+        email = email.strip().lower()
+        
+        # Basic email validation
+        if '@' not in email or '.' not in email:
+            return Response({"error": "Invalid email format"}, status=400)
+        
+        webid = unquote(webid).split('#')[0]
+        students = StudentAccount.objects.filter(webid__startswith=webid)
+        if not students.exists():
+            return Response({"error": "Student account not found"}, status=404)
+        
+        student = students.first()
+        
+        # Check if email is already taken by another student
+        if StudentAccount.objects.filter(email=email).exclude(id=student.id).exists():
+            return Response({"error": "Email already in use"}, status=400)
+        
+        student.email = email
+        student.save()
+        
+        return Response(StudentAccountSerializer(student).data)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
+# ─── Resume Views ─────────────────────────────────────────────────────────────
+
+@api_view(['GET'])
+def list_student_resumes(request):
+    """Get all resumes for a student by webid"""
+    try:
+        webid = request.query_params.get('webid')
+        if not webid:
+            return Response({"error": "webid parameter is required"}, status=400)
+        webid = unquote(webid).split('#')[0]
+        resumes = Resume.objects.filter(student_webid=webid)
+        return Response(ResumeSerializer(resumes, many=True).data)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
+@api_view(['POST'])
+def create_resume(request):
+    """Create a new resume for a student"""
+    try:
+        webid = request.query_params.get('webid')
+        title = request.data.get('title')
+        
+        if not webid:
+            return Response({"error": "webid parameter is required"}, status=400)
+        if not title:
+            return Response({"error": "title is required"}, status=400)
+        
+        webid = unquote(webid).split('#')[0]
+        
+        # Generate placeholder URL
+        import uuid
+        resume_id = str(uuid.uuid4())[:8]
+        pod_url = f"https://placeholder.pod/resumes/{resume_id}"
+        
+        resume = Resume.objects.create(
+            student_webid=webid,
+            title=title.strip(),
+            pod_url=pod_url
+        )
+        
+        return Response(ResumeSerializer(resume).data, status=201)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
+@api_view(['PATCH'])
+def update_resume(request, resume_id):
+    """Update resume title"""
+    try:
+        resume = Resume.objects.get(id=resume_id)
+        title = request.data.get('title')
+        
+        if title:
+            resume.title = title.strip()
+            resume.save()
+        
+        return Response(ResumeSerializer(resume).data)
+    except Resume.DoesNotExist:
+        return Response({"error": "Resume not found"}, status=404)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
+@api_view(['DELETE'])
+def delete_resume(request, resume_id):
+    """Delete a resume"""
+    try:
+        resume = Resume.objects.get(id=resume_id)
+        resume.delete()
+        return Response({"message": "Resume deleted successfully"}, status=200)
+    except Resume.DoesNotExist:
+        return Response({"error": "Resume not found"}, status=404)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
 # ─── Employer Account Views ───────────────────────────────────────────────────
 
 @api_view(['POST'])
@@ -90,6 +260,142 @@ def get_employer_by_webid(request):
         return Response(EmployerAccountSerializer(employer).data)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['PATCH'])
+def update_employer_name(request):
+    """Update employer company name"""
+    try:
+        webid = request.query_params.get('webid')
+        company_name = request.data.get('company_name')
+        
+        if not webid:
+            return Response({"error": "WebID parameter is required"}, status=400)
+        if not company_name:
+            return Response({"error": "company_name is required"}, status=400)
+        
+        webid = unquote(webid).split('#')[0]
+        employers = EmployerAccount.objects.filter(webid__startswith=webid)
+        if not employers.exists():
+            return Response({"error": "Employer account not found"}, status=404)
+        
+        employer = employers.first()
+        employer.company_name = company_name.strip()
+        employer.save()
+        
+        return Response(EmployerAccountSerializer(employer).data)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
+@api_view(['PATCH'])
+def update_employer_contact_person(request):
+    """Update employer contact person"""
+    try:
+        webid = request.query_params.get('webid')
+        contact_person = request.data.get('contact_person')
+        
+        if not webid:
+            return Response({"error": "WebID parameter is required"}, status=400)
+        if not contact_person:
+            return Response({"error": "contact_person is required"}, status=400)
+        
+        webid = unquote(webid).split('#')[0]
+        employers = EmployerAccount.objects.filter(webid__startswith=webid)
+        if not employers.exists():
+            return Response({"error": "Employer account not found"}, status=404)
+        
+        employer = employers.first()
+        employer.contact_person = contact_person.strip()
+        employer.save()
+        
+        return Response(EmployerAccountSerializer(employer).data)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
+@api_view(['PATCH'])
+def update_employer_email(request):
+    """Update employer email"""
+    try:
+        webid = request.query_params.get('webid')
+        email = request.data.get('email')
+        
+        if not webid:
+            return Response({"error": "WebID parameter is required"}, status=400)
+        if not email:
+            return Response({"error": "email is required"}, status=400)
+        
+        email = email.strip().lower()
+        
+        # Basic email validation
+        if '@' not in email or '.' not in email:
+            return Response({"error": "Invalid email format"}, status=400)
+        
+        webid = unquote(webid).split('#')[0]
+        employers = EmployerAccount.objects.filter(webid__startswith=webid)
+        if not employers.exists():
+            return Response({"error": "Employer account not found"}, status=404)
+        
+        employer = employers.first()
+        
+        # Check if email is already taken by another employer
+        if EmployerAccount.objects.filter(email=email).exclude(id=employer.id).exists():
+            return Response({"error": "Email already in use"}, status=400)
+        
+        employer.email = email
+        employer.save()
+        
+        return Response(EmployerAccountSerializer(employer).data)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
+@api_view(['PATCH'])
+def update_employer_description(request):
+    """Update employer company description"""
+    try:
+        webid = request.query_params.get('webid')
+        company_description = request.data.get('company_description')
+        
+        if not webid:
+            return Response({"error": "WebID parameter is required"}, status=400)
+        if company_description is None:
+            return Response({"error": "company_description is required"}, status=400)
+        
+        webid = unquote(webid).split('#')[0]
+        employers = EmployerAccount.objects.filter(webid__startswith=webid)
+        if not employers.exists():
+            return Response({"error": "Employer account not found"}, status=404)
+        
+        employer = employers.first()
+        employer.company_description = company_description
+        employer.save()
+        
+        return Response(EmployerAccountSerializer(employer).data)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
+@api_view(['PATCH'])
+def update_employer_picture(request):
+    """Update employer profile picture"""
+    try:
+        webid = request.query_params.get('webid')
+        profile_picture = request.data.get('profile_picture')
+        
+        if not webid:
+            return Response({"error": "WebID parameter is required"}, status=400)
+        if not profile_picture:
+            return Response({"error": "profile_picture field is required"}, status=400)
+        
+        webid = unquote(webid).split('#')[0]
+        employers = EmployerAccount.objects.filter(webid__startswith=webid)
+        if not employers.exists():
+            return Response({"error": "Employer account not found"}, status=404)
+        
+        employer = employers.first()
+        employer.profile_picture = profile_picture
+        employer.save()
+        
+        return Response(EmployerAccountSerializer(employer).data)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
 
 # ─── Tag Views ────────────────────────────────────────────────────────────────
 
@@ -311,6 +617,49 @@ def apply_to_job(request):
         serializer.save()
         return Response(serializer.data, status=201)
     return Response(serializer.errors, status=400)
+
+@api_view(['GET'])
+def employer_applications(request):
+    """Get all applications for an employer's job postings"""
+    try:
+        employer_webid = request.query_params.get('employer_webid')
+        if not employer_webid:
+            return Response({"error": "employer_webid parameter is required"}, status=400)
+        
+        employer_webid = unquote(employer_webid).split('#')[0]
+        
+        # Get all jobs for this employer
+        jobs = JobPosting.objects.filter(employer_webid=employer_webid)
+        job_ids = [job.id for job in jobs]
+        
+        # Get all applications for these jobs
+        applications = JobApplication.objects.filter(job_id__in=job_ids).order_by('-submitted_at')
+        
+        # Build response with student info and job title
+        results = []
+        for app in applications:
+            # Get student data
+            student = StudentAccount.objects.filter(webid__startswith=app.applicant_webid).first()
+            
+            result = {
+                'id': app.id,
+                'job_id': app.job.id,
+                'job_title': app.job.title,
+                'applicant_webid': app.applicant_webid,
+                'resume_pod_url': app.resume_pod_url,
+                'submitted_at': app.submitted_at,
+                'student': {
+                    'first_name': student.first_name if student else 'Unknown',
+                    'last_name': student.last_name if student else 'Unknown',
+                    'email': student.email if student else '',
+                    'profile_picture': student.profile_picture if student else None,
+                } if student else None
+            }
+            results.append(result)
+        
+        return Response(results)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
 
 # ─── Request Views ────────────────────────────────────────────────────────────
 

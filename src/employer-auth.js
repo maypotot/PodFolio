@@ -202,7 +202,7 @@ function EmployerLogin() {
           console.log("Detected Solid session for employer:", solidUser.webId);
           console.log("Expected WebID:", expectedWebId);
 
-          if (solidUser.webId === expectedWebId) {
+          if (solidUser.url === expectedWebId) {
             console.log("Employer WebIDs match! Completing login...");
             
             sessionStorage.setItem("employer_webid", solidUser.webId);

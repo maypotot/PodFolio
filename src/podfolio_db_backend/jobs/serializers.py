@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import JobPosting, JobApplication, EmployerRequest, StudentAccount, EmployerAccount, SkillInterestTag, JobPostingTag, StudentSkillInterest
+from .models import JobPosting, JobApplication, EmployerRequest, StudentAccount, EmployerAccount, SkillInterestTag, JobPostingTag, StudentSkillInterest, Resume
 
 class StudentAccountSerializer(serializers.ModelSerializer):
     # Include student's tags in the response
@@ -13,6 +13,12 @@ class StudentAccountSerializer(serializers.ModelSerializer):
     def get_tags(self, obj):
         student_tags = StudentSkillInterest.objects.filter(student_webid=obj.webid).select_related('tag')
         return [{'id': st.tag.id, 'tag_name': st.tag.tag_name} for st in student_tags]
+
+class ResumeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Resume
+        fields = '__all__'
+        read_only_fields = ['id', 'created_at', 'updated_at']
 
 class EmployerAccountSerializer(serializers.ModelSerializer):
     class Meta:

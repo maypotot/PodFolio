@@ -185,7 +185,7 @@ function EmployerHomeFeed() {
         <div className="no-jobs-message">
           <p>No job postings yet. Create your first job posting!</p>
           <Link to="/employer-create-job">
-            <button className="employer-responsive-button">Create Job Posting</button>
+            <button className="create-job-button">Create Job Posting</button>
           </Link>
         </div>
       ) : (

@@ -5,7 +5,7 @@ import HomeFeed from "./student-homefeed.js";
 import Profile from "./student-profile.js";
 import CreateResume from "./student-create_resume.js";
 import ViewResume from "./student-view-resume.js";
-import ConfigPerms from "./config_perms";
+import ConfigPerms from "./student-config-perms.js";
 import InPerms from "./student-perms.js"
 import { EmployerHome, EmployerSignup, EmployerLogin } from "./employer-auth.js";
 import EmployerHomeFeed from "./employer-homefeed.js";
@@ -13,6 +13,9 @@ import EmployerCreateJob from "./employer-create-job.js";
 import JobApplicants from "./employer-job-applicants.js";
 import EmployerLayout from "./employer-layout.js";
 import StudentSearch from "./employer-search-result.js";
+import EmployerProfile from "./employer-profile.js"; 
+import EmployerNotifs from "./employer-notifs.js";
+import EmployerViewResume from "./employer-view-resume.js";
 
 import { useNavigate } from "react-router-dom";
 
@@ -471,7 +474,7 @@ function App() {
         <Route path="/create-resume" element={<StudentLayout><CreateResume/></StudentLayout>}/>
         <Route path="/view-resume" element={<StudentLayout><ViewResume/></StudentLayout>}/>
         <Route path="/in-perms" element={<StudentLayout><InPerms/></StudentLayout>}/>
-        <Route path="/config-perms" element={<ConfigPerms/>}/>
+        <Route path="/config-perms" element={<StudentLayout><ConfigPerms/></StudentLayout>}/>
         
         {/* Employer Routes */}
         <Route path="/employer-home" element={<EmployerHome/>}/>
@@ -481,6 +484,9 @@ function App() {
         <Route path="/employer-create-job" element={<EmployerCreateJob/>}/>
         <Route path="/jobs/:jobId/applicants" element={<EmployerLayout><JobApplicants/></EmployerLayout>}/>
         <Route path="/employer-student-search" element={<EmployerLayout><StudentSearch/></EmployerLayout>}/>
+        <Route path="/employer-profile" element={<EmployerLayout><EmployerProfile/></EmployerLayout>}/>
+        <Route path="/employer-notifs" element={<EmployerLayout><EmployerNotifs/></EmployerLayout>}/>
+        <Route path="/employer-view-resume" element={<EmployerLayout><EmployerViewResume/></EmployerLayout>}/>
       </Routes>
     </Router>
   )

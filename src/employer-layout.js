@@ -62,9 +62,11 @@ function EmployerLayout({ children }) {
     }
   };
 
-  const displayName = employerData
+  const displayName = employerData 
     ? employerData.company_name
     : (user?.name || "Company Name");
+
+  const profilePicture = employerData?.profile_picture || "/user-image.png";
 
   return (
     <main className="homefeed">
@@ -87,8 +89,8 @@ function EmployerLayout({ children }) {
           </form>
         </div>
         <div className="header-section">
-          <img src="/user-image.png" alt="User Avatar" className="avatar-icon"/>
-          <Link to="/in-perms">
+          <img src={profilePicture} alt="User Avatar" className="avatar-icon"/>
+          <Link to="/employer-notifs ">
             <button className="employer-header-buttons">
               <img src="/notifications-icon.png" alt="Notifications" className="button-icons"/>
             </button>
@@ -102,7 +104,7 @@ function EmployerLayout({ children }) {
       <div className="content">
         <div className="left-panel">
           <div className="left-panel-section">
-            <img src="/user-image.png" alt="User" className="user-icon"/>
+            <img src={profilePicture} alt="User" className="user-icon"/>
             <div className="user-name">{loading ? "Loading..." : displayName}</div>
           </div>
           <div className="left-panel-section">
