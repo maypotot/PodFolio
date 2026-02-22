@@ -32,10 +32,6 @@ export default class PersonalInformation extends SolidModel {
             required: true,
             type: FieldType.String,
         },
-        WebsiteLink: {
-            required: true,
-            type: FieldType.String,
-        },
         ProfessionalSummary: {
             required: false,
             type: FieldType.String,

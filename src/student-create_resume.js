@@ -41,6 +41,8 @@ function CreateResume() {
     // Clear current resume from session
     sessionStorage.removeItem("current_resume_id");
     sessionStorage.removeItem("current_resume_title");
+
+    createInformation();
     
     // Navigate to profile
     navigate("/profile");
