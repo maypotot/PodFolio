@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import "./main.css";
-
-const EMPLOYER_WEBID = "https://test-employer.solidcommunity.net/profile/card#me.";
+import "./employer-side.css";
 
 function JobApplicants() {
   const { jobId } = useParams();
@@ -25,14 +23,21 @@ function JobApplicants() {
 
   async function handleSubmitRequest(applicant) {
     try {
+      // Get employer webid from session, strip #me fragment
+      const rawEmployerWebid = sessionStorage.getItem("employer_webid") || "";
+      const employerWebid = rawEmployerWebid.split('#')[0];
+
+      // Strip #me fragment from applicant webid
+      const applicantWebid = applicant.applicant_webid.split('#')[0];
+
       const payload = {
-        employer_webid: EMPLOYER_WEBID,
-        applicant_webid: applicant.applicant_webid,
+        employer_webid: employerWebid,
+        applicant_webid: applicantWebid,
         job_application_id: applicant.id,
         summary: summary,
       };
 
-      const res = await fetch("http://127.0.0.1:8000/api/requests/", {
+      const res = await fetch("http://127.0.0.1:8000/api/requests/create/", {  // ✅ fixed URL
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -42,11 +47,10 @@ function JobApplicants() {
         alert("Request submitted!");
         setRequestModal({ open: false, applicant: null });
         setSummary("");
-      }
-      else {
+      } else {
         const errorData = await res.json();
         console.error("Failed to submit request:", errorData);
-        alert("Failed to submit request: " + (errorData.detail || "Unknown error"));
+        alert("Failed to submit request: " + (errorData.detail || JSON.stringify(errorData)));
       }
     } catch (error) {
       console.error("Failed to submit request:", error);
@@ -64,10 +68,15 @@ function JobApplicants() {
         <ul>
           {applicants.map(app => (
             <li key={app.id} style={{ borderBottom: "1px solid #ccc", padding: "10px 0" }}>
-              <p>Applicant WebID: {app.applicant_webid}</p>
-              <p>Resume: <a href={app.resume_pod_url} target="_blank" rel="noreferrer">View Resume</a></p>
+              <p>Applicant WebID: {app.applicant_webid.split('#')[0]}</p>
+              Resume:{" "}
+                <Link 
+                  to="/employer-view-resume" 
+                >
+                  View Resume
+                </Link>
               <p>Submitted At: {new Date(app.submitted_at).toLocaleString()}</p>
-              <button onClick={() => setRequestModal({ open: true, applicant: app })}>
+              <button className="employer-add-tag-button" onClick={() => setRequestModal({ open: true, applicant: app })}>
                 Request
               </button>
             </li>
@@ -75,11 +84,10 @@ function JobApplicants() {
         </ul>
       )}
 
-      {/* Modal for entering request summary */}
       {requestModal.open && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h3>Request for {requestModal.applicant.applicant_webid}</h3>
+            <h3>Request for {requestModal.applicant.applicant_webid.split('#')[0]}</h3>
             <textarea
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
@@ -89,7 +97,12 @@ function JobApplicants() {
             />
             <div style={{ marginTop: "10px" }}>
               <button onClick={() => handleSubmitRequest(requestModal.applicant)}>Submit</button>
-              <button onClick={() => setRequestModal({ open: false, applicant: null })} style={{ marginLeft: "10px" }}>Cancel</button>
+              <button
+                onClick={() => setRequestModal({ open: false, applicant: null })}
+                style={{ marginLeft: "10px" }}
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>
