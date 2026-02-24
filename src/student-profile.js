@@ -388,6 +388,10 @@ function Profile() {
       if (response.ok) {
         const newResume = await response.json();
         // Store resume ID in sessionStorage to use in create-resume page
+
+        alert(`Resume created successfully!\nResume ID: ${newResume.id}\nTitle: ${newResume.title}`);
+
+        sessionStorage.setItem("current_resume_id", newResume.id);
         sessionStorage.setItem("current_resume_id", newResume.id);
         sessionStorage.setItem("current_resume_title", newResume.title);
         
