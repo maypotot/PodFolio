@@ -2,6 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./main.css"; 
 import StudentLayout from "./student-layout";
+import { restoreSession, loadInformation } from "./solid.js";
+let podInfolist = [];
+let resumeIndexList = [];
+let maxResumeIndex = 0;
 
 function Profile() {
   const [studentData, setStudentData] = useState(null);
@@ -40,7 +44,25 @@ function Profile() {
   const [editingResumeId, setEditingResumeId] = useState(null);
   const [editingResumeTitle, setEditingResumeTitle] = useState("");
 
-  useEffect(() => {
+
+  useEffect( () => {
+    async function getInfo() {
+    const user =  await restoreSession();
+    const podInformation = await loadInformation();
+  
+    for (let i in podInformation){
+      for (let j in podInformation[i].information){
+            podInfolist.push(podInformation[i].information[j]);
+      }
+    }
+  
+    resumeIndexList = Array.from(
+      new Set(podInfolist.map((info) => Number(info.ResumeIndex)).filter((value) => !Number.isNaN(value)))
+    );
+    maxResumeIndex = resumeIndexList.length > 0 ? Math.max(...resumeIndexList) : null;
+    }
+  getInfo();
+
     async function fetchStudentData() {
       try {
         const webid = sessionStorage.getItem("webid");
@@ -359,7 +381,7 @@ function Profile() {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ title: resumeTitle.trim() }),
+          body: JSON.stringify({ title: resumeTitle.trim()}),
         }
       );
 
@@ -385,7 +407,7 @@ function Profile() {
     // Store resume ID and navigate to create-resume page for editing
     sessionStorage.setItem("current_resume_id", resume.id);
     sessionStorage.setItem("current_resume_title", resume.title);
-    navigate("/create-resume");
+    navigate("/edit-resume");
   };
 
   const handleEditResumeTitle = (resume) => {

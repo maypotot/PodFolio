@@ -19,6 +19,7 @@ function ConfigPerms() {
     // Get application context from sessionStorage
     const job = sessionStorage.getItem("current_job_title");
     const resume = sessionStorage.getItem("current_resume_title");
+    console.log("Session:", sessionStorage)
     
     if (!job || !resume) {
       alert("No application found. Redirecting to home feed.");

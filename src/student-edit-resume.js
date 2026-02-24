@@ -4,24 +4,14 @@ import "./main.css";
 import StudentLayout from "./student-layout.js";
 
 import { 
-  loadInformation,
-  loadAward,
-  loadExperience,
-  loadImage,
-  loadReference,
-  loadProject,
-  loadTraining,
-  load
- } from "./solid.js";
-import { 
-  createInformation,
-  createWebsite,
-  createProject,
-  createExperience,
-  createSkill,
+  updateInformation,
+  updateSkill,
+  updateProject,
+  updateExperience,
+  updateWebsite
  } from "./main.js";
 
-function CreateResume() {
+function EditResume() {
   const navigate = useNavigate();
   const [resumeTitle, setResumeTitle] = useState("");
 
@@ -37,12 +27,12 @@ function CreateResume() {
     }
   }, [navigate]);
 
-  const handleCompleteResume = () => {
+  const handleEditResume = () => {
     // Clear current resume from session
     sessionStorage.removeItem("current_resume_id");
     sessionStorage.removeItem("current_resume_title");
-    console.log(sessionStorage.getItem("current_resume_id"))
-    createInformation();
+
+    updateInformation();
     
     // Navigate to profile
     navigate("/profile");
@@ -53,7 +43,7 @@ function CreateResume() {
         <div className="resume">
           <div className="tag-header">
             <h1>Editing: {resumeTitle}</h1>
-            <button className="complete-button" onClick={handleCompleteResume}>
+            <button className="complete-button" onClick={handleEditResume}>
               Complete Resume
             </button>
           </div>
@@ -131,8 +121,8 @@ function CreateResume() {
                   className="resume-input"
                   id="WebsiteLink"
                 />
-                <button className="student-add-tag-button" onClick={createWebsite}>
-                  Add Website
+                <button className="student-add-tag-button" onClick={updateWebsite}>
+                  Update Website
                 </button>
               </div>
 
@@ -239,8 +229,8 @@ function CreateResume() {
                   className="skills-input"
                   id="Skill"
                 />
-                <button className="student-add-tag-button" onClick={createSkill}>
-                  Add Skill
+                <button className="student-add-tag-button" onClick={updateSkill}>
+                  Update Skill
                 </button>
               </div>
             </div>
@@ -291,8 +281,8 @@ function CreateResume() {
                   />
                 </div>
                 
-                <button className="student-add-tag-button" onClick={createProject}>
-                  Add Project
+                <button className="student-add-tag-button" onClick={updateProject}>
+                  Update Project
                 </button>
               </div>
             </div>
@@ -352,8 +342,8 @@ function CreateResume() {
                     id="Description"
                   />
                 </div>
-                <button className="student-add-tag-button" onClick={createExperience}>
-                  Add Experience
+                <button className="student-add-tag-button" onClick={updateExperience}>
+                  Update Experience
                 </button>
               </div>
             </div>
@@ -363,4 +353,4 @@ function CreateResume() {
   );
 }
 
-export default CreateResume;
+export default EditResume;

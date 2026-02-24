@@ -3,42 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import "./main.css"; 
 import StudentLayout from "./student-layout.js";
 
-import { 
-  loadInformation,
-  loadAward,
-  loadExperience,
-  loadImage,
-  loadReference,
-  loadProject,
-  loadTraining,
-  load
- } from "./solid.js";
-import { 
-  appendInformation,
-  appendAward,
-  appendExperience,
-  appendReference,
-  appendProject,
-  appendTraining
- } from "./main.js";
-
-async function restoreInfo() {
-  const information = await loadInformation();
-  for (const info of information) {
-    console.log("Restoring info:", info);
-    appendInformation(info);
-  }
-  const experience = await loadExperience();
-  for (const exp of experience) { appendExperience(exp); }
-  const projects = await loadProject();
-  for (const proj of projects) { appendProject(proj); }
-  const awards = await loadAward();
-  for (const award of awards) { appendAward(award); }
-  const trainings = await loadTraining();
-  for (const training of trainings) { appendTraining(training); }
-  const references = await loadReference();
-  for (const reference of references) { appendReference(reference); }
-}
 
 function HomeFeed() {
   const [jobs, setJobs] = useState([]);
@@ -197,7 +161,6 @@ function HomeFeed() {
         <div className="feed-header">
           <h1>Job Listings</h1>
           <div className="feed-actions">
-            <button className="student-add-tag-button" onClick={restoreInfo}>Refresh Info</button>
             <Link to="/view-resume">
               <button className="student-add-tag-button">View Resume</button>
             </Link>

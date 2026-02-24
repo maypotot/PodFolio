@@ -5,6 +5,7 @@ import HomeFeed from "./student-homefeed.js";
 import Profile from "./student-profile.js";
 import CreateResume from "./student-create_resume.js";
 import ViewResume from "./student-view-resume.js";
+import EditResume from "./student-edit-resume.js";
 import ConfigPerms from "./student-config-perms.js";
 import InPerms from "./student-perms.js"
 import { EmployerHome, EmployerSignup, EmployerLogin } from "./employer-auth.js";
@@ -346,7 +347,7 @@ function Login() {
       <div className="login-form">
         {error && <div className="error-message">{error}</div>}
         
-        {step === 1 ? (
+        {step === 1 && !sessionStorage.getItem("login_webid") ? (
           // Step 1: Enter WebID and check database
           <>
             <p className="login-info">
@@ -446,7 +447,7 @@ function Login() {
           </>
            ): (
           <p className="login-info">
-            Unexpected state. Please refresh the page and try again.
+            Checking Solid Pod Connection...
           </p>
         )}
         
@@ -472,6 +473,7 @@ function App() {
         <Route path="/homefeed" element={<HomeFeed />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/create-resume" element={<StudentLayout><CreateResume/></StudentLayout>}/>
+        <Route path="/edit-resume" element={<StudentLayout><EditResume/></StudentLayout>}/>
         <Route path="/view-resume" element={<StudentLayout><ViewResume/></StudentLayout>}/>
         <Route path="/in-perms" element={<StudentLayout><InPerms/></StudentLayout>}/>
         <Route path="/config-perms" element={<StudentLayout><ConfigPerms/></StudentLayout>}/>

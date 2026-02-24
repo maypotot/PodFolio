@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import resumeData from "./sample_resume.json"; // import the JSON file
 import "./main.css";
@@ -29,6 +29,7 @@ let podExperienceList = [];
 let podImageList = [];
 let resumeIndexList = [];
 let resumeIndex = 1;
+
 
 function updateInfoText(info) {
 
@@ -200,7 +201,7 @@ function updateImageText(image) {
 }
 
 function updateResumeText() {
-
+  
   let skillsListElement = document.getElementById('SkillsList');
   skillsListElement.innerHTML = '';
   let projectsListElement = document.getElementById('ProjectsList');
@@ -254,6 +255,14 @@ function updateResumeText() {
 
 async function loadResumeData() {
 
+  // Clear previous data
+  podInfolist = [];
+  podSkilllist = [];
+  podProjectlist = [];
+  podWebsiteList = [];
+  podExperienceList = [];
+  podImageList = [];
+
   const user = await restoreSession();
   const podInformation = await loadInformation();
 
@@ -297,8 +306,9 @@ async function loadResumeData() {
           podExperienceList.push(podExperiences[i].experience[j]);
     }
   }
+
   
-  const podImages = await loadImage();
+  // const podImages = await loadImage();
 
   // for (let i in podImages){
   //   let items = getThingAll(podImages[i]);
@@ -317,11 +327,9 @@ async function loadResumeData() {
   //   }
   // }
 
-  console.log("Resume Index List:", resumeIndexList);
   resumeIndex = resumeIndexList[0] || 1;
 
 
-  updateResumeText();
 
   alert("All info loaded.");
 
@@ -353,82 +361,101 @@ function previousResume() {
 
 
 
+
 function ViewResume() {
+  const [isLoading, setIsLoading] = useState(true);
+  const hasRun = useRef(false);
+
   useEffect(() => {
-    loadResumeData();
+    if (hasRun.current) return;
+    hasRun.current = true;
+
+    setIsLoading(true);
+    loadResumeData()
+      .then(() => setIsLoading(false))
+      .then(() => new Promise(resolve => setTimeout(resolve, 1000)))
+      .then(() => updateResumeText());
   }, []);
 
   return (
     <main className="main-feed">
         <div className="resume">
             <h1>Resume Preview</h1>
-            <button className="student-button" onClick={loadResumeData}>Reload Resume</button>
-            <Link to="/config-perms">
-              <button className="student-button">Configure Permissions</button>
-            </Link>
-            <h1 className="full-name" id="FullName">{resumeData.name}</h1>
+            {isLoading ? (
+              <p style={{fontSize: '32px', color: '#666', textAlign: 'center', marginTop: '50px'}}>Loading resumes...</p>
+            ) : (
+              <>
+                <button className="student-button" onClick={previousResume}>Previous Resume</button>
+                <button className="student-button" onClick={nextResume}>Next Resume</button>
+                <button className="student-button" onClick={deleteResume}>Delete Resume</button>
+                <Link to="/config-perms">
+                  <button className="student-button">Configure Permissions</button>
+                </Link>
+                <h1 className="full-name" id="FullName">{resumeData.name}</h1>
 
-          <img src={null} alt="Profile" className="profile-image" id="ProfileImage"/>
-          {/* Personal Information */}
-          <div className="resume-section">
-            <h2>Personal Information</h2>
-            <p id="ProfessionalTitle"></p>
-            <p id="Summary"></p>
-            <p id="Email"></p>
-            <p id="ContactNumber"></p>
-            <p id="Location"></p>
-            <p id="ProfessionalSummary"></p>
-            <p id="Websites"></p>
-          </div>
+              <img src={null} alt="Profile" className="profile-image" id="ProfileImage"/>
+              {/* Personal Information */}
+              <div className="resume-section">
+                <h2>Personal Information</h2>
+                <p id="ProfessionalTitle"></p>
+                <p id="Summary"></p>
+                <p id="Email"></p>
+                <p id="ContactNumber"></p>
+                <p id="Location"></p>
+                <p id="ProfessionalSummary"></p>
+                <p id="Websites"></p>
+              </div>
 
-          {/* Education */}
-          <div className="resume-section">
-            <h2>Education</h2>
-            <p id="Degree"></p>
-            <p id="School"></p>
-            <p id="Honors"></p>
-            <p id="Program"></p>
-            <p id="StartDate"></p>
-            <p id="EndDate"></p>
-            <p id="RelevantCourseWork"></p>
-            <p id="ThesisTitle"></p>
-          </div>
+              {/* Education */}
+              <div className="resume-section">
+                <h2>Education</h2>
+                <p id="Degree"></p>
+                <p id="School"></p>
+                <p id="Honors"></p>
+                <p id="Program"></p>
+                <p id="StartDate"></p>
+                <p id="EndDate"></p>
+                <p id="RelevantCourseWork"></p>
+                <p id="ThesisTitle"></p>
+              </div>
 
-          {/* Websites */}
-          <div className="resume-section">
-            <h2>Websites</h2>
-            <ul id="WebsitesList">
-              
-            </ul>
-          </div>
+              {/* Websites */}
+              <div className="resume-section">
+                <h2>Websites</h2>
+                <ul id="WebsitesList">
+                  
+                </ul>
+              </div>
 
-          {/* Skills */}
-          <div className="resume-section">
-            <h2>Skills</h2>
-            <ul id="SkillsList">
-              
-            </ul>
-          </div>
+              {/* Skills */}
+              <div className="resume-section">
+                <h2>Skills</h2>
+                <ul id="SkillsList">
+                  
+                </ul>
+              </div>
 
-          {/* Projects */}
-          <div className="resume-section">
-            <h2>Projects</h2>
-            <ul id="ProjectsList">
-              
-            </ul>
-          </div>
+              {/* Projects */}
+              <div className="resume-section">
+                <h2>Projects</h2>
+                <ul id="ProjectsList">
+                  
+                </ul>
+              </div>
 
-          {/* Experience */}
-          <div className="resume-section">
-            <h2>Experience</h2>
-            <ul id="ExperienceList">
-              
-            </ul>
-          </div>
+              {/* Experience */}
+              <div className="resume-section">
+                <h2>Experience</h2>
+                <ul id="ExperienceList">
+                  
+                </ul>
+              </div>
 
-          <Link to="/create-resume">
-            <button className="student-button">Edit Resume</button>
-          </Link>
+              <Link to="/create-resume">
+                <button className="student-button">Edit Resume</button>
+              </Link>
+              </>
+            )}
         </div>
       
     </main>

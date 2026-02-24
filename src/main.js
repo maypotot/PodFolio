@@ -40,7 +40,9 @@ import {
     performWebsiteCreation,
     performSkillCreation,
     performSkillDeletion,
-    performWebsiteDeletion
+    performWebsiteDeletion,
+    performUpdateWebsite,
+    performUpdateSkill,
     
 } from './solid';
 import Website from './solid/Website';
@@ -374,242 +376,6 @@ export async function createSkill() {
     alert("Skill has been created")   
 }
 
-export function appendInformation(info) {
-    const infoItem = document.createElement('li');
-
-    infoItem.innerHTML = `
-        <h3>Personal Information</h3>
-
-        <button
-            type="button"
-            onclick="deleteInformation('${info.url}', this.parentElement, this)"
-        >
-            Delete
-        </button>
-        <br /> <br />
-
-        <span>${info.FullName}</span><br /> <br />
-        <button
-            type="button"
-            onclick="updateInformation('${info.url}')"
-        >
-            Update
-        </button>
-
-        <h4>Professional Title</h4>
-        <span>${info.ProfessionalTitle}</span>
-
-        <h4>Summary</h4>
-        <span>${info.Summary}</span>
-
-        <h4>Contact Details</h4>
-        <span>${info.Email}</span>
-        <span>${info.ContactNumber}</span>
-        <span>${info.Location}</span>
-        <span>${info.WebsiteLink}</span>
-
-        <h4>Professional Summary</h4>
-        <span>${info.ProfessionalSummary}</span>
-
-
-        <h4>Education</h4>
-        <span>${info.School}</span>
-        <span>${info.Degree}</span>
-        <span>${info.Program}</span>
-        <span>${info.StartDate}</span>
-        <span>${info.EndDate}</span>
-        <span>${info.RelevantCoursework}</span>
-        <span>${info.Honors}</span>
-        <span>${info.ThesisTitle}</span>
-    `;
-
-    document.getElementById('information').appendChild(infoItem);
-}
-
-export function appendExperience(experience) {
-    const experienceItem = document.createElement('li');
-
-    experienceItem.innerHTML = `
-        <h3>Experience</h3>
-
-        <button
-            type="button"
-            onclick="deleteExperience('${experience.url}', this.parentElement, this)"
-        >
-            Delete
-        </button>
-        <br /> <br />
-
-        <button
-            type="button"
-            onclick="updateExperience('${experience.url}', this.parentElement, this)"
-        >
-            Update
-        </button>
-        <br /> <br />
-
-        <span>${experience.PositionTitle}</span><br /> <br />
-
-        <h4>Organization</h4>
-        <span>${experience.Organization}</span>
-
-        <h4>Duration</h4>
-        <span>${experience.Duration}</span>
-
-        <h4>Description</h4>
-        <span>${experience.Description}</span>
-    `;
-
-    document.getElementById('experience').appendChild(experienceItem);
-}
-
-export function appendProject(project) {
-    const projectItem = document.createElement('li');
-
-    projectItem.innerHTML = `
-        <h3>Project</h3>
-
-        <button
-            type="button"
-            onclick="deleteProject('${project.url}', this.parentElement, this)"
-        >
-            Delete
-        </button>
-        <br /> <br />
-
-        <button
-            type="button"
-            onclick="updateProject('${project.url}', this.parentElement, this)"
-        >
-            Update
-        </button>
-        <br /> <br />
-
-        <span>${project.ProjectName}</span><br /> <br />
-
-        <h4>Summary</h4>
-        <span>${project.Summary}</span>
-
-        <h4>Tools</h4>
-        <span>${project.Tools}</span>
-
-        <h4>Link</h4>
-        <span>${project.ProjectLink}</span>
-    `;
-
-    document.getElementById('projects').appendChild(projectItem);
-}
-
-export function appendAward(award) {
-    const awardItem  = document.createElement('li');
-
-    awardItem.innerHTML = `
-        <h3>Award</h3>
-
-        <button
-            type="button"
-            onclick="deleteAward('${award.url}', this.parentElement, this)"
-        >
-            Delete
-        </button>
-        <br /> <br />
-
-        <button
-            type="button"
-            onclick="updateAward('${award.url}', this.parentElement, this)"
-        >
-            Update
-        </button>
-        <br /> <br />
-
-        <h4>Award Title</h4>
-        <span>${award.AwardTitle}</span><br /> <br />
-
-        <h4>Date</h4>
-        <span>${award.Date}</span>
-
-        <h4>Organization</h4>
-        <span>${award.Organization}</span>
-    `;
-
-    document.getElementById('awards').appendChild(awardItem);
-}
-
-export function appendTraining(training) {
-    const trainingItem = document.createElement('li');
-
-    trainingItem.innerHTML = `
-        <h3>Training</h3>
-
-        <button
-            type="button"
-            onclick="deleteTraining('${training.url}', this.parentElement, this)"
-        >
-            Delete
-        </button>
-        <br /> <br />
-
-        <button
-            type="button"
-            onclick="updateTraining('${training.url}', this.parentElement, this)"
-        >
-            Update
-        </button>
-        <br /> <br />
-
-        <span>${training.TrainingTitle}</span><br /> <br />
-
-        <h4>Organization</h4>
-        <span>${training.Organization}</span>
-
-        <h4>Year Earned</h4>
-        <span>${training.YearEarned}</span>
-
-        <h4>Year Expire</h4>
-        <span>${training.YearExpire}</span>
-
-    `;
-
-    document.getElementById('trainings').appendChild(trainingItem);
-}
-
-export function appendReference(reference) {
-    const referenceItem = document.createElement('li');
-
-    referenceItem.innerHTML = `
-        <h3>Reference</h3>
-
-        <button
-            type="button"
-            onclick="deleteReference('${reference.url}', this.parentElement, this)"
-        >
-            Delete
-        </button>
-        <br /> <br />
-
-        <button
-            type="button"
-            onclick="updateReference('${reference.url}', this.parentElement, this)"
-        >
-            Update
-        </button>
-        <br /> <br />
-
-        <span>${reference.Name}</span><br /> <br />
-
-        <h4>Position</h4>
-        <span>${reference.Position}</span>
-
-        <h4>Organization</h4>
-        <span>${reference.Email}</span>
-
-        <h4>Email</h4>
-        <span>${reference.ContactNumber}</span>
-
-    `;
-
-    document.getElementById('references').appendChild(referenceItem);
-}
 
 export async function appendImage(itemList) {
     itemList.shift();
@@ -650,14 +416,13 @@ export async function appendImage(itemList) {
 }
 
 
-function updateInformation(infoUrl) {
+export function updateInformation(infoUrl) {
     const FullName = document.getElementById('FullName').value;
     const ProfessionalTitle = document.getElementById('ProfessionalTitle').value;
     const Summary = document.getElementById('Summary').value;
     const Email = document.getElementById('Email').value;
     const ContactNumber = document.getElementById('ContactNumber').value;
     const Location = document.getElementById('Location').value;
-    const WebsiteLink = document.getElementById('WebsiteLink').value;
     const ProfessionalSummary = document.getElementById('ProfessionalSummary').value;
     const School = document.getElementById('School').value;
     const Degree = document.getElementById('Degree').value;
@@ -668,7 +433,7 @@ function updateInformation(infoUrl) {
     const Honors = document.getElementById('Honors').value;
     const ThesisTitle = document.getElementById('ThesisTitle').value;
 
-    if (!FullName || !ProfessionalTitle || !Summary || !Email || !ContactNumber || !Location || !WebsiteLink || !School || !Degree || !Program || !StartDate || !EndDate) {
+    if (!FullName || !ProfessionalTitle || !Summary || !Email || !ContactNumber || !Location || !School || !Degree || !Program || !StartDate || !EndDate) {
         alert('Please fill in all fields');
         return;
     }
@@ -679,7 +444,6 @@ function updateInformation(infoUrl) {
         Email: Email,
         ContactNumber: ContactNumber,
         Location: Location,
-        WebsiteLink: WebsiteLink,
         ProfessionalSummary: ProfessionalSummary,
         School: School,
         Degree: Degree,
@@ -690,40 +454,42 @@ function updateInformation(infoUrl) {
         Honors: Honors,
         ThesisTitle: ThesisTitle
     });
-    alert("Information has been updated. Please Refresh")
+    alert("Information has been updated.")
 }
 
-function updateExperience(experienceUrl) {
+export function updateExperience(experienceUrl) {
     const PositionTitle = document.getElementById('PositionTitle').value;
     const Organization = document.getElementById('Organization').value;
     const Duration = document.getElementById('Duration').value;
     const Description = document.getElementById('Description').value;
+    const ExperienceLocation = document.getElementById('ExperienceLocation').value;
 
     performUpdateExperience(experienceUrl, {
         PositionTitle: PositionTitle,
         Organization: Organization,
         Duration: Duration,
-        Description: Description
+        Description: Description,
+        Location: ExperienceLocation
     });
-    alert("Experience has been updated. Please refresh to see changes.")
+    alert("Experience has been updated.")
 }
 
-function updateProject(projectUrl) {
+export function updateProject(projectUrl) {
     const ProjectName = document.getElementById('ProjectName').value;
-    const ProjectSummary = document.getElementById('ProjectSummary').value;
+    const Summary = document.getElementById('ProjectSummary').value;
     const Tools = document.getElementById('Tools').value;
     const ProjectLink = document.getElementById('ProjectLink').value;
 
     performUpdateProject(projectUrl, {
         ProjectName: ProjectName,
-        ProjectSummary: ProjectSummary,
+        ProjectSummary: Summary,
         Tools: Tools,
         ProjectLink: ProjectLink
     });
-    alert("Project has been updated. Please refresh to see changes.")
-}
+        alert("Project has been updated. Please refresh to see changes.")
+    }
 
-function updateAward(awardUrl) {
+export function updateAward(awardUrl) {
     const AwardTitle = document.getElementById('AwardTitle').value;
     const AwardDate = document.getElementById('AwardDate').value;
     const AwardOrganization = document.getElementById('AwardOrganization').value;
@@ -736,7 +502,7 @@ function updateAward(awardUrl) {
     alert("Award has been updated. Please refresh to see changes.")
 }
 
-function updateTraining(trainingUrl) {
+export function updateTraining(trainingUrl) {
     const TrainingTitle = document.getElementById('TrainingTitle').value;
     const TrainingOrganization = document.getElementById('TrainingOrganization').value;
     const YearEarned = document.getElementById('YearEarned').value;
@@ -748,10 +514,10 @@ function updateTraining(trainingUrl) {
         YearEarned: YearEarned,
         YearExpire: YearExpire
     });
-    alert("Training has been updated. Please refresh to see changes.")
+    alert("Training has been updated.")
 }
 
-function updateReference(referenceUrl) {
+export function updateReference(referenceUrl) {
     const ReferenceName = document.getElementById('ReferenceName').value;
     const ReferencePosition = document.getElementById('ReferencePosition').value;
     const ReferenceEmail = document.getElementById('ReferenceEmail').value;
@@ -763,16 +529,33 @@ function updateReference(referenceUrl) {
         Email: ReferenceEmail,
         ContactNumber: ReferenceContactNumber
     });
-    alert("Reference has been updated. Please refresh to see changes.")
+    alert("Reference has been updated.")
 }
 
+export function updateWebsite(websiteUrl) {
+    const WebsiteLink = document.getElementById('WebsiteLink').value;
 
-function updateImage(imageUrl) {
+    performUpdateWebsite(websiteUrl, {
+        WebsiteLink: WebsiteLink
+    });
+    alert("Website has been updated.")
+}
+
+export function updateSkill(skillUrl) {
+    const SkillName = document.getElementById('Skill').value;
+
+    performUpdateSkill(skillUrl, {
+        Skill: SkillName
+    });
+    alert("Skills have been updated.")
+}
+
+export function updateImage(imageUrl) {
     const ImageLink = document.getElementById('ImageLink').value;
     performUpdateImage(imageUrl, {
         Link: ImageLink,
     });
-    alert("Image has been updated. Please refresh to see changes.")
+    alert("Image has been updated.")
 }
 
 export function deleteInformation(infoUrl) {
@@ -837,3 +620,4 @@ window.createImage = createImage;
 window.updateImage = updateImage;
 window.deleteImage = deleteImage;
 window.createWebsite = createWebsite;
+window.updateWebsite = updateWebsite;

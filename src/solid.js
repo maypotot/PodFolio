@@ -495,6 +495,23 @@ export async function performUpdateImage(imageUrl, inputImage) {
      });
 }
 
+export async function performUpdateWebsite(websiteUrl, inputWebsite) {
+    const website = websiteList?.website.find((website) => website.url === websiteUrl);
+
+    await website.update({ 
+        WebsiteLink: inputWebsite.WebsiteLink,
+     });
+}
+
+export async function performUpdateSkill(skillUrl, inputSkill) {
+    const skill = skillList?.skills.find((skill) => skill.url === skillUrl);
+
+    await skill.update({ 
+        Skill: inputSkill.Skill,
+     });
+}
+
+
 // Deletion
 export async function performInformationDeletion(infoUrl) {
     let podInfo;
