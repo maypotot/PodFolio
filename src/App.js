@@ -229,7 +229,7 @@ function Login() {
             console.log("WebIDs match! Completing login...");
             
             // Store the full WebID in session storage
-            sessionStorage.setItem("webid", solidUser.webId);
+            sessionStorage.setItem("webid", expectedWebId);
             
             // Clear the temporary login WebID
             sessionStorage.removeItem("login_webid");
