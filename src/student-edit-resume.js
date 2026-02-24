@@ -37,6 +37,22 @@ let podExperienceList = [];
 let podImageList = [];
 let resumeIndexList = [];
 
+// Helper functions to get filtered data by resume ID
+export function getFilteredResumeData(resumeId) {
+  const filteredInfo = podInfolist.filter(info => info.ResumeIndex == resumeId);
+  const filteredSkills = podSkilllist.filter(skill => skill.ResumeIndex == resumeId);
+  const filteredProjects = podProjectlist.filter(project => project.ResumeIndex == resumeId);
+  const filteredWebsites = podWebsiteList.filter(website => website.ResumeIndex == resumeId);
+  const filteredExperiences = podExperienceList.filter(exp => exp.ResumeIndex == resumeId);
+  
+  return {
+    info: filteredInfo,
+    skills: filteredSkills,
+    projects: filteredProjects,
+    websites: filteredWebsites,
+    experiences: filteredExperiences
+  };
+}
 
 export async function loadResumeData() {
 
@@ -130,9 +146,11 @@ function EditResume() {
     if (hasRun.current) return;
     hasRun.current = true;
 
-    // Get current resume title from sessionStorage
+    // Get current resume title and ID from sessionStorage
     const title = sessionStorage.getItem("current_resume_title");
-    if (title) {
+    const resumeId = sessionStorage.getItem("current_resume_id");
+    
+    if (title && resumeId) {
       setResumeTitle(title);
     } else {
       // If no resume title, redirect back to profile
