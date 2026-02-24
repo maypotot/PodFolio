@@ -21,6 +21,9 @@ import {
   createSkill,
  } from "./main.js";
 
+
+
+
 function CreateResume() {
   const navigate = useNavigate();
   const [resumeTitle, setResumeTitle] = useState("");
@@ -39,13 +42,14 @@ function CreateResume() {
 
   const handleCompleteResume = () => {
     // Clear current resume from session
+    console.log(sessionStorage.getItem("current_resume_id"))
+    createInformation().then(() => {
+      navigate("/profile");
+    })
+    
     sessionStorage.removeItem("current_resume_id");
     sessionStorage.removeItem("current_resume_title");
-    console.log(sessionStorage.getItem("current_resume_id"))
-    createInformation();
-    
     // Navigate to profile
-    navigate("/profile");
   };
 
   return (

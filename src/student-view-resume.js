@@ -20,6 +20,7 @@ import {
   deleteProject,
   deleteWebsite
  } from "./main.js";
+import { resume } from "react-dom/server";
 
 let podInfolist = [];
 let podSkilllist = [];
@@ -31,7 +32,7 @@ let resumeIndexList = [];
 let resumeIndex = 1;
 
 
-function updateInfoText(info) {
+export function updateInfoText(info) {
 
   let fullname = document.getElementById('FullName');
   let title = document.getElementById('ProfessionalTitle');
@@ -118,7 +119,7 @@ function deleteProjectButton(e) {
   }
 }
 
-function updateSkillText(skill, num) {
+export function updateSkillText(skill, num) {
 
   let skillsListElement = document.getElementById('SkillsList');
   const listItem = document.createElement('li');
@@ -135,7 +136,7 @@ function updateSkillText(skill, num) {
 }
 
 
-function updateProjectText(project, num) {
+export function updateProjectText(project, num) {
   let projectsListElement = document.getElementById('ProjectsList');
   const listItem = document.createElement('li');
   listItem.innerHTML = `
@@ -156,7 +157,7 @@ function updateProjectText(project, num) {
   projectsListElement.appendChild(listItem);
 }
 
-function updateWebsiteText(website, num) {
+export function updateWebsiteText(website, num) {
   let websitesListElement = document.getElementById('WebsitesList');
   const listItem = document.createElement('li');
   listItem.textContent = website.WebsiteLink;
@@ -173,7 +174,7 @@ function updateWebsiteText(website, num) {
   websitesListElement.appendChild(listItem);
 }
 
-function updateExperienceText(experience, num) {
+export function updateExperienceText(experience, num) {
   let experiencesListElement = document.getElementById('ExperienceList');
   const listItem = document.createElement('li');
   listItem.innerHTML = `
@@ -194,13 +195,13 @@ function updateExperienceText(experience, num) {
   experiencesListElement.appendChild(listItem);
 }
 
-function updateImageText(image) {
+export function updateImageText(image) {
   let imageElement = document.getElementById('ProfileImage');
   imageElement.src = URL.createObjectURL(image.ImageFile);
   console.log("Image URL: " + imageElement.src);
 }
 
-function updateResumeText() {
+export function updateResumeText(indexToCheck) {
   
   let skillsListElement = document.getElementById('SkillsList');
   skillsListElement.innerHTML = '';
@@ -212,32 +213,32 @@ function updateResumeText() {
   experiencesListElement.innerHTML = '';
 
   for (let i in podInfolist){
-    if (podInfolist[i].ResumeIndex == resumeIndex){
+    if (podInfolist[i].ResumeIndex == indexToCheck){
       updateInfoText(podInfolist[i]);
       break
     }
   }
 
   for (let i in podSkilllist){
-    if (podSkilllist[i].ResumeIndex == resumeIndex){
+    if (podSkilllist[i].ResumeIndex == indexToCheck){
       updateSkillText(podSkilllist[i], i);
     }
   }
 
   for (let i in podProjectlist){
-    if (podProjectlist[i].ResumeIndex == resumeIndex){
+    if (podProjectlist[i].ResumeIndex == indexToCheck){
       updateProjectText(podProjectlist[i], i);
     }
   }
   
   for (let i in podWebsiteList){
-    if (podWebsiteList[i].ResumeIndex == resumeIndex){
+    if (podWebsiteList[i].ResumeIndex == indexToCheck){
       updateWebsiteText(podWebsiteList[i], i);
     }
   }
   
   for (let i in podExperienceList){
-    if (podExperienceList[i].ResumeIndex == resumeIndex){
+    if (podExperienceList[i].ResumeIndex == indexToCheck){
       updateExperienceText(podExperienceList[i], i);
     }
   }
@@ -253,7 +254,7 @@ function updateResumeText() {
   // }
 }
 
-async function loadResumeData() {
+export async function loadResumeData() {
 
   // Clear previous data
   podInfolist = [];
@@ -327,7 +328,6 @@ async function loadResumeData() {
   //   }
   // }
 
-  resumeIndex = resumeIndexList[0] || 1;
 
 
 
@@ -335,7 +335,7 @@ async function loadResumeData() {
 
 }
 
-function nextResume() {
+export function nextResume() {
   const currentIndex = resumeIndexList.indexOf(resumeIndex);
 
   if (currentIndex === -1 || currentIndex >= resumeIndexList.length - 1) {
@@ -344,10 +344,10 @@ function nextResume() {
   }
 
   resumeIndex = resumeIndexList[currentIndex + 1];
-  updateResumeText();
+  updateResumeText(resumeIndex);
 }
 
-function previousResume() {
+export function previousResume() {
   const currentIndex = resumeIndexList.indexOf(resumeIndex);
 
   if (currentIndex <= 0) {
@@ -356,7 +356,7 @@ function previousResume() {
   }
 
   resumeIndex = resumeIndexList[currentIndex - 1];
-  updateResumeText();
+  updateResumeText(resumeIndex);
 }
 
 
@@ -374,7 +374,7 @@ function ViewResume() {
     loadResumeData()
       .then(() => setIsLoading(false))
       .then(() => new Promise(resolve => setTimeout(resolve, 1000)))
-      .then(() => updateResumeText());
+      .then(() => updateResumeText(resumeIndex));
   }, []);
 
   return (

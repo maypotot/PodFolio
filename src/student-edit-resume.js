@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./main.css"; 
+import { restoreSession } from "./solid.js";
 import StudentLayout from "./student-layout.js";
 
 import { 
@@ -11,11 +12,124 @@ import {
   updateWebsite
  } from "./main.js";
 
+import { 
+  loadInformation,
+  loadExperience,
+  loadImage,
+  loadProject,
+  loadWebsite,
+  loadSkill
+ } from "./solid.js";
+import {
+  updateInfoText,
+  updateSkillText,
+  updateProjectText,
+  updateExperienceText,
+  updateWebsiteText,
+  updateResumeText,
+} from "./student-view-resume.js"
+
+let podInfolist = [];
+let podSkilllist = [];
+let podProjectlist = [];
+let podWebsiteList = [];
+let podExperienceList = [];
+let podImageList = [];
+let resumeIndexList = [];
+
+
+export async function loadResumeData() {
+
+  // Clear previous data
+  podInfolist = [];
+  podSkilllist = [];
+  podProjectlist = [];
+  podWebsiteList = [];
+  podExperienceList = [];
+  podImageList = [];
+
+  const user = await restoreSession();
+  const podInformation = await loadInformation();
+
+  for (let i in podInformation){
+    for (let j in podInformation[i].information){
+          podInfolist.push(podInformation[i].information[j]);
+    }
+  }
+
+  resumeIndexList = Array.from(
+    new Set(podInfolist.map((info) => Number(info.ResumeIndex)).filter((value) => !Number.isNaN(value)))
+  );
+
+  const podSkills = await loadSkill();
+
+  for (let i in podSkills){
+    for (let j in podSkills[i].skill){
+          podSkilllist.push(podSkills[i].skill[j]);
+    }
+  }
+  
+  const podProjects = await loadProject();
+
+  for (let i in podProjects){
+    for (let j in podProjects[i].projects){
+          podProjectlist.push(podProjects[i].projects[j]);
+    }
+  }
+  
+  const podWebsites = await loadWebsite();
+
+  for (let i in podWebsites){
+    for (let j in podWebsites[i].website){
+          podWebsiteList.push(podWebsites[i].website[j]);
+    }
+  }
+  const podExperiences = await loadExperience();
+
+  for (let i in podExperiences){
+    for (let j in podExperiences[i].experience){
+          podExperienceList.push(podExperiences[i].experience[j]);
+    }
+  }
+
+  
+  // const podImages = await loadImage();
+
+  // for (let i in podImages){
+  //   let items = getThingAll(podImages[i]);
+  //   let itemListPromises = [];
+
+  //   items.forEach( (item) => {
+  //       itemListPromises.push(getFile(item.url, { fetch: fetch }))
+  //       // deleteFile(item.url, { fetch: fetch})
+  //   });
+  //   console.log("Pod images loaded:", itemListPromises);
+  // }
+
+  // for (let i in podImages){
+  //   for (let j in podImages[i].image){
+  //         podImageList.push(podImages[i].image[j]);
+  //   }
+  // }
+
+
+
+
+  alert("All info loaded.");
+
+}
+
+
 function EditResume() {
   const navigate = useNavigate();
   const [resumeTitle, setResumeTitle] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const hasRun = useRef(false);
 
   useEffect(() => {
+    if (hasRun.current) return;
+    hasRun.current = true;
+
     // Get current resume title from sessionStorage
     const title = sessionStorage.getItem("current_resume_title");
     if (title) {
@@ -24,7 +138,14 @@ function EditResume() {
       // If no resume title, redirect back to profile
       alert("No resume selected. Please create or select a resume from your profile.");
       navigate("/profile");
+      return;
     }
+    
+    loadResumeData()
+      .then(() => setIsLoading(false))
+      .then(() => new Promise(resolve => setTimeout(resolve, 1000)))
+      .then(() => updateResumeText(18))
+      .then(() => console.log(podInfolist));
   }, [navigate]);
 
   const handleEditResume = () => {
@@ -48,8 +169,76 @@ function EditResume() {
             </button>
           </div>
 
+          {isLoading ? (
+            <p style={{fontSize: '32px', color: '#666', textAlign: 'center', marginTop: '50px'}}>Loading resume...</p>
+          ) : (
           <div className="tags-section">
             <div className="resume-section">
+                <Link to="/config-perms">
+                  <button className="student-button">Configure Permissions</button>
+                </Link>
+
+              <img src={null} alt="Profile" className="profile-image" id="ProfileImage"/>
+              {/* Personal Information */}
+              <div className="resume-section">
+                <h2>Personal Information</h2>
+                <p id="ProfessionalTitle"></p>
+                <p id="Summary"></p>
+                <p id="Email"></p>
+                <p id="ContactNumber"></p>
+                <p id="Location"></p>
+                <p id="ProfessionalSummary"></p>
+                <p id="Websites"></p>
+              </div>
+
+              {/* Education */}
+              <div className="resume-section">
+                <h2>Education</h2>
+                <p id="Degree"></p>
+                <p id="School"></p>
+                <p id="Honors"></p>
+                <p id="Program"></p>
+                <p id="StartDate"></p>
+                <p id="EndDate"></p>
+                <p id="RelevantCourseWork"></p>
+                <p id="ThesisTitle"></p>
+              </div>
+
+              {/* Websites */}
+              <div className="resume-section">
+                <h2>Websites</h2>
+                <ul id="WebsitesList">
+                  
+                </ul>
+              </div>
+
+              {/* Skills */}
+              <div className="resume-section">
+                <h2>Skills</h2>
+                <ul id="SkillsList">
+                  
+                </ul>
+              </div>
+
+              {/* Projects */}
+              <div className="resume-section">
+                <h2>Projects</h2>
+                <ul id="ProjectsList">
+                  
+                </ul>
+              </div>
+
+              {/* Experience */}
+              <div className="resume-section">
+                <h2>Experience</h2>
+                <ul id="ExperienceList">
+                  
+                </ul>
+              </div>
+
+              <Link to="/create-resume">
+                <button className="student-button">Edit Resume</button>
+              </Link>
               <h2>Personal Information</h2>
 
               <div className="resume-field">
@@ -348,6 +537,7 @@ function EditResume() {
               </div>
             </div>
           </div>
+          )}
         </div>
       </div>
   );

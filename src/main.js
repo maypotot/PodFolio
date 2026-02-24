@@ -47,7 +47,6 @@ import {
 } from './solid';
 import Website from './solid/Website';
 
-
 async function main() {
     bootSolidModels();
     setEngine(new SolidEngine(getAuthenticatedFetch()));
@@ -146,11 +145,8 @@ export async function createInformation() {
     
     // const fileInput = document.getElementById('ImageFile');
     // const imageFile = fileInput.files[0];
-    
-    const user = await restoreSession();
-
-    const podInformation = await loadInformation();
-    const maxResumeIndex = getHighestResumeIndex(podInformation);
+    let podResumeID = sessionStorage.getItem("current_resume_id");
+    console.log("This is the podResumeID: " + podResumeID);
 
     const information = await performInformationCreation({
         FullName,
@@ -168,13 +164,14 @@ export async function createInformation() {
         RelevantCoursework,
         Honors,
         ThesisTitle,
-        ResumeIndex: maxResumeIndex + 1,
+        ResumeIndex: podResumeID
         
     });
     alert("Information has been created")
 }
 
 export async function createExperience() {
+    let podResumeID = sessionStorage.getItem("current_resume_id");
     const PositionTitle = document.getElementById('PositionTitle').value;
     const Organization = document.getElementById('Organization').value;
     const Duration = document.getElementById('Duration').value;
@@ -197,12 +194,13 @@ export async function createExperience() {
         Duration,
         Description,
         ExperienceLocation,
-        ResumeIndex: maxResumeIndex + 1
+        ResumeIndex: podResumeID
     });
     alert("Experience has been created")
 }
 
 export async function createProject() {
+    let podResumeID = sessionStorage.getItem("current_resume_id");
     const ProjectName = document.getElementById('ProjectName').value;
     const Summary = document.getElementById('ProjectSummary').value;
     const Tools = document.getElementById('Tools').value;
@@ -224,12 +222,13 @@ export async function createProject() {
         Summary: Summary,
         Tools: Tools,
         ProjectLink: ProjectLink,
-        ResumeIndex: maxResumeIndex + 1
+        ResumeIndex: podResumeID
     });
     alert("Project has been created")
 }
 
 export async function createAward() {
+    let podResumeID = sessionStorage.getItem("current_resume_id");
     const AwardTitle = document.getElementById('AwardTitle').value;
     const Date = document.getElementById('AwardDate').value;
     const Organization = document.getElementById('AwardOrganization').value;
@@ -252,7 +251,8 @@ export async function createAward() {
     const award = await performAwardCreation({
         AwardTitle,
         Date,
-        Organization
+        Organization,
+        ResumeIndex: podResumeID
     });
 
 }
@@ -341,6 +341,7 @@ export async function createImage() {
 }
 
 export async function createWebsite() {
+    let podResumeID = sessionStorage.getItem("current_resume_id");
     const WebsiteLink = document.getElementById('WebsiteLink').value;
 
     if (!WebsiteLink) {
@@ -354,11 +355,12 @@ export async function createWebsite() {
     const maxResumeIndex = getHighestResumeIndex(podInformation);
 
 
-    const items = await performWebsiteCreation({WebsiteLink, ResumeIndex: maxResumeIndex + 1});
+    const items = await performWebsiteCreation({WebsiteLink, ResumeIndex: podResumeID});
     alert("Website has been created")   
 }
 
 export async function createSkill() {
+    let podResumeID = sessionStorage.getItem("current_resume_id");
     const Skill = document.getElementById('Skill').value;
 
     if (!Skill) {
@@ -372,7 +374,7 @@ export async function createSkill() {
     const maxResumeIndex = getHighestResumeIndex(podInformation);
 
 
-    const items = await performSkillCreation({Skill: Skill, ResumeIndex: maxResumeIndex + 1});
+    const items = await performSkillCreation({Skill: Skill, ResumeIndex: podResumeID});
     alert("Skill has been created")   
 }
 
