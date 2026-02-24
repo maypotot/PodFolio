@@ -392,7 +392,6 @@ function Profile() {
         alert(`Resume created successfully!\nResume ID: ${newResume.id}\nTitle: ${newResume.title}`);
 
         sessionStorage.setItem("current_resume_id", newResume.id);
-        sessionStorage.setItem("current_resume_id", newResume.id);
         sessionStorage.setItem("current_resume_title", newResume.title);
         
         // Navigate to create-resume page
