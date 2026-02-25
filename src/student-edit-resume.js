@@ -20,15 +20,6 @@ import {
   loadWebsite,
   loadSkill
  } from "./solid.js";
-import {
-  updateInfoText,
-  updateSkillText,
-  updateProjectText,
-  updateExperienceText,
-  updateWebsiteText,
-  updateResumeText,
-} from "./student-view-resume.js"
-
 let podInfolist = [];
 let podSkilllist = [];
 let podProjectlist = [];
@@ -36,6 +27,302 @@ let podWebsiteList = [];
 let podExperienceList = [];
 let podImageList = [];
 let resumeIndexList = [];
+
+export function updateInfoText(info) {
+
+  let fullname = document.getElementById('FullName');
+  let title = document.getElementById('ProfessionalTitle');
+  let summary = document.getElementById('Summary');
+  let email = document.getElementById('Email');
+  let contact = document.getElementById('ContactNumber');
+  let location = document.getElementById('Location'); 
+  let profsummary = document.getElementById('ProfessionalSummary');
+  let school = document.getElementById('School');
+  let degree = document.getElementById('Degree');
+  let honors = document.getElementById('Honors');
+  let program = document.getElementById('Program');
+  let startdate = document.getElementById('StartDate');
+  let enddate = document.getElementById('EndDate');
+  let coursework = document.getElementById('RelevantCourseWork');
+  let thesistitle = document.getElementById('ThesisTitle');
+  
+  
+  
+  
+  fullname.textContent = info.FullName;
+  title.textContent = "Professional Title: " + info.ProfessionalTitle;
+  summary.textContent = "Summary: " + info.Summary;
+  email.textContent = "Email: " + info.Email;
+  contact.textContent = "Contact Number: " + info.ContactNumber;
+  location.textContent = "Location: " + info.Location;
+  profsummary.textContent = "Professional Summary: " + info.ProfessionalSummary;
+  school.textContent = "Institution: " + info.School;
+  degree.textContent = "Degree: " + info.Degree;
+  honors.textContent = "Honors: " + info.Honors;
+  program.textContent = "Program: " + info.Program;
+  startdate.textContent = "Start Date: " + info.StartDate;
+  enddate.textContent = "End Date: " + info.EndDate;
+  coursework.textContent = "Relevant Course Work: " + info.RelevantCourseWork;
+  thesistitle.textContent = "Thesis Title: " + info.ThesisTitle;
+}
+
+export function updateSkillText(skill, num) {
+
+  let skillsListElement = document.getElementById('SkillsList');
+  const listItem = document.createElement('li');
+  listItem.style.display = 'flex';
+  listItem.style.alignItems = 'center';
+  listItem.style.gap = '10px';
+  
+  const radioBtn = document.createElement('input');
+  radioBtn.type = 'radio';
+  radioBtn.name = 'skillSelect';
+  radioBtn.value = skill.url;
+  radioBtn.setAttribute('data-skill-url', skill.url);
+  
+  const label = document.createElement('span');
+  label.textContent = skill.Skill;
+  
+  listItem.appendChild(radioBtn);
+  listItem.appendChild(label);
+  listItem.appendChild(document.createElement('br'));
+  skillsListElement.appendChild(listItem);
+}
+
+
+export function updateProjectText(project, num) {
+  let projectsListElement = document.getElementById('ProjectsList');
+  const listItem = document.createElement('li');
+  listItem.style.marginBottom = '15px';
+  
+  const radioBtn = document.createElement('input');
+  radioBtn.type = 'radio';
+  radioBtn.name = 'projectSelect';
+  radioBtn.value = project.url;
+  radioBtn.setAttribute('data-project-url', project.url);
+  
+  const content = document.createElement('div');
+  content.style.display = 'flex';
+  content.style.alignItems = 'flex-start';
+  content.style.gap = '10px';
+  
+  const projectInfo = document.createElement('div');
+  projectInfo.innerHTML = `
+  <strong>Title:</strong> ${project.ProjectName}<br />
+  <strong>Summary:</strong> ${project.Summary}<br />
+  <strong>Tools:</strong> ${project.Tools}<br />
+  <strong>Project Link:</strong> ${project.ProjectLink}
+  `;
+  
+  content.appendChild(radioBtn);
+  content.appendChild(projectInfo);
+  listItem.appendChild(content);
+
+  projectsListElement.appendChild(listItem);
+}
+
+export function updateWebsiteText(website, num) {
+  let websitesListElement = document.getElementById('WebsitesList');
+  const listItem = document.createElement('li');
+  listItem.style.display = 'flex';
+  listItem.style.alignItems = 'center';
+  listItem.style.gap = '10px';
+  
+  const radioBtn = document.createElement('input');
+  radioBtn.type = 'radio';
+  radioBtn.name = 'websiteSelect';
+  radioBtn.value = website.url;
+  radioBtn.setAttribute('data-website-url', website.url);
+  
+  const label = document.createElement('span');
+  label.textContent = website.WebsiteLink;
+
+  listItem.appendChild(radioBtn);
+  listItem.appendChild(label);
+  listItem.appendChild(document.createElement('br'));
+
+  websitesListElement.appendChild(listItem);
+}
+
+export function updateExperienceText(experience, num) {
+  let experiencesListElement = document.getElementById('ExperienceList');
+  const listItem = document.createElement('li');
+  listItem.style.marginBottom = '15px';
+  
+  const radioBtn = document.createElement('input');
+  radioBtn.type = 'radio';
+  radioBtn.name = 'experienceSelect';
+  radioBtn.value = experience.url;
+  radioBtn.setAttribute('data-experience-url', experience.url);
+  
+  const content = document.createElement('div');
+  content.style.display = 'flex';
+  content.style.alignItems = 'flex-start';
+  content.style.gap = '10px';
+  
+  const experienceInfo = document.createElement('div');
+  experienceInfo.innerHTML = `
+  <strong>Title:</strong> ${experience.PositionTitle}<br />
+  <strong>Organization:</strong> ${experience.Organization}<br />
+  <strong>Duration:</strong> ${experience.Duration}<br />
+  <strong>Description:</strong> ${experience.Description}<br />
+  <strong>Location:</strong> ${experience.ExperienceLocation}<br />
+  `;
+  
+  content.appendChild(radioBtn);
+  content.appendChild(experienceInfo);
+  listItem.appendChild(content);
+  listItem.appendChild(document.createElement('br'));
+  experiencesListElement.appendChild(listItem);
+}
+
+export function updateImageText(image) {
+  let imageElement = document.getElementById('ProfileImage');
+  imageElement.src = URL.createObjectURL(image.ImageFile);
+  console.log("Image URL: " + imageElement.src);
+}
+
+export function handleUpdateInformation() {
+  const resumeId = sessionStorage.getItem("current_resume_id");
+  
+  // Find the information matching the current resume
+  const info = podInfolist.find(i => i.ResumeIndex == resumeId);
+  
+  if (!info) {
+    alert("No information found for this resume.");
+    return;
+  }
+  
+  // Call the original updateInformation function with the information URL
+  console.log("Updating information with URL:", info.url);
+  updateInformation(info.url);
+}
+
+export function handleUpdateSkill() {
+  const skillInput = document.getElementById('Skill').value;
+  
+  if (!skillInput.trim()) {
+    alert("Please enter a skill.");
+    return;
+  }
+  
+  // Get the selected skill radio button
+  const selectedSkill = document.querySelector('input[name="skillSelect"]:checked');
+  
+  if (!selectedSkill) {
+    alert("Please select a skill to update.");
+    return;
+  }
+  
+  const skillUrl = selectedSkill.value;
+  
+  // Call the original updateSkill function with the skill URL
+  console.log("Updating skill with URL:", skillUrl);
+  updateSkill(skillUrl);
+}
+
+export function handleUpdateProject() {
+  // Get the selected project radio button
+  const selectedProject = document.querySelector('input[name="projectSelect"]:checked');
+  
+  if (!selectedProject) {
+    alert("Please select a project to update.");
+    return;
+  }
+  
+  const projectUrl = selectedProject.value;
+  
+  // Call the original updateProject function with the project URL
+  console.log("Updating project with URL:", projectUrl);
+  updateProject(projectUrl);
+}
+
+export function handleUpdateExperience() {
+  // Get the selected experience radio button
+  const selectedExperience = document.querySelector('input[name="experienceSelect"]:checked');
+  
+  if (!selectedExperience) {
+    alert("Please select an experience to update.");
+    return;
+  }
+  
+  const experienceUrl = selectedExperience.value;
+  
+  // Call the original updateExperience function with the experience URL
+  console.log("Updating experience with URL:", experienceUrl);
+  updateExperience(experienceUrl);
+}
+
+export function handleUpdateWebsite() {
+  // Get the selected website radio button
+  const selectedWebsite = document.querySelector('input[name="websiteSelect"]:checked');
+  
+  if (!selectedWebsite) {
+    alert("Please select a website to update.");
+    return;
+  }
+  
+  const websiteUrl = selectedWebsite.value;
+  
+  // Call the original updateWebsite function with the website URL
+  console.log("Updating website with URL:", websiteUrl);
+  updateWebsite(websiteUrl);
+}
+
+export function updateResumeText(indexToCheck) {
+  
+  let skillsListElement = document.getElementById('SkillsList');
+  skillsListElement.innerHTML = '';
+  let projectsListElement = document.getElementById('ProjectsList');
+  projectsListElement.innerHTML = '';
+  let websitesListElement = document.getElementById('WebsitesList');
+  websitesListElement.innerHTML = '';
+  let experiencesListElement = document.getElementById('ExperienceList');
+  experiencesListElement.innerHTML = '';
+
+  for (let i in podInfolist){
+      console.log("Index To Check:", indexToCheck);
+      console.log("Pod Info Index:", podInfolist[i].ResumeIndex);
+    if (podInfolist[i].ResumeIndex == indexToCheck){
+      updateInfoText(podInfolist[i]);
+      break
+    }
+  }
+
+  for (let i in podSkilllist){
+    if (podSkilllist[i].ResumeIndex == indexToCheck){
+      updateSkillText(podSkilllist[i], i);
+    }
+  }
+
+  for (let i in podProjectlist){
+    if (podProjectlist[i].ResumeIndex == indexToCheck){
+      updateProjectText(podProjectlist[i], i);
+    }
+  }
+  
+  for (let i in podWebsiteList){
+    if (podWebsiteList[i].ResumeIndex == indexToCheck){
+      updateWebsiteText(podWebsiteList[i], i);
+    }
+  }
+  
+  for (let i in podExperienceList){
+    if (podExperienceList[i].ResumeIndex == indexToCheck){
+      updateExperienceText(podExperienceList[i], i);
+    }
+  }
+  
+  // for (let i in podInfolist){
+  //   if (podInfolist[i].ResumeIndex == resumeIndex){
+  //     console.log(podInfolist[i].ResumeImage, podImageList[i].image.name)
+  //     if (podImageList[i].ResumeImage == podImageList[i].image.name){
+  //       updateImageText(podImageList[i]);
+  //     }
+  //     break
+  //   }
+  // }
+}
 
 // Helper functions to get filtered data by resume ID
 export function getFilteredResumeData(resumeId) {
@@ -162,8 +449,8 @@ function EditResume() {
     loadResumeData()
       .then(() => setIsLoading(false))
       .then(() => new Promise(resolve => setTimeout(resolve, 1000)))
-      .then(() => updateResumeText(18))
-      .then(() => console.log(podInfolist));
+      .then(() => updateResumeText(sessionStorage.getItem("current_resume_id")))
+      .then(() => console.log(sessionStorage.getItem("current_resume_id")));
   }, [navigate]);
 
   const handleEditResume = () => {
@@ -200,24 +487,24 @@ function EditResume() {
               {/* Personal Information */}
               <div className="resume-section">
                 <h2>Personal Information</h2>
+                <p id="FullName"></p>
                 <p id="ProfessionalTitle"></p>
                 <p id="Summary"></p>
                 <p id="Email"></p>
                 <p id="ContactNumber"></p>
                 <p id="Location"></p>
                 <p id="ProfessionalSummary"></p>
-                <p id="Websites"></p>
               </div>
 
               {/* Education */}
               <div className="resume-section">
                 <h2>Education</h2>
-                <p id="Degree"></p>
                 <p id="School"></p>
-                <p id="Honors"></p>
+                <p id="Degree"></p>
                 <p id="Program"></p>
                 <p id="StartDate"></p>
                 <p id="EndDate"></p>
+                <p id="Honors"></p>
                 <p id="RelevantCourseWork"></p>
                 <p id="ThesisTitle"></p>
               </div>
@@ -328,7 +615,7 @@ function EditResume() {
                   className="resume-input"
                   id="WebsiteLink"
                 />
-                <button className="student-add-tag-button" onClick={updateWebsite}>
+                <button className="student-add-tag-button" onClick={handleUpdateWebsite}>
                   Update Website
                 </button>
               </div>
@@ -343,6 +630,9 @@ function EditResume() {
                   id="ProfessionalSummary"
                 />
               </div>
+              <button className="student-add-tag-button" onClick={handleUpdateInformation}>
+                Update Information
+              </button>
             </div>
 
             <div className="resume-section">
@@ -436,7 +726,7 @@ function EditResume() {
                   className="skills-input"
                   id="Skill"
                 />
-                <button className="student-add-tag-button" onClick={updateSkill}>
+                <button className="student-add-tag-button" onClick={handleUpdateSkill}>
                   Update Skill
                 </button>
               </div>
@@ -488,7 +778,7 @@ function EditResume() {
                   />
                 </div>
                 
-                <button className="student-add-tag-button" onClick={updateProject}>
+                <button className="student-add-tag-button" onClick={handleUpdateProject}>
                   Update Project
                 </button>
               </div>
@@ -549,7 +839,7 @@ function EditResume() {
                     id="Description"
                   />
                 </div>
-                <button className="student-add-tag-button" onClick={updateExperience}>
+                <button className="student-add-tag-button" onClick={handleUpdateExperience}>
                   Update Experience
                 </button>
               </div>

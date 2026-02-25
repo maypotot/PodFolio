@@ -411,104 +411,329 @@ export async function loadSkill() {
 
 // Updating Information
 export async function performUpdateInformation(infoUrl, inputInfo) {
-    const info = infoList?.information.find((info) => info.url === infoUrl);
+    let podInfo;
+    let podInformationList = [];
+    const allContainers = await InformationList.find(user.storageUrl);
+    infoList = allContainers.resourceUrls.filter(c => c.includes("information"));
 
-    await info.update({ FullName: inputInfo.FullName
-        , ProfessionalTitle: inputInfo.ProfessionalTitle
-        , Summary: inputInfo.Summary
-        , Email: inputInfo.Email
-        , ContactNumber: inputInfo.ContactNumber
-        , Location: inputInfo.Location
-        , WebsiteLink: inputInfo.WebsiteLink
-        , ProfessionalSummary: inputInfo.ProfessionalSummary
-        , School: inputInfo.School
-        , Degree: inputInfo.Degree
-        , Program: inputInfo.Program
-        , StartDate: inputInfo.StartDate
-        , EndDate: inputInfo.EndDate
-        , RelevantCoursework: inputInfo.RelevantCoursework
-        , Honors: inputInfo.Honors
-        , ThesisTitle: inputInfo.ThesisTitle
-     });
+    if (!infoList) {
+        return;
+    }
+
+    for (let url in infoList) {
+        podInfo = await InformationList.find(infoList[url]);
+        podInformationList.push(podInfo);
+    }
+    for (let info in podInformationList) {
+        await podInformationList[info].loadRelation('information');
+    }
+
+    for (let i in podInformationList) {
+        let information = podInformationList[i].information;
+        for (let j in information) {
+            console.log("Checking information with URL:", information[j].url);
+            if (information[j].url === infoUrl) {
+                await information[j].update({ FullName: inputInfo.FullName
+                    , ProfessionalTitle: inputInfo.ProfessionalTitle
+                    , Summary: inputInfo.Summary
+                    , Email: inputInfo.Email
+                    , ContactNumber: inputInfo.ContactNumber
+                    , Location: inputInfo.Location
+                    , WebsiteLink: inputInfo.WebsiteLink
+                    , ProfessionalSummary: inputInfo.ProfessionalSummary
+                    , School: inputInfo.School
+                    , Degree: inputInfo.Degree
+                    , Program: inputInfo.Program
+                    , StartDate: inputInfo.StartDate
+                    , EndDate: inputInfo.EndDate
+                    , RelevantCoursework: inputInfo.RelevantCoursework
+                    , Honors: inputInfo.Honors
+                    , ThesisTitle: inputInfo.ThesisTitle
+                 });
+            alert('Information updated successfully. Please refresh the page to see the changes.');
+            return;
+            }
+        }
+    }
 }
 
 
 export async function performUpdateExperience(expUrl, inputExp) {
-    const exp = experienceList?.experience.find((exp) => exp.url === expUrl);
+    let podExperience;
+    let podExperienceList = [];
+    const allContainers = await ExperienceList.find(user.storageUrl);
+    experienceList = allContainers.resourceUrls.filter(c => c.includes("experience"));
 
-    await exp.update({ 
-        PositionTitle: inputExp.PositionTitle,
-        Organization: inputExp.Organization,
-        Duration: inputExp.Duration,
-        Description: inputExp.Description
-     });
+    if (!experienceList) {
+        return;
+    }
+
+    for (let url in experienceList) {
+        podExperience = await ExperienceList.find(experienceList[url]);
+        podExperienceList.push(podExperience);
+    }
+    for (let exp in podExperienceList) {
+        await podExperienceList[exp].loadRelation('experience');
+    }
+
+    for (let i in podExperienceList) {
+        let experiences = podExperienceList[i].experience;
+        for (let j in experiences) {
+            console.log("Checking experience with URL:", experiences[j].url);
+            if (experiences[j].url === expUrl) {
+                await experiences[j].update({ 
+                    PositionTitle: inputExp.PositionTitle,
+                    Organization: inputExp.Organization,
+                    Duration: inputExp.Duration,
+                    Description: inputExp.Description
+                 });
+            alert('Experience updated successfully. Please refresh the page to see the changes.');
+            return;
+            }
+        }
+    }
 }
 
 export async function performUpdateProject(projectUrl, inputProject) {
-    const proj = projectList?.projects.find((project) => project.url === projectUrl);
+    let podProject;
+    let podProjectList = [];
+    const allContainers = await ProjectList.find(user.storageUrl);
+    projectList = allContainers.resourceUrls.filter(c => c.includes("projects"));
 
-    await proj.update({ 
-        ProjectName: inputProject.ProjectName,
-        Tools: inputProject.Tools,
-        Summary: inputProject.ProjectSummary,
-        ProjectLink: inputProject.ProjectLink
-     });
+    if (!projectList) {
+        return;
+    }
+
+    for (let url in projectList) {
+        podProject = await ProjectList.find(projectList[url]);
+        podProjectList.push(podProject);
+    }
+    for (let proj in podProjectList) {
+        await podProjectList[proj].loadRelation('projects');
+    }
+
+    for (let i in podProjectList) {
+        let projects = podProjectList[i].projects;
+        for (let j in projects) {
+            console.log("Checking project with URL:", projects[j].url);
+            if (projects[j].url === projectUrl) {
+                await projects[j].update({ 
+                    ProjectName: inputProject.ProjectName,
+                    Tools: inputProject.Tools,
+                    Summary: inputProject.ProjectSummary,
+                    ProjectLink: inputProject.ProjectLink
+                 });
+            alert('Project updated successfully. Please refresh the page to see the changes.');
+            return;
+            }
+        }
+    }
 }
 
 export async function performUpdateAward(awardUrl, inputAward) {
-    const award = awardList?.award.find((award) => award.url === awardUrl);
+    let podAward;
+    let podAwardList = [];
+    const allContainers = await AwardList.find(user.storageUrl);
+    awardList = allContainers.resourceUrls.filter(c => c.includes("awards"));
 
-    await award.update({ 
-        AwardTitle: inputAward.AwardTitle,
-        Date: inputAward.Date,
-        Organization: inputAward.Organization
-     });
+    if (!awardList) {
+        return;
+    }
+
+    for (let url in awardList) {
+        podAward = await AwardList.find(awardList[url]);
+        podAwardList.push(podAward);
+    }
+    for (let award in podAwardList) {
+        await podAwardList[award].loadRelation('award');
+    }
+
+    for (let i in podAwardList) {
+        let awards = podAwardList[i].award;
+        for (let j in awards) {
+            console.log("Checking award with URL:", awards[j].url);
+            if (awards[j].url === awardUrl) {
+                await awards[j].update({ 
+                    AwardTitle: inputAward.AwardTitle,
+                    Date: inputAward.Date,
+                    Organization: inputAward.Organization
+                 });
+            alert('Award updated successfully. Please refresh the page to see the changes.');
+            return;
+            }
+        }
+    }
 }
 
 export async function performUpdateTraining(trainingUrl, inputTraining) {
-    const training = trainingList?.training.find((training) => training.url === trainingUrl);
+    let podTraining;
+    let podTrainingList = [];
+    const allContainers = await TrainingList.find(user.storageUrl);
+    trainingList = allContainers.resourceUrls.filter(c => c.includes("training"));
 
-    await training.update({ 
-        TrainingTitle: inputTraining.TrainingTitle,
-        Organization: inputTraining.Organization,
-        YearEarned: inputTraining.YearEarned,
-        YearExpire: inputTraining.YearExpire
-     });
+    if (!trainingList) {
+        return;
+    }
+
+    for (let url in trainingList) {
+        podTraining = await TrainingList.find(trainingList[url]);
+        podTrainingList.push(podTraining);
+    }
+    for (let training in podTrainingList) {
+        await podTrainingList[training].loadRelation('training');
+    }
+
+    for (let i in podTrainingList) {
+        let trainings = podTrainingList[i].training;
+        for (let j in trainings) {
+            console.log("Checking training with URL:", trainings[j].url);
+            if (trainings[j].url === trainingUrl) {
+                await trainings[j].update({ 
+                    TrainingTitle: inputTraining.TrainingTitle,
+                    Organization: inputTraining.Organization,
+                    YearEarned: inputTraining.YearEarned,
+                    YearExpire: inputTraining.YearExpire
+                 });
+            alert('Training updated successfully. Please refresh the page to see the changes.');
+            return;
+            }
+        }
+    }
 }
 
 export async function performUpdateReference(referenceUrl, inputReference) {
-    const reference = referenceList?.reference.find((reference) => reference.url === referenceUrl);
+    let podReference;
+    let podReferenceList = [];
+    const allContainers = await ReferenceList.find(user.storageUrl);
+    referenceList = allContainers.resourceUrls.filter(c => c.includes("references"));
 
-    await reference.update({ 
-        Name: inputReference.Name,
-        Position: inputReference.Position,
-        Email: inputReference.Email,
-        ContactNumber: inputReference.ContactNumber
-     });
+    if (!referenceList) {
+        return;
+    }
+
+    for (let url in referenceList) {
+        podReference = await ReferenceList.find(referenceList[url]);
+        podReferenceList.push(podReference);
+    }
+    for (let reference in podReferenceList) {
+        await podReferenceList[reference].loadRelation('reference');
+    }
+
+    for (let i in podReferenceList) {
+        let references = podReferenceList[i].reference;
+        for (let j in references) {
+            console.log("Checking reference with URL:", references[j].url);
+            if (references[j].url === referenceUrl) {
+                await references[j].update({ 
+                    Name: inputReference.Name,
+                    Position: inputReference.Position,
+                    Email: inputReference.Email,
+                    ContactNumber: inputReference.ContactNumber
+                 });
+            alert('Reference updated successfully. Please refresh the page to see the changes.');
+            return;
+            }
+        }
+    }
 }
 
 export async function performUpdateImage(imageUrl, inputImage) {
-    const image = imageList?.image.find((image) => image.url === imageUrl);
+    let podImage;
+    let podImageList = [];
+    const allContainers = await ImageList.find(user.storageUrl);
+    imageList = allContainers.resourceUrls.filter(c => c.includes("images"));
 
-    await image.update({ 
-        Link: inputImage.Link,
-     });
+    if (!imageList) {
+        return;
+    }
+
+    for (let url in imageList) {
+        podImage = await ImageList.find(imageList[url]);
+        podImageList.push(podImage);
+    }
+    for (let image in podImageList) {
+        await podImageList[image].loadRelation('image');
+    }
+
+    for (let i in podImageList) {
+        let images = podImageList[i].image;
+        for (let j in images) {
+            console.log("Checking image with URL:", images[j].url);
+            if (images[j].url === imageUrl) {
+                await images[j].update({ 
+                    Link: inputImage.Link,
+                 });
+            alert('Image updated successfully. Please refresh the page to see the changes.');
+            return;
+            }
+        }
+    }
 }
 
 export async function performUpdateWebsite(websiteUrl, inputWebsite) {
-    const website = websiteList?.website.find((website) => website.url === websiteUrl);
+    let podWebsite;
+    let podWebsiteList = [];
+    const allContainers = await WebsiteList.find(user.storageUrl);
+    websiteList = allContainers.resourceUrls.filter(c => c.includes("website"));
 
-    await website.update({ 
-        WebsiteLink: inputWebsite.WebsiteLink,
-     });
+    if (!websiteList) {
+        return;
+    }
+
+    for (let url in websiteList) {
+        podWebsite = await WebsiteList.find(websiteList[url]);
+        podWebsiteList.push(podWebsite);
+    }
+    for (let exp in podWebsiteList) {
+        await podWebsiteList[exp].loadRelation('website');
+    }
+
+    for (let i in podWebsiteList) {
+        let websites = podWebsiteList[i].website;
+        for (let j in websites) {
+            console.log("Checking website with URL:", websites[j].url);
+            if (websites[j].url === websiteUrl) {
+                await websites[j].update({ 
+                    WebsiteLink: inputWebsite.WebsiteLink,
+                });
+            alert('Website updated successfully. Please refresh the page to see the changes.');
+            return;
+            }
+        }
+    }
 }
 
 export async function performUpdateSkill(skillUrl, inputSkill) {
-    const skill = skillList?.skills.find((skill) => skill.url === skillUrl);
+    let podSkill;
+    let podSkillList = [];
+    const allContainers = await SkillList.find(user.storageUrl);
+    skillList = allContainers.resourceUrls.filter(c => c.includes("skills"));
 
-    await skill.update({ 
-        Skill: inputSkill.Skill,
-     });
+    if (!skillList) {
+        return;
+    }
+
+    for (let url in skillList) {
+        podSkill = await SkillList.find(skillList[url]);
+        podSkillList.push(podSkill);
+    }
+    for (let skill in podSkillList) {
+        await podSkillList[skill].loadRelation('skill');
+    }
+
+    for (let i in podSkillList) {
+        let skills = podSkillList[i].skill;
+        for (let j in skills) {
+            console.log("Checking skill with URL:", skills[j].url);
+            if (skills[j].url === skillUrl) {
+                await skills[j].update({ 
+                    Skill: inputSkill.Skill,
+                 });
+            alert('Skill updated successfully. Please refresh the page to see the changes.');
+            return;
+            }
+        }
+    }
 }
 
 
