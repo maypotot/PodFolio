@@ -258,9 +258,11 @@ function ConfigPerms() {
     // Get application context from sessionStorage
     const job = sessionStorage.getItem("current_job_title");
     const resume = sessionStorage.getItem("current_resume_title");
-    const employer = sessionStorage.getItem("current_employer_id") || "https://thesis-test.solidcommunity.net/profile/card#me"; // Default for testing
-    // const resumeId = sessionStorage.getItem("current_resume_id");
-    const resumeId = 22
+    const employer = sessionStorage.getItem("current_employer_webid") || "https://thesis-test.solidcommunity.net/profile/card#me"; // Default for testing
+    const resumeId = sessionStorage.getItem("current_resume_id");
+    console.log("THIS IS THE RESUME ID:", resumeId);
+    console.log("THIS IS THE EMPLOYER WEB ID:", employer);
+    // const resumeId = 22
     
     console.log("Session:", sessionStorage);
     console.log("Current Resume ID:", resumeId);
