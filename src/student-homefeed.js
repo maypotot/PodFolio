@@ -115,6 +115,13 @@ function HomeFeed() {
 
       // Get the selected resume's pod_url
       const selectedResume = resumes.find(r => r.id === parseInt(selectedResumeId));
+
+      sessionStorage.setItem("current_resume_id", selectedResume.id);
+      sessionStorage.setItem("current_resume_title", selectedResume.title);
+
+      sessionStorage.setItem("current_employer_id", selectedJob.employer_id);
+
+
       
       const response = await fetch("http://127.0.0.1:8000/api/jobs/apply/", {
         method: "POST",
