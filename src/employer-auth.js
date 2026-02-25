@@ -194,28 +194,29 @@ function EmployerLogin() {
   useEffect(() => {
     async function checkSolidSession() {
       try {
-
         const expectedWebId = sessionStorage.getItem("employer_login_webid");
         solidUser = await restoreSession();
         
         if (solidUser) {
-          console.log("Detected Solid session for employer:", solidUser.webId);
+          console.log("Detected Solid session for employer:", solidUser.url);  
           console.log("Expected WebID:", expectedWebId);
 
-          if (solidUser.url === expectedWebId) {
+          if (solidUser.url === expectedWebId) {  
             console.log("Employer WebIDs match! Completing login...");
             
-            sessionStorage.setItem("employer_webid", solidUser.webId);
-
+            sessionStorage.setItem("employer_webid", expectedWebId);
+            console.log("Stored employer_webid in sessionStorage:", expectedWebId);
+            
             sessionStorage.removeItem("employer_login_webid");
             
             setStep(3);
-
             return;
           } else {
             console.log("WebIDs don't match");
+            console.log("Solid returned:", solidUser.url);
+            console.log("Expected:", expectedWebId);
             setError("The Solid account you logged in with doesn't match. Please try again.");
-            sessionStorage.removeItem("login_webid");
+            sessionStorage.removeItem("employer_login_webid");
             setStep(1);
           }
         }
@@ -255,7 +256,6 @@ function EmployerLogin() {
         
         sessionStorage.setItem("employer_login_webid", webid);
         setStep(2);
-
         setLoading(false);
       } else if (response.status === 404) {
         setError("Employer account not found. Please sign up first.");
