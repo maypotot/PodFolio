@@ -182,6 +182,59 @@ async function getAgentAccess(requestingID, resourceURL) {
   }
 }
 
+// Persmission helper functions for SOLID
+
+async function grantPermission(employerWebId, resourceURL, resumeId) {
+  try {
+    const response = await fetch("http://127.0.1:8000/api/permissions/grant/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        employer_webid: employerWebId,
+        student_webid: studentWebId,
+        resource_url: resourceURL,
+        resume_id: resumeId
+      })
+
+    });
+    if (response.ok) {
+      console.log("Permission granted in backend for:", { employerWebId, resourceURL, resumeId });
+    } else {
+      console.error("Failed to grant permission in backend");
+    }
+  } catch (error) {
+    console.error("Error granting permission in backend:", error);
+    return false;
+    
+  } 
+}
+
+async function revokePermission(employerWebId, resourceURL, resumeId, studentWebId) {
+  try {
+    const response = await fetch("http://127.0.1:8000/api/permissions/revoke/", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        employer_webid: employerWebId,
+        resource_url: resourceURL,
+        resume_id: resumeId,
+        student_webid: studentWebId
+      })
+  });
+
+  if (response.ok) {
+    const data = await response.json();
+    console.log("Permission revoked in backend for:", data);
+  }
+  else {
+    console.error("Failed to revoke permission in backend");
+    return false;
+  }
+} catch (error) {
+    console.error("Error revoking permission in backend:", error);
+    return false;
+}
+}
 
 function ConfigPerms() {
   const navigate = useNavigate();
@@ -317,11 +370,12 @@ function ConfigPerms() {
     }
     
     if (newAccess === true) {
-      console.log(`Calling requestAccess for ${key}:`, { employerId, resourceURL });
+      console.log(`Calling requestAccess for ${key}:`, { employerId, resourceURL }); //whenever requestAccess runs, may entry sa database, employer, student, resourceURL, resumeid
       await requestAccess(employerId, resourceURL);
     } else {
       console.log(`Calling denyAccess for ${key}:`, { employerId, resourceURL });
-      await denyAccess(employerId, resourceURL);
+      await denyAccess(employerId, resourceURL); 
+      //remove the entry in the database for employer, student, resourceURL, resumeid
     }
   };
 
