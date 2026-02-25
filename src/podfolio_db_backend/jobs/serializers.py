@@ -1,5 +1,8 @@
+from gzip import READ
+from os import read
+
 from rest_framework import serializers
-from .models import JobPosting, JobApplication, EmployerRequest, StudentAccount, EmployerAccount, SkillInterestTag, JobPostingTag, StudentSkillInterest, Resume
+from .models import JobPosting, JobApplication, EmployerRequest, StudentAccount, EmployerAccount, SkillInterestTag, JobPostingTag, StudentSkillInterest, Resume, AccessRequest
 
 class StudentAccountSerializer(serializers.ModelSerializer):
     # Include student's tags in the response
@@ -63,3 +66,9 @@ class EmployerRequestSerializer(serializers.ModelSerializer):
         except JobApplication.DoesNotExist:
             raise serializers.ValidationError({"job_application_id": "Job application not found"})
         return EmployerRequest.objects.create(job_application=job_application, **validated_data)
+
+class AccessRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AccessRequest
+        fields = '__all__'
+        read_only_fields = ['id']

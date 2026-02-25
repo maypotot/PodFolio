@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import JobPosting, JobApplication, EmployerRequest, StudentAccount, EmployerAccount, SkillInterestTag, JobPostingTag, StudentSkillInterest, Resume
-from .serializers import JobPostingSerializer, JobApplicationSerializer, EmployerRequestSerializer, StudentAccountSerializer, EmployerAccountSerializer, SkillInterestTagSerializer, ResumeSerializer
+from .models import JobPosting, JobApplication, EmployerRequest, StudentAccount, EmployerAccount, SkillInterestTag, JobPostingTag, StudentSkillInterest, Resume, AccessRequest
+from .serializers import JobPostingSerializer, JobApplicationSerializer, EmployerRequestSerializer, StudentAccountSerializer, EmployerAccountSerializer, SkillInterestTagSerializer, ResumeSerializer, AccessRequestSerializer
 from rest_framework import status
 from urllib.parse import unquote
 
@@ -686,3 +686,83 @@ def requests_by_student(request):
 def all_requests(request):
     reqs = EmployerRequest.objects.all()
     return Response(EmployerRequestSerializer(reqs, many=True).data)
+
+@api_view(['POST'])
+def grant_permission(request):
+    """
+    Grant employer access to a student's resume.
+    Expects { "employer_webid": "...", "student_webid": "...", "resource_url": "..." }
+    """
+    try:
+        employer_webid = request.data.get('employer_webid')
+        student_webid = request.data.get('student_webid')
+        resource_url = request.data.get('resource_url')
+        resume_id = request.data.get('resume_id')  
+
+        if not employer_webid or not student_webid or not resource_url:
+            return Response({"error": "employer_webid, student_webid, and resource_url are required"}, status=400)
+
+        AccessRequest.objects.create(
+            employer_webid=employer_webid,
+            student_webid=student_webid,
+            resource_url=resource_url,
+            defaults={'resume_id': resume_id}
+            )
+
+        return Response({"message": "Permission granted"}, status=201)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+    
+@api_view(['DELETE'])
+def revoke_permission(request):
+    """
+    Revoke employer access to a student's resume.
+    Expects { "employer_webid": "...", "student_webid": "...", "resource_url": "..." }
+    """
+    try:
+        employer_webid = request.data.get('employer_webid')
+        student_webid = request.data.get('student_webid')
+        resource_url = request.data.get('resource_url')
+
+        if not employer_webid or not student_webid or not resource_url:
+            return Response({"error": "employer_webid, student_webid, and resource_url are required"}, status=400)
+
+        deleted_count, _ = AccessRequest.objects.filter(
+            employer_webid=employer_webid,
+            student_webid=student_webid,
+            resource_url=resource_url
+        ).delete()
+
+        if deleted_count > 0:
+                return Response({"message": "Permission revoked"}, status=200)
+        else:
+            return Response({"error": "Permission not found"}, status=404)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
+@api_view(['GET'])
+def list_permissions(request): 
+    """
+    Use to pre-fill UI with existing permissions if needed.
+
+    List all permissions for a given student or employer.
+    Use query params: ?student_webid=... or ?employer_webid=...
+    """
+    
+    try:
+        student_webid = request.query_params.get('student_webid')
+        employer_webid = request.query_params.get('employer_webid')
+
+
+
+        if student_webid:
+            perms = AccessRequest.objects.filter(student_webid=student_webid)
+        elif employer_webid:
+            perms = AccessRequest.objects.filter(employer_webid=employer_webid)
+        else:
+            return Response({"error": "student_webid or employer_webid parameter is required"}, status=400)
+
+        return Response(AccessRequestSerializer(perms, many=True).data)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)

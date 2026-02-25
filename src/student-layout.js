@@ -25,13 +25,10 @@ function StudentLayout({ children, searchQuery, setSearchQuery, handleSearch, cl
           
           if (studentRes.ok) {
             const data = await studentRes.json();
-            console.log("Student data received:", data);
             setStudentData(data);
           } else {
             console.error("Failed to fetch student data:", studentRes.status);
           }
-        } else {
-          console.log("No WebID found in sessionStorage");
         }
       } catch (error) {
         console.error("Failed to fetch data:", error);

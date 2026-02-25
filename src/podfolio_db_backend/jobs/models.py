@@ -117,3 +117,14 @@ class EmployerRequest(models.Model):
 
     def __str__(self):
         return f"Employer Request: {self.employer_webid} -> {self.applicant_webid}"
+
+class AccessRequest(models.Model):
+    employer_webid = models.TextField()
+    student_webid = models.TextField()
+    resource_url = models.TextField()
+    resume_id = models.IntegerField(blank=True, null=True)  
+
+    class Meta:
+        unique_together = ('employer_webid', 'student_webid', 'resource_url')
+
+        

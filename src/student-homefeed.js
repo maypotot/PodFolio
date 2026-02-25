@@ -119,7 +119,7 @@ function HomeFeed() {
       sessionStorage.setItem("current_resume_id", selectedResume.id);
       sessionStorage.setItem("current_resume_title", selectedResume.title);
 
-      sessionStorage.setItem("current_employer_id", selectedJob.employer_id);
+      sessionStorage.setItem("current_employer_webid", selectedJob.employer_webid);
 
 
       

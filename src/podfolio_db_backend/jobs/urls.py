@@ -50,4 +50,9 @@ urlpatterns = [
     path("requests/create/", views.create_request, name="create_request"),
     path("requests/student/", views.requests_by_student, name="requests_by_student"),
     path("requests/all/", views.all_requests, name="all_requests"),
+
+    # Resource permissions endpoints
+    path("permissions/grant/", views.grant_permission, name="grant_permission"),
+    path("permissions/revoke/", views.revoke_permission, name="revoke_permission"),
+    path("permissions/list/", views.list_permissions, name="list_permissions"),
 ]

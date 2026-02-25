@@ -221,7 +221,7 @@ function Login() {
         solidUser = await restoreSession();
         
         if (solidUser) {
-          console.log("Detected Solid session after redirect:", solidUser.webId);
+          console.log("Detected Solid session after redirect:", solidUser.url);
           console.log("Expected WebID:", expectedWebId);
           
 

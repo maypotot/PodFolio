@@ -198,15 +198,14 @@ function EmployerLogin() {
         solidUser = await restoreSession();
         
         if (solidUser) {
-          console.log("Detected Solid session for employer:", solidUser.url);  
+          console.log("Detected Solid session for employer:", solidUser.url);
           console.log("Expected WebID:", expectedWebId);
 
           if (solidUser.url === expectedWebId) {  
             console.log("Employer WebIDs match! Completing login...");
             
             sessionStorage.setItem("employer_webid", expectedWebId);
-            console.log("Stored employer_webid in sessionStorage:", expectedWebId);
-            
+
             sessionStorage.removeItem("employer_login_webid");
             
             setStep(3);
