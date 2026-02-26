@@ -418,7 +418,7 @@ export async function appendImage(itemList) {
 }
 
 
-export function updateInformation(infoUrl) {
+export async function updateInformation(infoUrl) {
     const FullName = document.getElementById('FullName').value;
     const ProfessionalTitle = document.getElementById('ProfessionalTitle').value;
     const Summary = document.getElementById('Summary').value;
@@ -435,10 +435,6 @@ export function updateInformation(infoUrl) {
     const Honors = document.getElementById('Honors').value;
     const ThesisTitle = document.getElementById('ThesisTitle').value;
 
-    if (!FullName || !ProfessionalTitle || !Summary || !Email || !ContactNumber || !Location || !School || !Degree || !Program || !StartDate || !EndDate) {
-        alert('Please fill in all fields');
-        return;
-    }
     performUpdateInformation(infoUrl, {
         FullName: FullName,
         ProfessionalTitle: ProfessionalTitle,
@@ -464,7 +460,7 @@ export function updateExperience(experienceUrl) {
     const Organization = document.getElementById('Organization').value;
     const Duration = document.getElementById('Duration').value;
     const Description = document.getElementById('Description').value;
-    const ExperienceLocation = document.getElementById('ExperienceLocation').value;
+    const ExperienceLocation = document.getElementById('Location').value;
 
     performUpdateExperience(experienceUrl, {
         PositionTitle: PositionTitle,
