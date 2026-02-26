@@ -47,23 +47,23 @@ export function updateInfoText(info) {
   let thesistitle = document.getElementById('ThesisTitle');
   
   
-  
-  
-  fullname.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>${info.FullName}</span><br /><input id='FullName' class='resume-input' type='text' value='${info.FullName}' />`;
-  title.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Professional Title: ${info.ProfessionalTitle}</span><br /><input id='ProfessionalTitle' class='resume-input' type='text' value='${info.ProfessionalTitle}' />`;
-  summary.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Summary: ${info.Summary}</span><br /><textarea id='Summary' class='resume-input' rows='5'>${info.Summary}</textarea>`;
-  email.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Email: ${info.Email}</span><br /><input id='Email' class='resume-input' type='text' value='${info.Email}' />`;
-  contact.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Contact Number: ${info.ContactNumber}</span><br /><input id='ContactNumber' class='resume-input' type='text' value='${info.ContactNumber}' />`;
-  location.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Location: ${info.Location}</span><br /><input id='Location' class='resume-input' type='text' value='${info.Location}' />`;
-  profsummary.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Professional Summary: ${info.ProfessionalSummary}</span><br /><input id='ProfessionalSummary' class='resume-input' type='text' value='${info.ProfessionalSummary}' />`;
-  school.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Institution: ${info.School}</span><br /><input id='School' class='resume-input' type='text' value='${info.School}' />`;
-  degree.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Degree: ${info.Degree}</span><br /><input id='Degree' class='resume-input' type='text' value='${info.Degree}' />`;
-  honors.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Honors: ${info.Honors}</span><br /><input id='Honors' class='resume-input' type='text' value='${info.Honors}' />`;
-  program.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Program: ${info.Program}</span><br /><input id='Program' class='resume-input' type='text' value='${info.Program}' />`;
-  startdate.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Start Date: ${info.StartDate}</span><br /><input id='StartDate' class='resume-input' type='text' value='${info.StartDate}' />`;
-  enddate.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>End Date: ${info.EndDate}</span><br /><input id='EndDate' class='resume-input' type='text' value='${info.EndDate}' />`;
-  coursework.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Relevant Course Work: ${info.RelevantCourseWork}</span><br /><input id='RelevantCoursework' class='resume-input' type='text' value='${info.RelevantCourseWork}' />`;
-  thesistitle.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Thesis Title: ${info.ThesisTitle}</span><br /><input id='ThesisTitle' class='resume-input' type='text' value='${info.ThesisTitle}' />`;
+    
+  fullname.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>${info.FullName}</span><br />`;
+  title.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Professional Title: ${info.ProfessionalTitle}</span><br />`;
+  summary.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Summary: ${info.Summary}</span><br />`;
+  email.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Email: ${info.Email}</span><br />`;
+  contact.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Contact Number: ${info.ContactNumber}</span><br />`;
+  location.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Location: ${info.Location}</span><br />`;
+  profsummary.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Professional Summary: ${info.ProfessionalSummary}</span><br />`;
+  school.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Institution: ${info.School}</span><br />`;
+  degree.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Degree: ${info.Degree}</span><br />`;
+  honors.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Honors: ${info.Honors}</span><br />`;
+  program.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Program: ${info.Program}</span><br />`;
+  startdate.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Start Date: ${info.StartDate}</span><br />`;
+  enddate.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>End Date: ${info.EndDate}</span><br />`;
+  coursework.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Relevant Course Work: ${info.RelevantCourseWork}</span><br />`;
+  thesistitle.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Thesis Title: ${info.ThesisTitle}</span><br />`;
+
 }
 
 export function updateSkillText(skill, num) {
@@ -445,11 +445,13 @@ function EditResume() {
     } else {
       console.warn("No information found for the current resume ID.");
     }
-    updateInformation(currentInfo.url).then(() => {
-      sessionStorage.removeItem("current_resume_id");
-      sessionStorage.removeItem("current_resume_title");
-      navigate("/profile");
-    })
+    updateInformation(currentInfo.url)
+      .then(() => new Promise(resolve => setTimeout(resolve, 1000)))
+      .then(() => {
+        sessionStorage.removeItem("current_resume_id");
+        sessionStorage.removeItem("current_resume_title");
+        navigate("/profile");
+      })
 
 
     
@@ -484,7 +486,7 @@ function EditResume() {
                 <p id="Location"></p>
                 <p id="ProfessionalSummary"></p>
               </div>
-
+                
               {/* Education */}
               <div className="resume-section">
                 <h2>Education</h2>
@@ -497,6 +499,23 @@ function EditResume() {
                 <p id="RelevantCourseWork"></p>
                 <p id="ThesisTitle"></p>
               </div>
+              
+              <input id='FullNameInput' class='resume-input' type='text' placeholder='FullName' />
+              <input id='ProfessionalTitleInput' class='resume-input' type='text' placeholder='Professional Title' />
+              <textarea id='SummaryInput' class='resume-input' rows='5'></textarea>
+              <input id='EmailInput' class='resume-input' type='text' placeholder='Email Address' />
+              <br /><input id='ContactNumberInput' class='resume-input' type='text' placeholder='Contact Number' />
+              <br /><input id='LocationInput' class='resume-input' type='text' placeholder='Location (City, State)' />
+              <br /><input id='ProfessionalSummaryInput' class='resume-input' type='text' placeholder='Professional Summary' />
+              <br /><input id='SchoolInput' class='resume-input' type='text' placeholder='School Name' />
+              <br /><input id='DegreeInput' class='resume-input' type='text' placeholder='Degree' />
+              <br /><input id='HonorsInput' class='resume-input' type='text' placeholder='Honors (if any)' />
+              <br /><input id='ProgramInput' class='resume-input' type='text' placeholder='Program (if any)' />
+              <br /><input id='StartDateInput' class='resume-input' type='text' placeholder='Start Date (e.g. 2020-09-01)' />
+              <br /><input id='EndDateInput' class='resume-input' type='text' placeholder='End Date (e.g. 2024-05-31)' />
+              <br /><input id='RelevantCourseworkInput' class='resume-input' type='text' placeholder='Relevant Coursework (if any)' />
+              <br /><input id='ThesisTitleInput' class='resume-input' type='text' placeholder="Thesis Title (if any)" />
+                          
 
               {/* Websites */}
               <div className="resume-section">
