@@ -17,6 +17,7 @@ import StudentSearch from "./employer-search-result.js";
 import EmployerProfile from "./employer-profile.js"; 
 import EmployerNotifs from "./employer-notifs.js";
 import EmployerViewResume from "./employer-view-resume.js";
+import EmployerAccessResumes from "./employer-access-resumes.js";
 
 import { useNavigate } from "react-router-dom";
 
@@ -497,6 +498,7 @@ function App() {
         <Route path="/employer-profile" element={<EmployerLayout><EmployerProfile/></EmployerLayout>}/>
         <Route path="/employer-notifs" element={<EmployerLayout><EmployerNotifs/></EmployerLayout>}/>
         <Route path="/employer-view-resume" element={<EmployerLayout><EmployerViewResume/></EmployerLayout>}/>
+        <Route path="/employer-access-resumes" element={<EmployerLayout><EmployerAccessResumes/></EmployerLayout>}/>
       </Routes>
     </Router>
   )
