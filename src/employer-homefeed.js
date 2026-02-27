@@ -176,9 +176,14 @@ function EmployerHomeFeed() {
     <div className="main-feed">
       <div className="feed-header">
         <h1 className="employer-h1">Job Listings</h1>
-        <Link to="/employer-create-job">
-          <button className="create-job-button">+ Create New Job</button>
-        </Link>
+        <div style={{ display: "flex", gap: "10px" }}>
+          <Link to="/employer-access-resumes">
+            <button className="create-job-button">Accessible Resumes</button>
+          </Link>
+          <Link to="/employer-create-job">
+            <button className="create-job-button">+ Create New Job</button>
+          </Link>
+        </div>
       </div>
 
       {jobs.length === 0 ? (

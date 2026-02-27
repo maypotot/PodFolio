@@ -109,12 +109,17 @@ export async function loadResumeData() {
 
 }
 
-async function requestAccess(requestingID, resourceURL) {
+function stripFragment(url) {
+  return url ? url.split("#")[0] : url;
+}
+
+async function requestAccess(requestingID, resourceURL, resumeId, studentWebId) {
   const session = getDefaultSession();
+  const resourceBaseUrl = stripFragment(resourceURL);
 
   try {
     const updatedAccess = await universalAccess.setAgentAccess(
-      resourceURL,
+      resourceBaseUrl,
       requestingID,
       {
         read: true,
@@ -130,6 +135,11 @@ async function requestAccess(requestingID, resourceURL) {
     } else {
       alert("Access granted for: " + requestingID);
       console.log("Access granted for:", requestingID);
+      
+      // Also persist in database
+      if (resumeId && studentWebId) {
+        await requestAccessDatabase(requestingID, resourceBaseUrl, resumeId, studentWebId);
+      }
     }
   } catch (error) {
     console.error("Error granting access:", error);
@@ -138,12 +148,13 @@ async function requestAccess(requestingID, resourceURL) {
   return true;
 }
 
-async function denyAccess(requestingID, resourceURL) {
+async function denyAccess(requestingID, resourceURL, resumeId, studentWebId) {
   const session = getDefaultSession();
+  const resourceBaseUrl = stripFragment(resourceURL);
 
   try {
     const updatedAccess = await universalAccess.setAgentAccess(
-      resourceURL,
+      resourceBaseUrl,
       requestingID,
       {
         read: false,
@@ -159,6 +170,11 @@ async function denyAccess(requestingID, resourceURL) {
     } else {
       alert("Access removed for: " + requestingID);
       console.log("Access removed for:", requestingID);
+      
+      // Also remove from database
+      if (resumeId && studentWebId) {
+        await denyAccessDatabase(requestingID, resourceBaseUrl, resumeId, studentWebId);
+      }
     }
   } catch (error) {
     console.error("Error removing access:", error);
@@ -169,10 +185,11 @@ async function denyAccess(requestingID, resourceURL) {
 
 async function getAgentAccess(requestingID, resourceURL) {
   const session = getDefaultSession();
+  const resourceBaseUrl = stripFragment(resourceURL);
 
   try {
     return await universalAccess.getAgentAccess(
-      resourceURL,
+      resourceBaseUrl,
       requestingID,
       { fetch: session.fetch }
     );
@@ -184,56 +201,135 @@ async function getAgentAccess(requestingID, resourceURL) {
 
 // Persmission helper functions for SOLID
 
-async function grantPermission(employerWebId, resourceURL, resumeId) {
+async function requestAccessDatabase(employerWebId, resourceURL, resumeId, studentWebId) {
+  console.log("\n=== REQUEST ACCESS DATABASE ===");
+  console.log("Requesting access in backend with:", { 
+    employerWebId, 
+    resourceURL, 
+    resumeId, 
+    studentWebId 
+  });
+  
+  const payload = {
+    employer_webid: employerWebId,
+    student_webid: studentWebId,
+    resource_url: resourceURL,
+    resume_id: resumeId
+  };
+  
+  console.log("Stringified payload:", JSON.stringify(payload, null, 2));
+  
   try {
     const response = await fetch("http://127.0.1:8000/api/permissions/grant/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        employer_webid: employerWebId,
-        student_webid: studentWebId,
-        resource_url: resourceURL,
-        resume_id: resumeId
-      })
-
+      body: JSON.stringify(payload)
     });
+    
     if (response.ok) {
-      console.log("Permission granted in backend for:", { employerWebId, resourceURL, resumeId });
+      const data = await response.json();
+      console.log("✅ Permission granted in backend:", data);
+      console.log("Response data:", { employerWebId, resourceURL, resumeId });
     } else {
-      console.error("Failed to grant permission in backend");
+      const errorData = await response.text();
+      console.error("❌ Failed to grant permission in backend. Status:", response.status);
+      console.error("Error response:", errorData);
     }
   } catch (error) {
     console.error("Error granting permission in backend:", error);
     return false;
-    
   } 
 }
 
-async function revokePermission(employerWebId, resourceURL, resumeId, studentWebId) {
+async function denyAccessDatabase(employerWebId, resourceURL, resumeId, studentWebId) {
+  console.log("\n=== DENY ACCESS DATABASE ===");
+  console.log("Revoking access in backend with:", { 
+    employerWebId, 
+    resourceURL, 
+    resumeId, 
+    studentWebId 
+  });
+  
+  const payload = {
+    employer_webid: employerWebId,
+    resource_url: resourceURL,
+    resume_id: resumeId,
+    student_webid: studentWebId
+  };
+  
+  console.log("Stringified payload:", JSON.stringify(payload, null, 2));
+  
   try {
     const response = await fetch("http://127.0.1:8000/api/permissions/revoke/", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        employer_webid: employerWebId,
-        resource_url: resourceURL,
-        resume_id: resumeId,
-        student_webid: studentWebId
-      })
+      body: JSON.stringify(payload)
   });
 
   if (response.ok) {
     const data = await response.json();
-    console.log("Permission revoked in backend for:", data);
+    console.log("✅ Permission revoked in backend for:", data);
   }
   else {
-    console.error("Failed to revoke permission in backend");
+    const errorData = await response.text();
+    console.error("❌ Failed to revoke permission in backend. Status:", response.status);
+    console.error("Error response:", errorData);
+    console.error("Request payload was:", payload);
+    console.error("\n⚠️ TIP: Click 'Test: Get DB Permissions' to see what's actually in the database");
     return false;
   }
 } catch (error) {
     console.error("Error revoking permission in backend:", error);
     return false;
 }
+}
+
+// Test function to retrieve permissions from database
+async function getPermissionsDatabase(studentWebId, employerWebId = null, resumeId = null) {
+  console.log("\n=== Fetching Permissions from Database ===");
+  console.log("Parameters:", { studentWebId, employerWebId, resumeId });
+  
+  try {
+    // Build query string
+    let url = "http://127.0.1:8000/api/permissions/list/?";
+    if (studentWebId) url += `student_webid=${encodeURIComponent(studentWebId)}`;
+    if (employerWebId) url += `&employer_webid=${encodeURIComponent(employerWebId)}`;
+    if (resumeId) url += `&resume_id=${resumeId}`;
+    
+    console.log("Fetching from URL:", url);
+    
+    const response = await fetch(url, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" }
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      console.log("\n=== Permissions Retrieved from Database ===");
+      console.log(`Total permissions found: ${data.length}`);
+      console.log("\nFull data structure:", data);
+      
+      // Log each permission individually for clarity
+      data.forEach((perm, index) => {
+        console.log(`\nPermission ${index + 1}:`);
+        console.log("  - ID:", perm.id);
+        console.log("  - Employer WebID:", perm.employer_webid);
+        console.log("  - Student WebID:", perm.student_webid);
+        console.log("  - Resource URL:", perm.resource_url);
+        console.log("  - Resume ID:", perm.resume_id);
+      });
+      
+      return data;
+    } else {
+      console.error("Failed to fetch permissions from database. Status:", response.status);
+      const errorText = await response.text();
+      console.error("Error response:", errorText);
+      return [];
+    }
+  } catch (error) {
+    console.error("Error fetching permissions from database:", error);
+    return [];
+  }
 }
 
 function ConfigPerms() {
@@ -243,6 +339,8 @@ function ConfigPerms() {
   const [isLoading, setIsLoading] = useState(true);
   const hasRun = useRef(false);
   const [employerId, setEmployerId] = useState("");
+  const [resumeId, setResumeId] = useState("");
+  const [studentWebId, setStudentWebId] = useState("");
   const [filteredData, setFilteredData] = useState({
     info: [],
     skills: [],
@@ -251,17 +349,32 @@ function ConfigPerms() {
     experiences: []
   });
   const [permissions, setPermissions] = useState({});
+  const [dbPermissions, setDbPermissions] = useState([]);
+
+  // Test function to retrieve and display database permissions
+  const testGetPermissions = async () => {
+    console.log("\n========================================");
+    console.log("TESTING: Fetching permissions from database");
+    console.log("Current state - studentWebId:", studentWebId);
+    console.log("Current state - employerId:", employerId);
+    console.log("Current state - resumeId:", resumeId);
+    console.log("========================================");
+    
+    const perms = await getPermissionsDatabase(studentWebId, employerId, resumeId);
+    setDbPermissions(perms);
+    
+    console.log("\nDatabase permissions saved to state:", perms);
+    alert(`Found ${perms.length} permissions in database. Check console for details.`);
+  };
 
   // Function to check existing access for all resources
   const checkExistingAccess = async (employer, data) => {
-    console.log("\n=== Checking Existing Access ===");
     const initialPermissions = {};
     
     // Check personal info
     if (data.info.length > 0 && data.info[0].url) {
       const access = await getAgentAccess(employer, data.info[0].url);
       initialPermissions.info = access?.read === true;
-      console.log(`Info access: ${initialPermissions.info}`, access);
     }
     
     // Check skills
@@ -269,7 +382,6 @@ function ConfigPerms() {
       if (data.skills[index].url) {
         const access = await getAgentAccess(employer, data.skills[index].url);
         initialPermissions[`skill_${index}`] = access?.read === true;
-        console.log(`Skill ${index} access: ${initialPermissions[`skill_${index}`]}`, access);
       }
     }
     
@@ -278,7 +390,6 @@ function ConfigPerms() {
       if (data.projects[index].url) {
         const access = await getAgentAccess(employer, data.projects[index].url);
         initialPermissions[`project_${index}`] = access?.read === true;
-        console.log(`Project ${index} access: ${initialPermissions[`project_${index}`]}`, access);
       }
     }
     
@@ -287,7 +398,6 @@ function ConfigPerms() {
       if (data.websites[index].url) {
         const access = await getAgentAccess(employer, data.websites[index].url);
         initialPermissions[`website_${index}`] = access?.read === true;
-        console.log(`Website ${index} access: ${initialPermissions[`website_${index}`]}`, access);
       }
     }
     
@@ -296,7 +406,6 @@ function ConfigPerms() {
       if (data.experiences[index].url) {
         const access = await getAgentAccess(employer, data.experiences[index].url);
         initialPermissions[`experience_${index}`] = access?.read === true;
-        console.log(`Experience ${index} access: ${initialPermissions[`experience_${index}`]}`, access);
       }
     }
     
@@ -312,13 +421,16 @@ function ConfigPerms() {
     const job = sessionStorage.getItem("current_job_title");
     const resume = sessionStorage.getItem("current_resume_title");
     const employer = sessionStorage.getItem("current_employer_webid") || "https://thesis-test.solidcommunity.net/profile/card#me"; // Default for testing
-    const resumeId = sessionStorage.getItem("current_resume_id");
-    console.log("THIS IS THE RESUME ID:", resumeId);
+    const resumeIdFromStorage = sessionStorage.getItem("current_resume_id");
+    const session = getDefaultSession();
+    const studentWebIdFromSession = session.info?.webId || "";
+    
+    console.log("THIS IS THE RESUME ID:", resumeIdFromStorage);
     console.log("THIS IS THE EMPLOYER WEB ID:", employer);
-    // const resumeId = 22
+    console.log("THIS IS THE STUDENT WEB ID:", studentWebIdFromSession);
     
     console.log("Session:", sessionStorage);
-    console.log("Current Resume ID:", resumeId);
+    console.log("Current Resume ID:", resumeIdFromStorage);
     console.log("Employer ID:", employer);
     
     if (!job || !resume) {
@@ -330,6 +442,8 @@ function ConfigPerms() {
     setJobTitle(job);
     setResumeTitle(resume);
     setEmployerId(employer);
+    setResumeId(resumeIdFromStorage);
+    setStudentWebId(studentWebIdFromSession);
     
     // Load all resume data and then filter by current resume ID
     setIsLoading(true);
@@ -337,9 +451,9 @@ function ConfigPerms() {
       .then(() => setIsLoading(false))
       .then(() => new Promise(resolve => setTimeout(resolve, 1000)))
       .then(async () => {
-        if (resumeId) {
-          const data = getFilteredResumeData(resumeId);
-          console.log("\n=== All matching items for resume ID:", resumeId, "===");
+        if (resumeIdFromStorage) {
+          const data = getFilteredResumeData(resumeIdFromStorage);
+          console.log("\n=== All matching items for resume ID:", resumeIdFromStorage, "===");
           console.log("Filtered data object:", data);
           setFilteredData(data);
           
@@ -353,9 +467,21 @@ function ConfigPerms() {
   }, [navigate]);
 
   const handlePermission = async (key, resourceURL) => {
+    console.log("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    console.log("🔘 HANDLE PERMISSION CLICKED");
+    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    
     // Toggle permission: if currently has access (true), deny it (false); otherwise grant access (true)
     const currentAccess = permissions[key];
     const newAccess = !currentAccess;
+    
+    console.log(`Permission Key: ${key}`);
+    console.log(`Current Access: ${currentAccess}`);
+    console.log(`New Access: ${newAccess} (${newAccess ? 'GRANTING' : 'REVOKING'})`);
+    console.log(`Resource URL: ${resourceURL}`);
+    console.log(`Employer ID: ${employerId}`);
+    console.log(`Student WebID: ${studentWebId}`);
+    console.log(`Resume ID: ${resumeId}`);
     
     // Update state first for immediate UI feedback
     setPermissions(prev => ({
@@ -365,18 +491,19 @@ function ConfigPerms() {
     
     // Call requestAccess or denyAccess based on the new value
     if (!employerId || !resourceURL) {
-      console.warn("Missing employerId or resourceURL", { employerId, resourceURL });
+      console.warn("⚠️ Missing employerId or resourceURL", { employerId, resourceURL });
       return;
     }
     
     if (newAccess === true) {
-      console.log(`Calling requestAccess for ${key}:`, { employerId, resourceURL }); //whenever requestAccess runs, may entry sa database, employer, student, resourceURL, resumeid
-      await requestAccess(employerId, resourceURL);
+      console.log(`\n▶️ Calling requestAccess for ${key}`);
+      await requestAccess(employerId, resourceURL, resumeId, studentWebId);
     } else {
-      console.log(`Calling denyAccess for ${key}:`, { employerId, resourceURL });
-      await denyAccess(employerId, resourceURL); 
-      //remove the entry in the database for employer, student, resourceURL, resumeid
+      console.log(`\n▶️ Calling denyAccess for ${key}`);
+      await denyAccess(employerId, resourceURL, resumeId, studentWebId);
     }
+    
+    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
   };
 
   const handleAllowAll = async (category) => {
@@ -385,14 +512,14 @@ function ConfigPerms() {
     // Set all permissions for the given category to true and call requestAccess
     if (category === 'info' && filteredData.info.length > 0) {
       updatedPermissions.info = true;
-      await requestAccess(employerId, filteredData.info[0].url);
+      await requestAccess(employerId, filteredData.info[0].url, resumeId, studentWebId);
     }
     
     if (category === 'skill') {
       for (let index = 0; index < filteredData.skills.length; index++) {
         const key = `skill_${index}`;
         updatedPermissions[key] = true;
-        await requestAccess(employerId, filteredData.skills[index].url);
+        await requestAccess(employerId, filteredData.skills[index].url, resumeId, studentWebId);
       }
     }
     
@@ -400,7 +527,7 @@ function ConfigPerms() {
       for (let index = 0; index < filteredData.projects.length; index++) {
         const key = `project_${index}`;
         updatedPermissions[key] = true;
-        await requestAccess(employerId, filteredData.projects[index].url);
+        await requestAccess(employerId, filteredData.projects[index].url, resumeId, studentWebId);
       }
     }
     
@@ -408,7 +535,7 @@ function ConfigPerms() {
       for (let index = 0; index < filteredData.websites.length; index++) {
         const key = `website_${index}`;
         updatedPermissions[key] = true;
-        await requestAccess(employerId, filteredData.websites[index].url);
+        await requestAccess(employerId, filteredData.websites[index].url, resumeId, studentWebId);
       }
     }
     
@@ -416,7 +543,7 @@ function ConfigPerms() {
       for (let index = 0; index < filteredData.experiences.length; index++) {
         const key = `experience_${index}`;
         updatedPermissions[key] = true;
-        await requestAccess(employerId, filteredData.experiences[index].url);
+        await requestAccess(employerId, filteredData.experiences[index].url, resumeId, studentWebId);
       }
     }
     
@@ -503,9 +630,18 @@ function ConfigPerms() {
         <div className="resume">
           <div className="tag-header">
             <h1>Configure Permissions</h1>
-            <button className="complete-button" onClick={handleComplete}>
-              Complete Application
-            </button>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button 
+                className="complete-button" 
+                onClick={testGetPermissions}
+                style={{ backgroundColor: '#4CAF50' }}
+              >
+                🔍 Test: Get DB Permissions
+              </button>
+              <button className="complete-button" onClick={handleComplete}>
+                Complete Application
+              </button>
+            </div>
           </div>
 
           {isLoading ? (

@@ -418,27 +418,23 @@ export async function appendImage(itemList) {
 }
 
 
-export function updateInformation(infoUrl) {
-    const FullName = document.getElementById('FullName').value;
-    const ProfessionalTitle = document.getElementById('ProfessionalTitle').value;
-    const Summary = document.getElementById('Summary').value;
-    const Email = document.getElementById('Email').value;
-    const ContactNumber = document.getElementById('ContactNumber').value;
-    const Location = document.getElementById('Location').value;
-    const ProfessionalSummary = document.getElementById('ProfessionalSummary').value;
-    const School = document.getElementById('School').value;
-    const Degree = document.getElementById('Degree').value;
-    const Program = document.getElementById('Program').value;
-    const StartDate = document.getElementById('StartDate').value;
-    const EndDate = document.getElementById('EndDate').value;
-    const RelevantCoursework = document.getElementById('RelevantCoursework').value;
-    const Honors = document.getElementById('Honors').value;
-    const ThesisTitle = document.getElementById('ThesisTitle').value;
+export async function updateInformation(infoUrl) {
+    const FullName = document.getElementById('FullNameInput').value;
+    const ProfessionalTitle = document.getElementById('ProfessionalTitleInput').value;
+    const Summary = document.getElementById('SummaryInput').value;
+    const Email = document.getElementById('EmailInput').value;
+    const ContactNumber = document.getElementById('ContactNumberInput').value;
+    const Location = document.getElementById('LocationInput').value;
+    const ProfessionalSummary = document.getElementById('ProfessionalSummaryInput').value;
+    const School = document.getElementById('SchoolInput').value;
+    const Degree = document.getElementById('DegreeInput').value;
+    const Program = document.getElementById('ProgramInput').value;
+    const StartDate = document.getElementById('StartDateInput').value;
+    const EndDate = document.getElementById('EndDateInput').value;
+    const RelevantCoursework = document.getElementById('RelevantCourseworkInput').value;
+    const Honors = document.getElementById('HonorsInput').value;
+    const ThesisTitle = document.getElementById('ThesisTitleInput').value;
 
-    if (!FullName || !ProfessionalTitle || !Summary || !Email || !ContactNumber || !Location || !School || !Degree || !Program || !StartDate || !EndDate) {
-        alert('Please fill in all fields');
-        return;
-    }
     performUpdateInformation(infoUrl, {
         FullName: FullName,
         ProfessionalTitle: ProfessionalTitle,
@@ -464,7 +460,7 @@ export function updateExperience(experienceUrl) {
     const Organization = document.getElementById('Organization').value;
     const Duration = document.getElementById('Duration').value;
     const Description = document.getElementById('Description').value;
-    const ExperienceLocation = document.getElementById('ExperienceLocation').value;
+    const ExperienceLocation = document.getElementById('Location').value;
 
     performUpdateExperience(experienceUrl, {
         PositionTitle: PositionTitle,

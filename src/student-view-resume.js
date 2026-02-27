@@ -213,6 +213,8 @@ export function updateResumeText(indexToCheck) {
   experiencesListElement.innerHTML = '';
 
   for (let i in podInfolist){
+      console.log("Index To Check:", indexToCheck);
+      console.log("Pod Info Index:", podInfolist[i].ResumeIndex);
     if (podInfolist[i].ResumeIndex == indexToCheck){
       updateInfoText(podInfolist[i]);
       break

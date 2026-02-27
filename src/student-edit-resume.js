@@ -20,15 +20,6 @@ import {
   loadWebsite,
   loadSkill
  } from "./solid.js";
-import {
-  updateInfoText,
-  updateSkillText,
-  updateProjectText,
-  updateExperienceText,
-  updateWebsiteText,
-  updateResumeText,
-} from "./student-view-resume.js"
-
 let podInfolist = [];
 let podSkilllist = [];
 let podProjectlist = [];
@@ -36,6 +27,281 @@ let podWebsiteList = [];
 let podExperienceList = [];
 let podImageList = [];
 let resumeIndexList = [];
+
+export function updateInfoText(info) {
+
+  let fullname = document.getElementById('FullName');
+  let title = document.getElementById('ProfessionalTitle');
+  let summary = document.getElementById('Summary');
+  let email = document.getElementById('Email');
+  let contact = document.getElementById('ContactNumber');
+  let location = document.getElementById('Location'); 
+  let profsummary = document.getElementById('ProfessionalSummary');
+  let school = document.getElementById('School');
+  let degree = document.getElementById('Degree');
+  let honors = document.getElementById('Honors');
+  let program = document.getElementById('Program');
+  let startdate = document.getElementById('StartDate');
+  let enddate = document.getElementById('EndDate');
+  let coursework = document.getElementById('RelevantCourseWork');
+  let thesistitle = document.getElementById('ThesisTitle');
+  
+  
+    
+  fullname.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>${info.FullName}</span><br />`;
+  title.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Professional Title: ${info.ProfessionalTitle}</span><br />`;
+  summary.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Summary: ${info.Summary}</span><br />`;
+  email.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Email: ${info.Email}</span><br />`;
+  contact.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Contact Number: ${info.ContactNumber}</span><br />`;
+  location.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Location: ${info.Location}</span><br />`;
+  profsummary.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Professional Summary: ${info.ProfessionalSummary}</span><br />`;
+  school.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Institution: ${info.School}</span><br />`;
+  degree.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Degree: ${info.Degree}</span><br />`;
+  honors.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Honors: ${info.Honors}</span><br />`;
+  program.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Program: ${info.Program}</span><br />`;
+  startdate.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Start Date: ${info.StartDate}</span><br />`;
+  enddate.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>End Date: ${info.EndDate}</span><br />`;
+  coursework.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Relevant Course Work: ${info.RelevantCourseWork}</span><br />`;
+  thesistitle.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Thesis Title: ${info.ThesisTitle}</span><br />`;
+
+}
+
+export function updateSkillText(skill, num) {
+
+  let skillsListElement = document.getElementById('SkillsList');
+  const listItem = document.createElement('li');
+  listItem.style.display = 'flex';
+  listItem.style.alignItems = 'center';
+  listItem.style.gap = '10px';
+
+  const radioBtn = document.createElement('input');
+  radioBtn.type = 'radio';
+  radioBtn.name = 'skillSelect';
+  radioBtn.value = skill.url;
+
+  const label = document.createElement('span');
+  label.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>${skill.Skill}</span>`;
+
+  listItem.appendChild(radioBtn);
+  listItem.appendChild(label);
+  skillsListElement.appendChild(listItem);
+}
+
+
+export function updateProjectText(project, num) {
+  let projectsListElement = document.getElementById('ProjectsList');
+  const listItem = document.createElement('li');
+  listItem.style.marginBottom = '15px';
+
+  const radioBtn = document.createElement('input');
+  radioBtn.type = 'radio';
+  radioBtn.name = 'projectSelect';
+  radioBtn.value = project.url;
+
+  const projectInfo = document.createElement('div');
+  projectInfo.innerHTML = `
+    <span style='font-weight: bold; font-size: 1.2rem;'>Title:</span> ${project.ProjectName}<br />
+    <span style='font-weight: bold; font-size: 1.2rem;'>Summary:</span> ${project.Summary}<br />
+    <span style='font-weight: bold; font-size: 1.2rem;'>Tools:</span> ${project.Tools}<br />
+    <span style='font-weight: bold; font-size: 1.2rem;'>Project Link:</span> ${project.ProjectLink}
+  `;
+
+  listItem.appendChild(radioBtn);
+  listItem.appendChild(projectInfo);
+  projectsListElement.appendChild(listItem);
+}
+
+export function updateWebsiteText(website, num) {
+  let websitesListElement = document.getElementById('WebsitesList');
+  const listItem = document.createElement('li');
+  listItem.style.display = 'flex';
+  listItem.style.alignItems = 'center';
+  listItem.style.gap = '10px';
+
+  const radioBtn = document.createElement('input');
+  radioBtn.type = 'radio';
+  radioBtn.name = 'websiteSelect';
+  radioBtn.value = website.url;
+
+  const label = document.createElement('span');
+  label.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>${website.WebsiteLink}</span>`;
+
+  listItem.appendChild(radioBtn);
+  listItem.appendChild(label);
+  websitesListElement.appendChild(listItem);
+}
+
+export function updateExperienceText(experience, num) {
+  let experiencesListElement = document.getElementById('ExperienceList');
+  const listItem = document.createElement('li');
+  listItem.style.marginBottom = '15px';
+
+  const radioBtn = document.createElement('input');
+  radioBtn.type = 'radio';
+  radioBtn.name = 'experienceSelect';
+  radioBtn.value = experience.url;
+
+  const experienceInfo = document.createElement('div');
+  experienceInfo.innerHTML = `
+    <span style='font-weight: bold; font-size: 1.2rem;'>Title:</span> ${experience.PositionTitle}<br />
+    <span style='font-weight: bold; font-size: 1.2rem;'>Organization:</span> ${experience.Organization}<br />
+    <span style='font-weight: bold; font-size: 1.2rem;'>Duration:</span> ${experience.Duration}<br />
+    <span style='font-weight: bold; font-size: 1.2rem;'>Description:</span> ${experience.Description}<br />
+    <span style='font-weight: bold; font-size: 1.2rem;'>Location:</span> ${experience.ExperienceLocation}
+  `;
+
+  listItem.appendChild(radioBtn);
+  listItem.appendChild(experienceInfo);
+  experiencesListElement.appendChild(listItem);
+}
+
+export function updateImageText(image) {
+  let imageElement = document.getElementById('ProfileImage');
+  imageElement.src = URL.createObjectURL(image.ImageFile);
+  console.log("Image URL: " + imageElement.src);
+}
+
+export function handleUpdateInformation() {
+  const resumeId = sessionStorage.getItem("current_resume_id");
+  
+  // Find the information matching the current resume
+  const info = podInfolist.find(i => i.ResumeIndex == resumeId);
+  
+  if (!info) {
+    alert("No information found for this resume.");
+    return;
+  }
+  
+  // Call the original updateInformation function with the information URL
+  console.log("Updating information with URL:", info.url);
+  updateInformation(info.url);
+}
+
+export function handleUpdateSkill() {
+  const skillInput = document.getElementById('Skill').value;
+  
+  if (!skillInput.trim()) {
+    alert("Please enter a skill.");
+    return;
+  }
+  
+  // Get the selected skill radio button
+  const selectedSkill = document.querySelector('input[name="skillSelect"]:checked');
+  
+  if (!selectedSkill) {
+    alert("Please select a skill to update.");
+    return;
+  }
+  
+  const skillUrl = selectedSkill.value;
+  
+  // Call the original updateSkill function with the skill URL
+  console.log("Updating skill with URL:", skillUrl);
+  updateSkill(skillUrl);
+}
+
+export function handleUpdateProject() {
+  // Get the selected project radio button
+  const selectedProject = document.querySelector('input[name="projectSelect"]:checked');
+  
+  if (!selectedProject) {
+    alert("Please select a project to update.");
+    return;
+  }
+  
+  const projectUrl = selectedProject.value;
+  
+  // Call the original updateProject function with the project URL
+  console.log("Updating project with URL:", projectUrl);
+  updateProject(projectUrl);
+}
+
+export function handleUpdateExperience() {
+  // Get the selected experience radio button
+  const selectedExperience = document.querySelector('input[name="experienceSelect"]:checked');
+  
+  if (!selectedExperience) {
+    alert("Please select an experience to update.");
+    return;
+  }
+  
+  const experienceUrl = selectedExperience.value;
+  
+  // Call the original updateExperience function with the experience URL
+  console.log("Updating experience with URL:", experienceUrl);
+  updateExperience(experienceUrl);
+}
+
+export function handleUpdateWebsite() {
+  // Get the selected website radio button
+  const selectedWebsite = document.querySelector('input[name="websiteSelect"]:checked');
+  
+  if (!selectedWebsite) {
+    alert("Please select a website to update.");
+    return;
+  }
+  
+  const websiteUrl = selectedWebsite.value;
+  
+  // Call the original updateWebsite function with the website URL
+  console.log("Updating website with URL:", websiteUrl);
+  updateWebsite(websiteUrl);
+}
+
+export function updateResumeText(indexToCheck) {
+  
+  let skillsListElement = document.getElementById('SkillsList');
+  skillsListElement.innerHTML = '';
+  let projectsListElement = document.getElementById('ProjectsList');
+  projectsListElement.innerHTML = '';
+  let websitesListElement = document.getElementById('WebsitesList');
+  websitesListElement.innerHTML = '';
+  let experiencesListElement = document.getElementById('ExperienceList');
+  experiencesListElement.innerHTML = '';
+
+  for (let i in podInfolist){
+      console.log("Index To Check:", indexToCheck);
+      console.log("Pod Info Index:", podInfolist[i].ResumeIndex);
+    if (podInfolist[i].ResumeIndex == indexToCheck){
+      updateInfoText(podInfolist[i]);
+      break
+    }
+  }
+
+  for (let i in podSkilllist){
+    if (podSkilllist[i].ResumeIndex == indexToCheck){
+      updateSkillText(podSkilllist[i], i);
+    }
+  }
+
+  for (let i in podProjectlist){
+    if (podProjectlist[i].ResumeIndex == indexToCheck){
+      updateProjectText(podProjectlist[i], i);
+    }
+  }
+  
+  for (let i in podWebsiteList){
+    if (podWebsiteList[i].ResumeIndex == indexToCheck){
+      updateWebsiteText(podWebsiteList[i], i);
+    }
+  }
+  
+  for (let i in podExperienceList){
+    if (podExperienceList[i].ResumeIndex == indexToCheck){
+      updateExperienceText(podExperienceList[i], i);
+    }
+  }
+  
+  // for (let i in podInfolist){
+  //   if (podInfolist[i].ResumeIndex == resumeIndex){
+  //     console.log(podInfolist[i].ResumeImage, podImageList[i].image.name)
+  //     if (podImageList[i].ResumeImage == podImageList[i].image.name){
+  //       updateImageText(podImageList[i]);
+  //     }
+  //     break
+  //   }
+  // }
+}
 
 // Helper functions to get filtered data by resume ID
 export function getFilteredResumeData(resumeId) {
@@ -162,19 +428,34 @@ function EditResume() {
     loadResumeData()
       .then(() => setIsLoading(false))
       .then(() => new Promise(resolve => setTimeout(resolve, 1000)))
-      .then(() => updateResumeText(18))
-      .then(() => console.log(podInfolist));
+      .then(() => updateResumeText(sessionStorage.getItem("current_resume_id")))
+      .then(() => console.log(sessionStorage.getItem("current_resume_id")));
   }, [navigate]);
 
   const handleEditResume = () => {
     // Clear current resume from session
-    sessionStorage.removeItem("current_resume_id");
-    sessionStorage.removeItem("current_resume_title");
 
-    updateInformation();
+    const currentResumeId = sessionStorage.getItem("current_resume_id");
+    console.log("Current Resume ID:", currentResumeId);
+    console.log("Current Info List:", podInfolist);
+    const currentInfo = podInfolist.find(info => info.ResumeIndex == currentResumeId);
+
+    if (currentInfo) {
+      console.log("Current Info URL:", currentInfo.url);
+    } else {
+      console.warn("No information found for the current resume ID.");
+    }
+    updateInformation(currentInfo.url)
+      .then(() => new Promise(resolve => setTimeout(resolve, 1000)))
+      .then(() => {
+        sessionStorage.removeItem("current_resume_id");
+        sessionStorage.removeItem("current_resume_title");
+        navigate("/profile");
+      })
+
+
     
     // Navigate to profile
-    navigate("/profile");
   };
 
   return (
@@ -192,35 +473,49 @@ function EditResume() {
           ) : (
           <div className="tags-section">
             <div className="resume-section">
-                <Link to="/config-perms">
-                  <button className="student-button">Configure Permissions</button>
-                </Link>
 
               <img src={null} alt="Profile" className="profile-image" id="ProfileImage"/>
               {/* Personal Information */}
               <div className="resume-section">
                 <h2>Personal Information</h2>
+                <p id="FullName"></p>
                 <p id="ProfessionalTitle"></p>
                 <p id="Summary"></p>
                 <p id="Email"></p>
                 <p id="ContactNumber"></p>
                 <p id="Location"></p>
                 <p id="ProfessionalSummary"></p>
-                <p id="Websites"></p>
               </div>
-
+                
               {/* Education */}
               <div className="resume-section">
                 <h2>Education</h2>
-                <p id="Degree"></p>
                 <p id="School"></p>
-                <p id="Honors"></p>
+                <p id="Degree"></p>
                 <p id="Program"></p>
                 <p id="StartDate"></p>
                 <p id="EndDate"></p>
+                <p id="Honors"></p>
                 <p id="RelevantCourseWork"></p>
                 <p id="ThesisTitle"></p>
               </div>
+              
+              <input id='FullNameInput' class='resume-input' type='text' placeholder='FullName' />
+              <input id='ProfessionalTitleInput' class='resume-input' type='text' placeholder='Professional Title' />
+              <textarea id='SummaryInput' class='resume-input' rows='5'></textarea>
+              <input id='EmailInput' class='resume-input' type='text' placeholder='Email Address' />
+              <br /><input id='ContactNumberInput' class='resume-input' type='text' placeholder='Contact Number' />
+              <br /><input id='LocationInput' class='resume-input' type='text' placeholder='Location (City, State)' />
+              <br /><input id='ProfessionalSummaryInput' class='resume-input' type='text' placeholder='Professional Summary' />
+              <br /><input id='SchoolInput' class='resume-input' type='text' placeholder='School Name' />
+              <br /><input id='DegreeInput' class='resume-input' type='text' placeholder='Degree' />
+              <br /><input id='HonorsInput' class='resume-input' type='text' placeholder='Honors (if any)' />
+              <br /><input id='ProgramInput' class='resume-input' type='text' placeholder='Program (if any)' />
+              <br /><input id='StartDateInput' class='resume-input' type='text' placeholder='Start Date (e.g. 2020-09-01)' />
+              <br /><input id='EndDateInput' class='resume-input' type='text' placeholder='End Date (e.g. 2024-05-31)' />
+              <br /><input id='RelevantCourseworkInput' class='resume-input' type='text' placeholder='Relevant Coursework (if any)' />
+              <br /><input id='ThesisTitleInput' class='resume-input' type='text' placeholder="Thesis Title (if any)" />
+                          
 
               {/* Websites */}
               <div className="resume-section">
@@ -228,6 +523,16 @@ function EditResume() {
                 <ul id="WebsitesList">
                   
                 </ul>
+                <input
+                  type="text"
+                  placeholder="github.com"
+                  className="resume-input"
+                  id="WebsiteLink"
+                />
+                
+                <button className="student-add-tag-button" onClick={handleUpdateWebsite}>
+                  Update Website
+                </button>
               </div>
 
               {/* Skills */}
@@ -236,6 +541,15 @@ function EditResume() {
                 <ul id="SkillsList">
                   
                 </ul>
+                <input
+                  type="text"
+                  placeholder="Javascript"
+                  className="skills-input"
+                  id="Skill"
+                />
+                <button className="student-add-tag-button" onClick={handleUpdateSkill}>
+                  Update Skill
+                </button>
               </div>
 
               {/* Projects */}
@@ -244,212 +558,7 @@ function EditResume() {
                 <ul id="ProjectsList">
                   
                 </ul>
-              </div>
-
-              {/* Experience */}
-              <div className="resume-section">
-                <h2>Experience</h2>
-                <ul id="ExperienceList">
-                  
-                </ul>
-              </div>
-
-              <Link to="/create-resume">
-                <button className="student-button">Edit Resume</button>
-              </Link>
-              <h2>Personal Information</h2>
-
-              <div className="resume-field">
-                <h3 className="tag-title">Name</h3>
-                <input
-                  type="text"
-                  placeholder="Juan de la Cruz"
-                  className="resume-input"
-                  id="FullName"
-                />
-              </div>
-              
-              <div className="resume-field">
-                <h3 className="tag-title">Professional Title</h3>
-                <input
-                  type="text"
-                  placeholder="Dr."
-                  className="resume-input"
-                  id="ProfessionalTitle"
-                />
-              </div>
-
-              <div className="resume-field">
-                <h3 className="tag-title">Summary</h3>
-                <textarea
-                  type="text"
-                  placeholder="Summary of your profile"
-                  className="resume-input"
-                  rows={5}
-                  id="Summary"
-                />
-              </div>
-
-              <div className="resume-field">
-                <h3 className="tag-title">Email</h3>
-                <input
-                  type="text"
-                  placeholder="juandelacruz@gmail.com"
-                  className="resume-input"
-                  id="Email"
-                />
-              </div>
-
-              <div className="resume-field">
-                <h3 className="tag-title">Contact Number</h3>
-                <input
-                  type="text"
-                  placeholder="09171234567"
-                  className="resume-input"
-                  id="ContactNumber"
-                />
-              </div>
-
-              <div className="resume-field">
-                <h3 className="tag-title">Location</h3>
-                <input
-                  type="text"
-                  placeholder="Quezon City, Philippines"
-                  className="resume-input"
-                  id="Location"
-                />
-              </div>
-
-              <div className="resume-field">
-                <h3 className="tag-title">Website</h3>
-                <input
-                  type="text"
-                  placeholder="github.com"
-                  className="resume-input"
-                  id="WebsiteLink"
-                />
-                <button className="student-add-tag-button" onClick={updateWebsite}>
-                  Update Website
-                </button>
-              </div>
-
-              <div className="resume-field">
-                <h3 className="tag-title">Professional Summary</h3>
-                <textarea
-                  type="text"
-                  placeholder="Professional summary goes here"
-                  className="resume-input"
-                  rows={5}
-                  id="ProfessionalSummary"
-                />
-              </div>
-            </div>
-
-            <div className="resume-section">
-              <h2>Education</h2>
-
-              <div className="resume-field">
-                <h3 className="tag-title">Academic Institution</h3>
-                <input
-                  type="text"
-                  placeholder="University of the Philippines Diliman"
-                  className="resume-input"
-                  id="School"
-                />
-              </div>
-
-              <div className="resume-field">
-                <h3 className="tag-title">Degree</h3>
-                <input
-                  type="text"
-                  placeholder="BS Computer Science"
-                  className="resume-input"
-                  id="Degree"
-                />
-              </div>
-
-              <div className="resume-field">
-                <h3 className="tag-title">Program</h3>
-                <input
-                  type="text"
-                  placeholder="BS Computer Science"
-                  className="resume-input"
-                  id="Program"
-                />
-              </div>
-              
-              <div className="resume-field">
-                <h3 className="tag-title">Start Date</h3>
-                <input
-                  type="text"
-                  placeholder="January 2016"
-                  className="resume-input"
-                  id="StartDate"
-                />
-              </div>
-
-              <div className="resume-field">
-                <h3 className="tag-title">End Date</h3>
-                <input
-                  type="text"
-                  placeholder="January 2020"
-                  className="resume-input"
-                  id="EndDate"
-                />
-              </div>
-              
-              <div className="resume-field">
-                <h3 className="tag-title">Relevant Coursework</h3>
-                <input
-                  type="text"
-                  placeholder="Link to coursework or list here"
-                  className="resume-input"
-                  id="RelevantCoursework"
-                />
-              </div>
-
-              <div className="resume-field">
-                <h3 className="tag-title">Honors/Awards</h3>
-                <input
-                  type="text"
-                  placeholder="Summa Cum Laude"
-                  className="resume-input"
-                  id="Honors"
-                />
-              </div>
-
-              <div className="resume-field">
-                <h3 className="tag-title">Thesis Title</h3>
-                <input
-                  type="text"
-                  placeholder="Title of your thesis"
-                  className="resume-input"
-                  id="ThesisTitle"
-                />
-              </div>
-
-              <div className="resume-field-2">
-                <h2>Skills</h2>
-                <input
-                  type="text"
-                  placeholder="Javascript"
-                  className="skills-input"
-                  id="Skill"
-                />
-                <button className="student-add-tag-button" onClick={updateSkill}>
-                  Update Skill
-                </button>
-              </div>
-            </div>
-
-            <div className="resume-section">
-              <h2>Projects</h2>
-
-              <div className="projects">
-                <h3 className="project-list">Project</h3>
-
-                <div className="resume-field">
-                  <h3 className="tag-title">Project Title</h3>
+                <h3 className="tag-title">Project Title</h3>
                   <input
                     type="text"
                     placeholder="Snake Game"
@@ -487,17 +596,17 @@ function EditResume() {
                     id="ProjectLink"
                   />
                 </div>
-                
-                <button className="student-add-tag-button" onClick={updateProject}>
+                <button className="student-add-tag-button" onClick={handleUpdateProject}>
                   Update Project
                 </button>
               </div>
-            </div>
 
-            <div className="resume-section">
-              <h2>Experience</h2>
-
-              <div className="projects">
+              {/* Experience */}
+              <div className="resume-section">
+                <h2>Experience</h2>
+                <ul id="ExperienceList">
+                  
+                </ul>
                 <h3 className="project-list">Experience</h3>
 
                 <div className="resume-field">
@@ -549,12 +658,12 @@ function EditResume() {
                     id="Description"
                   />
                 </div>
-                <button className="student-add-tag-button" onClick={updateExperience}>
+                <button className="student-add-tag-button" onClick={handleUpdateExperience}>
                   Update Experience
                 </button>
               </div>
+
             </div>
-          </div>
           )}
         </div>
       </div>

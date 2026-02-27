@@ -702,14 +702,14 @@ def grant_permission(request):
         if not employer_webid or not student_webid or not resource_url:
             return Response({"error": "employer_webid, student_webid, and resource_url are required"}, status=400)
 
-        AccessRequest.objects.create(
+        access_request, created = AccessRequest.objects.get_or_create(
             employer_webid=employer_webid,
             student_webid=student_webid,
             resource_url=resource_url,
             defaults={'resume_id': resume_id}
-            )
+        )
 
-        return Response({"message": "Permission granted"}, status=201)
+        return Response({"message": "Permission granted", "created": created}, status=201)
     except Exception as e:
         return Response({"error": str(e)}, status=500)
     
@@ -747,21 +747,26 @@ def list_permissions(request):
     Use to pre-fill UI with existing permissions if needed.
 
     List all permissions for a given student or employer.
-    Use query params: ?student_webid=... or ?employer_webid=...
+    Use query params: ?student_webid=... or ?employer_webid=... or ?resume_id=...
     """
     
     try:
         student_webid = request.query_params.get('student_webid')
         employer_webid = request.query_params.get('employer_webid')
+        resume_id = request.query_params.get('resume_id')
 
-
-
+        # Start with all permissions and filter as needed
+        perms = AccessRequest.objects.all()
+        
         if student_webid:
-            perms = AccessRequest.objects.filter(student_webid=student_webid)
-        elif employer_webid:
-            perms = AccessRequest.objects.filter(employer_webid=employer_webid)
-        else:
-            return Response({"error": "student_webid or employer_webid parameter is required"}, status=400)
+            perms = perms.filter(student_webid=student_webid)
+        if employer_webid:
+            perms = perms.filter(employer_webid=employer_webid)
+        if resume_id:
+            perms = perms.filter(resume_id=resume_id)
+        
+        # If no filters provided, return all (for testing)
+        # You can change this to require at least one filter if needed
 
         return Response(AccessRequestSerializer(perms, many=True).data)
     except Exception as e:
