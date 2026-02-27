@@ -56,3 +56,11 @@ urlpatterns = [
     path("permissions/revoke/", views.revoke_permission, name="revoke_permission"),
     path("permissions/list/", views.list_permissions, name="list_permissions"),
 ]
+
+'''
+new application
+name allow
+address allow
+
+
+'''
