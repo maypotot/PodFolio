@@ -184,7 +184,7 @@ async function getAgentAccess(requestingID, resourceURL) {
 
 // Persmission helper functions for SOLID
 
-async function grantPermission(employerWebId, resourceURL, resumeId) {
+async function grantPermission(employerWebId, resourceURL, resumeId, studentWebId) {
   try {
     const response = await fetch("http://127.0.1:8000/api/permissions/grant/", {
       method: "POST",

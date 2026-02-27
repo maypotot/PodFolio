@@ -47,23 +47,23 @@ export function updateInfoText(info) {
   let thesistitle = document.getElementById('ThesisTitle');
   
   
-  
-  
-  fullname.textContent = info.FullName;
-  title.textContent = "Professional Title: " + info.ProfessionalTitle;
-  summary.textContent = "Summary: " + info.Summary;
-  email.textContent = "Email: " + info.Email;
-  contact.textContent = "Contact Number: " + info.ContactNumber;
-  location.textContent = "Location: " + info.Location;
-  profsummary.textContent = "Professional Summary: " + info.ProfessionalSummary;
-  school.textContent = "Institution: " + info.School;
-  degree.textContent = "Degree: " + info.Degree;
-  honors.textContent = "Honors: " + info.Honors;
-  program.textContent = "Program: " + info.Program;
-  startdate.textContent = "Start Date: " + info.StartDate;
-  enddate.textContent = "End Date: " + info.EndDate;
-  coursework.textContent = "Relevant Course Work: " + info.RelevantCourseWork;
-  thesistitle.textContent = "Thesis Title: " + info.ThesisTitle;
+    
+  fullname.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>${info.FullName}</span><br />`;
+  title.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Professional Title: ${info.ProfessionalTitle}</span><br />`;
+  summary.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Summary: ${info.Summary}</span><br />`;
+  email.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Email: ${info.Email}</span><br />`;
+  contact.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Contact Number: ${info.ContactNumber}</span><br />`;
+  location.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Location: ${info.Location}</span><br />`;
+  profsummary.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Professional Summary: ${info.ProfessionalSummary}</span><br />`;
+  school.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Institution: ${info.School}</span><br />`;
+  degree.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Degree: ${info.Degree}</span><br />`;
+  honors.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Honors: ${info.Honors}</span><br />`;
+  program.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Program: ${info.Program}</span><br />`;
+  startdate.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Start Date: ${info.StartDate}</span><br />`;
+  enddate.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>End Date: ${info.EndDate}</span><br />`;
+  coursework.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Relevant Course Work: ${info.RelevantCourseWork}</span><br />`;
+  thesistitle.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>Thesis Title: ${info.ThesisTitle}</span><br />`;
+
 }
 
 export function updateSkillText(skill, num) {
@@ -73,19 +73,17 @@ export function updateSkillText(skill, num) {
   listItem.style.display = 'flex';
   listItem.style.alignItems = 'center';
   listItem.style.gap = '10px';
-  
+
   const radioBtn = document.createElement('input');
   radioBtn.type = 'radio';
   radioBtn.name = 'skillSelect';
   radioBtn.value = skill.url;
-  radioBtn.setAttribute('data-skill-url', skill.url);
-  
+
   const label = document.createElement('span');
-  label.textContent = skill.Skill;
-  
+  label.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>${skill.Skill}</span>`;
+
   listItem.appendChild(radioBtn);
   listItem.appendChild(label);
-  listItem.appendChild(document.createElement('br'));
   skillsListElement.appendChild(listItem);
 }
 
@@ -94,30 +92,22 @@ export function updateProjectText(project, num) {
   let projectsListElement = document.getElementById('ProjectsList');
   const listItem = document.createElement('li');
   listItem.style.marginBottom = '15px';
-  
+
   const radioBtn = document.createElement('input');
   radioBtn.type = 'radio';
   radioBtn.name = 'projectSelect';
   radioBtn.value = project.url;
-  radioBtn.setAttribute('data-project-url', project.url);
-  
-  const content = document.createElement('div');
-  content.style.display = 'flex';
-  content.style.alignItems = 'flex-start';
-  content.style.gap = '10px';
-  
+
   const projectInfo = document.createElement('div');
   projectInfo.innerHTML = `
-  <strong>Title:</strong> ${project.ProjectName}<br />
-  <strong>Summary:</strong> ${project.Summary}<br />
-  <strong>Tools:</strong> ${project.Tools}<br />
-  <strong>Project Link:</strong> ${project.ProjectLink}
+    <span style='font-weight: bold; font-size: 1.2rem;'>Title:</span> ${project.ProjectName}<br />
+    <span style='font-weight: bold; font-size: 1.2rem;'>Summary:</span> ${project.Summary}<br />
+    <span style='font-weight: bold; font-size: 1.2rem;'>Tools:</span> ${project.Tools}<br />
+    <span style='font-weight: bold; font-size: 1.2rem;'>Project Link:</span> ${project.ProjectLink}
   `;
-  
-  content.appendChild(radioBtn);
-  content.appendChild(projectInfo);
-  listItem.appendChild(content);
 
+  listItem.appendChild(radioBtn);
+  listItem.appendChild(projectInfo);
   projectsListElement.appendChild(listItem);
 }
 
@@ -127,20 +117,17 @@ export function updateWebsiteText(website, num) {
   listItem.style.display = 'flex';
   listItem.style.alignItems = 'center';
   listItem.style.gap = '10px';
-  
+
   const radioBtn = document.createElement('input');
   radioBtn.type = 'radio';
   radioBtn.name = 'websiteSelect';
   radioBtn.value = website.url;
-  radioBtn.setAttribute('data-website-url', website.url);
-  
+
   const label = document.createElement('span');
-  label.textContent = website.WebsiteLink;
+  label.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>${website.WebsiteLink}</span>`;
 
   listItem.appendChild(radioBtn);
   listItem.appendChild(label);
-  listItem.appendChild(document.createElement('br'));
-
   websitesListElement.appendChild(listItem);
 }
 
@@ -148,31 +135,23 @@ export function updateExperienceText(experience, num) {
   let experiencesListElement = document.getElementById('ExperienceList');
   const listItem = document.createElement('li');
   listItem.style.marginBottom = '15px';
-  
+
   const radioBtn = document.createElement('input');
   radioBtn.type = 'radio';
   radioBtn.name = 'experienceSelect';
   radioBtn.value = experience.url;
-  radioBtn.setAttribute('data-experience-url', experience.url);
-  
-  const content = document.createElement('div');
-  content.style.display = 'flex';
-  content.style.alignItems = 'flex-start';
-  content.style.gap = '10px';
-  
+
   const experienceInfo = document.createElement('div');
   experienceInfo.innerHTML = `
-  <strong>Title:</strong> ${experience.PositionTitle}<br />
-  <strong>Organization:</strong> ${experience.Organization}<br />
-  <strong>Duration:</strong> ${experience.Duration}<br />
-  <strong>Description:</strong> ${experience.Description}<br />
-  <strong>Location:</strong> ${experience.ExperienceLocation}<br />
+    <span style='font-weight: bold; font-size: 1.2rem;'>Title:</span> ${experience.PositionTitle}<br />
+    <span style='font-weight: bold; font-size: 1.2rem;'>Organization:</span> ${experience.Organization}<br />
+    <span style='font-weight: bold; font-size: 1.2rem;'>Duration:</span> ${experience.Duration}<br />
+    <span style='font-weight: bold; font-size: 1.2rem;'>Description:</span> ${experience.Description}<br />
+    <span style='font-weight: bold; font-size: 1.2rem;'>Location:</span> ${experience.ExperienceLocation}
   `;
-  
-  content.appendChild(radioBtn);
-  content.appendChild(experienceInfo);
-  listItem.appendChild(content);
-  listItem.appendChild(document.createElement('br'));
+
+  listItem.appendChild(radioBtn);
+  listItem.appendChild(experienceInfo);
   experiencesListElement.appendChild(listItem);
 }
 
@@ -455,13 +434,28 @@ function EditResume() {
 
   const handleEditResume = () => {
     // Clear current resume from session
-    sessionStorage.removeItem("current_resume_id");
-    sessionStorage.removeItem("current_resume_title");
 
-    updateInformation();
+    const currentResumeId = sessionStorage.getItem("current_resume_id");
+    console.log("Current Resume ID:", currentResumeId);
+    console.log("Current Info List:", podInfolist);
+    const currentInfo = podInfolist.find(info => info.ResumeIndex == currentResumeId);
+
+    if (currentInfo) {
+      console.log("Current Info URL:", currentInfo.url);
+    } else {
+      console.warn("No information found for the current resume ID.");
+    }
+    updateInformation(currentInfo.url)
+      .then(() => new Promise(resolve => setTimeout(resolve, 1000)))
+      .then(() => {
+        sessionStorage.removeItem("current_resume_id");
+        sessionStorage.removeItem("current_resume_title");
+        navigate("/profile");
+      })
+
+
     
     // Navigate to profile
-    navigate("/profile");
   };
 
   return (
@@ -479,9 +473,6 @@ function EditResume() {
           ) : (
           <div className="tags-section">
             <div className="resume-section">
-                <Link to="/config-perms">
-                  <button className="student-button">Configure Permissions</button>
-                </Link>
 
               <img src={null} alt="Profile" className="profile-image" id="ProfileImage"/>
               {/* Personal Information */}
@@ -495,7 +486,7 @@ function EditResume() {
                 <p id="Location"></p>
                 <p id="ProfessionalSummary"></p>
               </div>
-
+                
               {/* Education */}
               <div className="resume-section">
                 <h2>Education</h2>
@@ -508,6 +499,23 @@ function EditResume() {
                 <p id="RelevantCourseWork"></p>
                 <p id="ThesisTitle"></p>
               </div>
+              
+              <input id='FullNameInput' class='resume-input' type='text' placeholder='FullName' />
+              <input id='ProfessionalTitleInput' class='resume-input' type='text' placeholder='Professional Title' />
+              <textarea id='SummaryInput' class='resume-input' rows='5'></textarea>
+              <input id='EmailInput' class='resume-input' type='text' placeholder='Email Address' />
+              <br /><input id='ContactNumberInput' class='resume-input' type='text' placeholder='Contact Number' />
+              <br /><input id='LocationInput' class='resume-input' type='text' placeholder='Location (City, State)' />
+              <br /><input id='ProfessionalSummaryInput' class='resume-input' type='text' placeholder='Professional Summary' />
+              <br /><input id='SchoolInput' class='resume-input' type='text' placeholder='School Name' />
+              <br /><input id='DegreeInput' class='resume-input' type='text' placeholder='Degree' />
+              <br /><input id='HonorsInput' class='resume-input' type='text' placeholder='Honors (if any)' />
+              <br /><input id='ProgramInput' class='resume-input' type='text' placeholder='Program (if any)' />
+              <br /><input id='StartDateInput' class='resume-input' type='text' placeholder='Start Date (e.g. 2020-09-01)' />
+              <br /><input id='EndDateInput' class='resume-input' type='text' placeholder='End Date (e.g. 2024-05-31)' />
+              <br /><input id='RelevantCourseworkInput' class='resume-input' type='text' placeholder='Relevant Coursework (if any)' />
+              <br /><input id='ThesisTitleInput' class='resume-input' type='text' placeholder="Thesis Title (if any)" />
+                          
 
               {/* Websites */}
               <div className="resume-section">
@@ -515,6 +523,16 @@ function EditResume() {
                 <ul id="WebsitesList">
                   
                 </ul>
+                <input
+                  type="text"
+                  placeholder="github.com"
+                  className="resume-input"
+                  id="WebsiteLink"
+                />
+                
+                <button className="student-add-tag-button" onClick={handleUpdateWebsite}>
+                  Update Website
+                </button>
               </div>
 
               {/* Skills */}
@@ -523,203 +541,6 @@ function EditResume() {
                 <ul id="SkillsList">
                   
                 </ul>
-              </div>
-
-              {/* Projects */}
-              <div className="resume-section">
-                <h2>Projects</h2>
-                <ul id="ProjectsList">
-                  
-                </ul>
-              </div>
-
-              {/* Experience */}
-              <div className="resume-section">
-                <h2>Experience</h2>
-                <ul id="ExperienceList">
-                  
-                </ul>
-              </div>
-
-              <Link to="/create-resume">
-                <button className="student-button">Edit Resume</button>
-              </Link>
-              <h2>Personal Information</h2>
-
-              <div className="resume-field">
-                <h3 className="tag-title">Name</h3>
-                <input
-                  type="text"
-                  placeholder="Juan de la Cruz"
-                  className="resume-input"
-                  id="FullName"
-                />
-              </div>
-              
-              <div className="resume-field">
-                <h3 className="tag-title">Professional Title</h3>
-                <input
-                  type="text"
-                  placeholder="Dr."
-                  className="resume-input"
-                  id="ProfessionalTitle"
-                />
-              </div>
-
-              <div className="resume-field">
-                <h3 className="tag-title">Summary</h3>
-                <textarea
-                  type="text"
-                  placeholder="Summary of your profile"
-                  className="resume-input"
-                  rows={5}
-                  id="Summary"
-                />
-              </div>
-
-              <div className="resume-field">
-                <h3 className="tag-title">Email</h3>
-                <input
-                  type="text"
-                  placeholder="juandelacruz@gmail.com"
-                  className="resume-input"
-                  id="Email"
-                />
-              </div>
-
-              <div className="resume-field">
-                <h3 className="tag-title">Contact Number</h3>
-                <input
-                  type="text"
-                  placeholder="09171234567"
-                  className="resume-input"
-                  id="ContactNumber"
-                />
-              </div>
-
-              <div className="resume-field">
-                <h3 className="tag-title">Location</h3>
-                <input
-                  type="text"
-                  placeholder="Quezon City, Philippines"
-                  className="resume-input"
-                  id="Location"
-                />
-              </div>
-
-              <div className="resume-field">
-                <h3 className="tag-title">Website</h3>
-                <input
-                  type="text"
-                  placeholder="github.com"
-                  className="resume-input"
-                  id="WebsiteLink"
-                />
-                <button className="student-add-tag-button" onClick={handleUpdateWebsite}>
-                  Update Website
-                </button>
-              </div>
-
-              <div className="resume-field">
-                <h3 className="tag-title">Professional Summary</h3>
-                <textarea
-                  type="text"
-                  placeholder="Professional summary goes here"
-                  className="resume-input"
-                  rows={5}
-                  id="ProfessionalSummary"
-                />
-              </div>
-              <button className="student-add-tag-button" onClick={handleUpdateInformation}>
-                Update Information
-              </button>
-            </div>
-
-            <div className="resume-section">
-              <h2>Education</h2>
-
-              <div className="resume-field">
-                <h3 className="tag-title">Academic Institution</h3>
-                <input
-                  type="text"
-                  placeholder="University of the Philippines Diliman"
-                  className="resume-input"
-                  id="School"
-                />
-              </div>
-
-              <div className="resume-field">
-                <h3 className="tag-title">Degree</h3>
-                <input
-                  type="text"
-                  placeholder="BS Computer Science"
-                  className="resume-input"
-                  id="Degree"
-                />
-              </div>
-
-              <div className="resume-field">
-                <h3 className="tag-title">Program</h3>
-                <input
-                  type="text"
-                  placeholder="BS Computer Science"
-                  className="resume-input"
-                  id="Program"
-                />
-              </div>
-              
-              <div className="resume-field">
-                <h3 className="tag-title">Start Date</h3>
-                <input
-                  type="text"
-                  placeholder="January 2016"
-                  className="resume-input"
-                  id="StartDate"
-                />
-              </div>
-
-              <div className="resume-field">
-                <h3 className="tag-title">End Date</h3>
-                <input
-                  type="text"
-                  placeholder="January 2020"
-                  className="resume-input"
-                  id="EndDate"
-                />
-              </div>
-              
-              <div className="resume-field">
-                <h3 className="tag-title">Relevant Coursework</h3>
-                <input
-                  type="text"
-                  placeholder="Link to coursework or list here"
-                  className="resume-input"
-                  id="RelevantCoursework"
-                />
-              </div>
-
-              <div className="resume-field">
-                <h3 className="tag-title">Honors/Awards</h3>
-                <input
-                  type="text"
-                  placeholder="Summa Cum Laude"
-                  className="resume-input"
-                  id="Honors"
-                />
-              </div>
-
-              <div className="resume-field">
-                <h3 className="tag-title">Thesis Title</h3>
-                <input
-                  type="text"
-                  placeholder="Title of your thesis"
-                  className="resume-input"
-                  id="ThesisTitle"
-                />
-              </div>
-
-              <div className="resume-field-2">
-                <h2>Skills</h2>
                 <input
                   type="text"
                   placeholder="Javascript"
@@ -730,16 +551,14 @@ function EditResume() {
                   Update Skill
                 </button>
               </div>
-            </div>
 
-            <div className="resume-section">
-              <h2>Projects</h2>
-
-              <div className="projects">
-                <h3 className="project-list">Project</h3>
-
-                <div className="resume-field">
-                  <h3 className="tag-title">Project Title</h3>
+              {/* Projects */}
+              <div className="resume-section">
+                <h2>Projects</h2>
+                <ul id="ProjectsList">
+                  
+                </ul>
+                <h3 className="tag-title">Project Title</h3>
                   <input
                     type="text"
                     placeholder="Snake Game"
@@ -777,17 +596,17 @@ function EditResume() {
                     id="ProjectLink"
                   />
                 </div>
-                
                 <button className="student-add-tag-button" onClick={handleUpdateProject}>
                   Update Project
                 </button>
               </div>
-            </div>
 
-            <div className="resume-section">
-              <h2>Experience</h2>
-
-              <div className="projects">
+              {/* Experience */}
+              <div className="resume-section">
+                <h2>Experience</h2>
+                <ul id="ExperienceList">
+                  
+                </ul>
                 <h3 className="project-list">Experience</h3>
 
                 <div className="resume-field">
@@ -843,8 +662,8 @@ function EditResume() {
                   Update Experience
                 </button>
               </div>
+
             </div>
-          </div>
           )}
         </div>
       </div>

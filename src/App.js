@@ -214,27 +214,33 @@ function Login() {
   useEffect(() => {
     async function checkSolidSession() {
       try {
+        console.log("Checking Solid session...");
         // Get the WebID that was stored before Solid auth
         const expectedWebId = sessionStorage.getItem("login_webid");
-        
+        console.log("Expected WebID from sessionStorage:", expectedWebId);
+
         // Check if there's a Solid session
-        solidUser = await restoreSession();
-        
+        if (sessionStorage.getItem("login_webid")) {
+          solidUser = await restoreSession();
+        } else {
+          console.log("Skipping restoreSession as user has not initiated Solid authentication.");
+        }
+        console.log("Solid session restored:", solidUser);
+
         if (solidUser) {
           console.log("Detected Solid session after redirect:", solidUser.url);
           console.log("Expected WebID:", expectedWebId);
-          
 
           if (solidUser.url === expectedWebId) {
             console.log("WebIDs match! Completing login...");
-            
+
             // Store the full WebID in session storage
             sessionStorage.setItem("webid", expectedWebId);
-            
+
             // Clear the temporary login WebID
             sessionStorage.removeItem("login_webid");
-            
-                        // Show connected state and wait for user action
+
+            // Show connected state and wait for user action
             setStep(3);
             return;
           } else {
@@ -250,7 +256,7 @@ function Login() {
         setCheckingAuth(false);
       }
     }
-    
+
     checkSolidSession();
   }, [navigate]);
 
@@ -260,7 +266,7 @@ function Login() {
     setLoading(true);
 
     console.log("Checking WebID in database:", webid);
-    
+
     if (webid.trim() === "") {
       setError("Please enter your WebID");
       setLoading(false);
@@ -270,20 +276,22 @@ function Login() {
     try {
       // Strip fragment before checking database
       const webidWithoutFragment = webid.split('#')[0];
-      
+      console.log("WebID without fragment:", webidWithoutFragment);
+
       // Check if WebID exists in database
       const response = await fetch(
         `http://localhost:8000/api/students/?webid=${encodeURIComponent(webidWithoutFragment)}`
       );
+      console.log("Database response status:", response.status);
 
       if (response.ok) {
         // WebID exists in database - proceed to Solid authentication
         const studentData = await response.json();
         console.log("WebID found in database:", studentData);
-        
+
         // Store the WebID temporarily so we can verify it after Solid redirect
         sessionStorage.setItem("login_webid", webid);
-        
+
         // Move to step 2: Solid authentication
         setStep(2);
         setLoading(false);
