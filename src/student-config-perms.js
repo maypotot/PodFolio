@@ -199,6 +199,27 @@ async function getAgentAccess(requestingID, resourceURL) {
   }
 }
 
+async function listPermissions(studentWebId, employerWebId) {
+  try {
+    const params = new URLSearchParams();
+    if (studentWebId) params.append('student_webid', studentWebId);
+    if (employerWebId) params.append('employer_webid', employerWebId);
+
+    const response = await fetch(`http://127.0.0.1:8000/api/permissions/list/?${params}`);
+    
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    } else {
+      console.error('Failed to list permissions');
+      return [];
+    }
+  } catch (error) {
+    console.error('Error listing permissions:', error);
+    return [];
+  }
+}
+
 // Persmission helper functions for SOLID
 
 async function requestAccessDatabase(employerWebId, resourceURL, resumeId, studentWebId) {
@@ -368,51 +389,105 @@ function ConfigPerms() {
   };
 
   // Function to check existing access for all resources
-  const checkExistingAccess = async (employer, data) => {
+  const checkExistingAccess = async (employer, data, studentWebId) => {
     const initialPermissions = {};
+
+    // First, get all permissions from database
+    const dbPermissions = await listPermissions(studentWebId, employer);
+    console.log("Database permissions retrieved:", dbPermissions);
+
+    const dbPermissionMap = {};
+    dbPermissions.forEach(perm => {
+    const strippedUrl = stripFragment(perm.resource_url);
+    dbPermissionMap[strippedUrl] = true;
+    });
     
     // Check personal info
     if (data.info.length > 0 && data.info[0].url) {
-      const access = await getAgentAccess(employer, data.info[0].url);
-      initialPermissions.info = access?.read === true;
+    const resourceUrl = stripFragment(data.info[0].url);
+    
+      // Check database first
+      if (dbPermissionMap[resourceUrl]) {
+        initialPermissions.info = true;
+        console.log("✓ Info: Found in database");
+      } else {
+        // Fallback to checking Solid Pod
+        const access = await getAgentAccess(employer, data.info[0].url);
+        initialPermissions.info = access?.read === true;
+        console.log(`Info: Solid Pod check = ${initialPermissions.info}`);
+      }
     }
     
     // Check skills
     for (let index = 0; index < data.skills.length; index++) {
       if (data.skills[index].url) {
-        const access = await getAgentAccess(employer, data.skills[index].url);
-        initialPermissions[`skill_${index}`] = access?.read === true;
+        const resourceUrl = stripFragment(data.skills[index].url);
+        const key = `skill_${index}`;
+
+        if (dbPermissionMap[resourceUrl]) {
+          initialPermissions[key] = true;
+          console.log(`✓ Skill ${index}: Found in database`);
+        } else {
+          const access = await getAgentAccess(employer, data.skills[index].url);
+          initialPermissions[key] = access?.read === true;
+          console.log(`Skill ${index}: Solid Pod check = ${initialPermissions[key]}`);
+        }
       }
     }
     
     // Check projects
     for (let index = 0; index < data.projects.length; index++) {
       if (data.projects[index].url) {
-        const access = await getAgentAccess(employer, data.projects[index].url);
-        initialPermissions[`project_${index}`] = access?.read === true;
+        const resourceUrl = stripFragment(data.projects[index].url);
+        const key = `project_${index}`;
+
+        if (dbPermissionMap[resourceUrl]) {
+          initialPermissions[key] = true;
+          console.log(`✓ Project ${index}: Found in database`);
+        } else {
+          const access = await getAgentAccess(employer, data.projects[index].url);
+          initialPermissions[key] = access?.read === true;
+          console.log(`Project ${index}: Solid Pod check = ${initialPermissions[key]}`);
+        }
       }
     }
     
     // Check websites
     for (let index = 0; index < data.websites.length; index++) {
       if (data.websites[index].url) {
-        const access = await getAgentAccess(employer, data.websites[index].url);
-        initialPermissions[`website_${index}`] = access?.read === true;
+        const resourceUrl = stripFragment(data.websites[index].url);
+        const key = `website_${index}`;
+
+        if (dbPermissionMap[resourceUrl]) {
+          initialPermissions[key] = true;
+          console.log(`✓ Website ${index}: Found in database`);
+        } else {
+          const access = await getAgentAccess(employer, data.websites[index].url);
+          initialPermissions[key] = access?.read === true;
+          console.log(`Website ${index}: Solid Pod check = ${initialPermissions[key]}`);
+        }
       }
-    }
+    } 
     
     // Check experiences
     for (let index = 0; index < data.experiences.length; index++) {
       if (data.experiences[index].url) {
-        const access = await getAgentAccess(employer, data.experiences[index].url);
-        initialPermissions[`experience_${index}`] = access?.read === true;
+        const resourceUrl = stripFragment(data.experiences[index].url);
+        const key = `experience_${index}`;
+
+        if (dbPermissionMap[resourceUrl]) {
+          initialPermissions[key] = true;
+          console.log(`✓ Experience ${index}: Found in database`);
+        } else {
+          const access = await getAgentAccess(employer, data.experiences[index].url);
+          initialPermissions[key] = access?.read === true;
+          console.log(`Experience ${index}: Solid Pod check = ${initialPermissions[key]}`);
+        }
       }
     }
-    
-    console.log("Final initial permissions:", initialPermissions);
-    return initialPermissions;
-  };
 
+    return initialPermissions;
+  }
   useEffect(() => {
     if (hasRun.current) return;
     hasRun.current = true;
@@ -458,7 +533,7 @@ function ConfigPerms() {
           setFilteredData(data);
           
           // Check existing access for all resources
-          const initialPermissions = await checkExistingAccess(employer, data);
+          const initialPermissions = await checkExistingAccess(employer, data, studentWebIdFromSession);
           setPermissions(initialPermissions);
         } else {
           console.warn("No resume ID found in sessionStorage");

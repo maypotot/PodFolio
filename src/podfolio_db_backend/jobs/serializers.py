@@ -1,8 +1,5 @@
-from gzip import READ
-from os import read
-
 from rest_framework import serializers
-from .models import JobPosting, JobApplication, EmployerRequest, StudentAccount, EmployerAccount, SkillInterestTag, JobPostingTag, StudentSkillInterest, Resume, AccessRequest
+from .models import JobPosting, JobApplication, EmployerRequest, StudentAccount, EmployerAccount, SkillInterestTag, JobPostingTag, StudentSkillInterest, Resume, ResourcePermission
 
 class StudentAccountSerializer(serializers.ModelSerializer):
     # Include student's tags in the response
@@ -22,6 +19,12 @@ class ResumeSerializer(serializers.ModelSerializer):
         model = Resume
         fields = '__all__'
         read_only_fields = ['id', 'created_at', 'updated_at']
+
+class ResourcePermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ResourcePermission
+        fields = ['id', 'employer_webid', 'student_webid', 'resource_url', 'resume_id', 'granted_at']
+        read_only_fields = ['id', 'granted_at']
 
 class EmployerAccountSerializer(serializers.ModelSerializer):
     class Meta:
@@ -52,23 +55,21 @@ class JobApplicationSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class EmployerRequestSerializer(serializers.ModelSerializer):
-    job_application_id = serializers.IntegerField(write_only=True)
+    job_application_id = serializers.IntegerField(write_only=True, required=False)
+    job_application = JobApplicationSerializer(read_only=True)  # Include full job application in response
 
     class Meta:
         model = EmployerRequest
-        fields = ['id', 'employer_webid', 'applicant_webid', 'summary', 'job_application_id', 'created_at']
-        read_only_fields = ['id', 'created_at']
+        fields = ['id', 'employer_webid', 'applicant_webid', 'summary', 'job_application_id', 'job_application', 'created_at']
+        read_only_fields = ['id', 'created_at', 'job_application']
 
     def create(self, validated_data):
-        job_application_id = validated_data.pop('job_application_id')
-        try:
-            job_application = JobApplication.objects.get(id=job_application_id)
-        except JobApplication.DoesNotExist:
-            raise serializers.ValidationError({"job_application_id": "Job application not found"})
-        return EmployerRequest.objects.create(job_application=job_application, **validated_data)
-
-class AccessRequestSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AccessRequest
-        fields = '__all__'
-        read_only_fields = ['id']
+        job_application_id = validated_data.pop('job_application_id', None)
+        if job_application_id:
+            try:
+                job_application = JobApplication.objects.get(id=job_application_id)
+            except JobApplication.DoesNotExist:
+                raise serializers.ValidationError({"job_application_id": "Job application not found"})
+            return EmployerRequest.objects.create(job_application=job_application, **validated_data)
+        else:
+            raise serializers.ValidationError({"job_application_id": "Job application ID is required"})

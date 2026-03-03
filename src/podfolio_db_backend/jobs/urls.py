@@ -57,10 +57,3 @@ urlpatterns = [
     path("permissions/list/", views.list_permissions, name="list_permissions"),
 ]
 
-'''
-new application
-name allow
-address allow
-
-
-'''

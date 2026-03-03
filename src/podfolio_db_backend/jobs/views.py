@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import JobPosting, JobApplication, EmployerRequest, StudentAccount, EmployerAccount, SkillInterestTag, JobPostingTag, StudentSkillInterest, Resume, AccessRequest
-from .serializers import JobPostingSerializer, JobApplicationSerializer, EmployerRequestSerializer, StudentAccountSerializer, EmployerAccountSerializer, SkillInterestTagSerializer, ResumeSerializer, AccessRequestSerializer
+from .models import JobPosting, JobApplication, EmployerRequest, StudentAccount, EmployerAccount, SkillInterestTag, JobPostingTag, StudentSkillInterest, Resume, ResourcePermission
+from .serializers import JobPostingSerializer, JobApplicationSerializer, EmployerRequestSerializer, StudentAccountSerializer, EmployerAccountSerializer, SkillInterestTagSerializer, ResumeSerializer, ResourcePermissionSerializer
 from rest_framework import status
 from urllib.parse import unquote
 
@@ -679,7 +679,12 @@ def requests_by_student(request):
     student_webid = request.query_params.get('student_webid')
     if not student_webid:
         return Response({"error": "Missing student_webid"}, status=400)
-    reqs = EmployerRequest.objects.filter(applicant_webid=student_webid)
+    
+    # Use select_related to include job_application data
+    reqs = EmployerRequest.objects.filter(
+        applicant_webid=student_webid
+    ).select_related('job_application', 'job_application__job').order_by('-created_at')
+    
     return Response(EmployerRequestSerializer(reqs, many=True).data)
 
 @api_view(['GET'])
@@ -687,37 +692,47 @@ def all_requests(request):
     reqs = EmployerRequest.objects.all()
     return Response(EmployerRequestSerializer(reqs, many=True).data)
 
+# ─── Resource Permission Views ────────────────────────────────────────────────
+
 @api_view(['POST'])
 def grant_permission(request):
     """
-    Grant employer access to a student's resume.
-    Expects { "employer_webid": "...", "student_webid": "...", "resource_url": "..." }
+    Grant permission: Create a ResourcePermission entry
+    Expected body: {employer_webid, student_webid, resource_url, resume_id (optional)}
     """
     try:
         employer_webid = request.data.get('employer_webid')
         student_webid = request.data.get('student_webid')
         resource_url = request.data.get('resource_url')
-        resume_id = request.data.get('resume_id')  
+        resume_id = request.data.get('resume_id')
 
         if not employer_webid or not student_webid or not resource_url:
-            return Response({"error": "employer_webid, student_webid, and resource_url are required"}, status=400)
+            return Response({
+                "error": "employer_webid, student_webid, and resource_url are required"
+            }, status=400)
 
-        access_request, created = AccessRequest.objects.get_or_create(
+        # Create or get existing permission (idempotent)
+        permission, created = ResourcePermission.objects.get_or_create(
             employer_webid=employer_webid,
             student_webid=student_webid,
             resource_url=resource_url,
             defaults={'resume_id': resume_id}
         )
 
-        return Response({"message": "Permission granted", "created": created}, status=201)
+        return Response({
+            "message": "Permission granted" if created else "Permission already exists",
+            "permission": ResourcePermissionSerializer(permission).data,
+            "created": created
+        }, status=201 if created else 200)
+
     except Exception as e:
         return Response({"error": str(e)}, status=500)
-    
+
 @api_view(['DELETE'])
 def revoke_permission(request):
     """
-    Revoke employer access to a student's resume.
-    Expects { "employer_webid": "...", "student_webid": "...", "resource_url": "..." }
+    Revoke permission: Delete a ResourcePermission entry
+    Expected body: {employer_webid, student_webid, resource_url}
     """
     try:
         employer_webid = request.data.get('employer_webid')
@@ -725,49 +740,90 @@ def revoke_permission(request):
         resource_url = request.data.get('resource_url')
 
         if not employer_webid or not student_webid or not resource_url:
-            return Response({"error": "employer_webid, student_webid, and resource_url are required"}, status=400)
+            return Response({
+                "error": "employer_webid, student_webid, and resource_url are required"
+            }, status=400)
 
-        deleted_count, _ = AccessRequest.objects.filter(
+        # Delete the permission if it exists
+        deleted_count, _ = ResourcePermission.objects.filter(
             employer_webid=employer_webid,
             student_webid=student_webid,
             resource_url=resource_url
         ).delete()
 
         if deleted_count > 0:
-                return Response({"message": "Permission revoked"}, status=200)
+            return Response({
+                "message": "Permission revoked",
+                "deleted_count": deleted_count
+            }, status=200)
         else:
-            return Response({"error": "Permission not found"}, status=404)
+            return Response({
+                "message": "No permission found to revoke"
+            }, status=404)
 
     except Exception as e:
         return Response({"error": str(e)}, status=500)
 
 @api_view(['GET'])
-def list_permissions(request): 
+def list_permissions(request):
     """
-    Use to pre-fill UI with existing permissions if needed.
-
-    List all permissions for a given student or employer.
-    Use query params: ?student_webid=... or ?employer_webid=... or ?resume_id=...
+    List all permissions for a student-employer pair
+    Query params: student_webid, employer_webid (both optional)
     """
-    
     try:
         student_webid = request.query_params.get('student_webid')
         employer_webid = request.query_params.get('employer_webid')
-        resume_id = request.query_params.get('resume_id')
 
-        # Start with all permissions and filter as needed
-        perms = AccessRequest.objects.all()
-        
+        permissions = ResourcePermission.objects.all()
+
         if student_webid:
-            perms = perms.filter(student_webid=student_webid)
+            permissions = permissions.filter(student_webid=student_webid)
         if employer_webid:
-            perms = perms.filter(employer_webid=employer_webid)
-        if resume_id:
-            perms = perms.filter(resume_id=resume_id)
-        
-        # If no filters provided, return all (for testing)
-        # You can change this to require at least one filter if needed
+            permissions = permissions.filter(employer_webid=employer_webid)
 
-        return Response(AccessRequestSerializer(perms, many=True).data)
+        return Response(ResourcePermissionSerializer(permissions, many=True).data)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
+@api_view(['GET'])
+def student_applications(request):
+    """
+    Get all applications for a student with job details
+    Query param: student_webid (required)
+    """
+    try:
+        student_webid = request.query_params.get('student_webid')
+        
+        if not student_webid:
+            return Response({"error": "student_webid parameter is required"}, status=400)
+        
+        student_webid = unquote(student_webid).split('#')[0]
+        
+        # Get all applications for this student
+        applications = JobApplication.objects.filter(
+            applicant_webid=student_webid
+        ).select_related('job').order_by('-submitted_at')
+        
+        # Build response with job details
+        results = []
+        for app in applications:
+            result = {
+                'id': app.id,
+                'job_id': app.job.id,
+                'job_title': app.job.title,
+                'company': app.job.company,
+                'company_logo': app.job.company_logo,
+                'employer_webid': app.job.employer_webid,
+                'location': app.job.location,
+                'employment_type': app.job.employment_type,
+                'applicant_webid': app.applicant_webid,
+                'resume_pod_url': app.resume_pod_url,
+                'submitted_at': app.submitted_at,
+            }
+            results.append(result)
+        
+        return Response(results)
+        
     except Exception as e:
         return Response({"error": str(e)}, status=500)

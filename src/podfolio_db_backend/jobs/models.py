@@ -1,4 +1,3 @@
-from venv import create
 from django.db import models
 
 class StudentAccount(models.Model):
@@ -65,6 +64,7 @@ class JobPosting(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     company = models.TextField(default="Unknown Company")
+    company_logo = models.TextField(blank=True, null=True)  # Base64-encoded image
 
     def __str__(self):
         return self.title
@@ -118,13 +118,17 @@ class EmployerRequest(models.Model):
     def __str__(self):
         return f"Employer Request: {self.employer_webid} -> {self.applicant_webid}"
 
-class AccessRequest(models.Model):
+class ResourcePermission(models.Model):
+    """Track permissions granted by students to employers for specific resources"""
     employer_webid = models.TextField()
     student_webid = models.TextField()
-    resource_url = models.TextField()
-    resume_id = models.IntegerField(blank=True, null=True)  
+    resource_url = models.TextField()  # The Solid Pod resource URL
+    resume_id = models.IntegerField(blank=True, null=True)  # Link to which resume this permission is for
+    granted_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ('employer_webid', 'student_webid', 'resource_url')
+        ordering = ['-granted_at']
 
-        
+    def __str__(self):
+        return f"Permission: {self.student_webid} → {self.employer_webid} for {self.resource_url}"
