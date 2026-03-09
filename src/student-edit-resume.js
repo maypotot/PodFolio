@@ -464,7 +464,7 @@ function EditResume() {
           <div className="tag-header">
             <h1>Editing: {resumeTitle}</h1>
             <button className="complete-button" onClick={handleEditResume}>
-              Complete Resume
+              Update Resume
             </button>
           </div>
 
@@ -478,44 +478,61 @@ function EditResume() {
               {/* Personal Information */}
               <div className="resume-section">
                 <h2>Personal Information</h2>
+
                 <p id="FullName"></p>
+                <input id='FullNameInput' class='resume-input' type='text' placeholder='Full Name' />
+
                 <p id="ProfessionalTitle"></p>
+                <input id='ProfessionalTitleInput' class='resume-input' type='text' placeholder='Professional Title' />
+
                 <p id="Summary"></p>
+                <textarea id='SummaryInput' class='resume-input' rows='5'></textarea>
+
+
                 <p id="Email"></p>
+                <input id='EmailInput' class='resume-input' type='text' placeholder='Email Address' />
+
+
                 <p id="ContactNumber"></p>
+                <br /><input id='ContactNumberInput' class='resume-input' type='text' placeholder='Contact Number' />
+
                 <p id="Location"></p>
+                 <br /><input id='LocationInput' class='resume-input' type='text' placeholder='Location (City, State)' />
+
                 <p id="ProfessionalSummary"></p>
+                 <br /><input id='ProfessionalSummaryInput' class='resume-input' type='text' placeholder='Professional Summary' />
               </div>
                 
+
               {/* Education */}
               <div className="resume-section">
                 <h2>Education</h2>
                 <p id="School"></p>
+                 <br /><input id='SchoolInput' class='resume-input' type='text' placeholder='School Name' />
+
                 <p id="Degree"></p>
+                <br /><input id='DegreeInput' class='resume-input' type='text' placeholder='Degree' />
+
                 <p id="Program"></p>
+                <br /><input id='ProgramInput' class='resume-input' type='text' placeholder='Program (if any)' />
+
                 <p id="StartDate"></p>
+                <br /><input id='StartDateInput' class='resume-input' type='text' placeholder='Start Date (e.g. 2020-09-01)' />
+
                 <p id="EndDate"></p>
+                <br /><input id='EndDateInput' class='resume-input' type='text' placeholder='End Date (e.g. 2024-05-31)' />
+
                 <p id="Honors"></p>
+                <br /><input id='HonorsInput' class='resume-input' type='text' placeholder='Honors (if any)' />
+
                 <p id="RelevantCourseWork"></p>
+                <br /><input id='RelevantCourseworkInput' class='resume-input' type='text' placeholder='Relevant Coursework (if any)' />
+
                 <p id="ThesisTitle"></p>
+                <br /><input id='ThesisTitleInput' class='resume-input' type='text' placeholder="Thesis Title (if any)" />
+
               </div>
               
-              <input id='FullNameInput' class='resume-input' type='text' placeholder='FullName' />
-              <input id='ProfessionalTitleInput' class='resume-input' type='text' placeholder='Professional Title' />
-              <textarea id='SummaryInput' class='resume-input' rows='5'></textarea>
-              <input id='EmailInput' class='resume-input' type='text' placeholder='Email Address' />
-              <br /><input id='ContactNumberInput' class='resume-input' type='text' placeholder='Contact Number' />
-              <br /><input id='LocationInput' class='resume-input' type='text' placeholder='Location (City, State)' />
-              <br /><input id='ProfessionalSummaryInput' class='resume-input' type='text' placeholder='Professional Summary' />
-              <br /><input id='SchoolInput' class='resume-input' type='text' placeholder='School Name' />
-              <br /><input id='DegreeInput' class='resume-input' type='text' placeholder='Degree' />
-              <br /><input id='HonorsInput' class='resume-input' type='text' placeholder='Honors (if any)' />
-              <br /><input id='ProgramInput' class='resume-input' type='text' placeholder='Program (if any)' />
-              <br /><input id='StartDateInput' class='resume-input' type='text' placeholder='Start Date (e.g. 2020-09-01)' />
-              <br /><input id='EndDateInput' class='resume-input' type='text' placeholder='End Date (e.g. 2024-05-31)' />
-              <br /><input id='RelevantCourseworkInput' class='resume-input' type='text' placeholder='Relevant Coursework (if any)' />
-              <br /><input id='ThesisTitleInput' class='resume-input' type='text' placeholder="Thesis Title (if any)" />
-                          
 
               {/* Websites */}
               <div className="resume-section">
