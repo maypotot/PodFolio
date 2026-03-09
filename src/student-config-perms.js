@@ -113,6 +113,14 @@ function stripFragment(url) {
   return url ? url.split("#")[0] : url;
 }
 
+function ensureWebIdHasMe(webId) {
+  if (!webId) return webId;
+  if (webId.endsWith("#me")) return webId;
+
+  const webIdBase = webId.split("#")[0];
+  return `${webIdBase}#me`;
+}
+
 async function requestAccess(requestingID, resourceURL, resumeId, studentWebId) {
   const session = getDefaultSession();
   const resourceBaseUrl = stripFragment(resourceURL);
@@ -495,7 +503,10 @@ function ConfigPerms() {
     // Get application context from sessionStorage
     const job = sessionStorage.getItem("current_job_title");
     const resume = sessionStorage.getItem("current_resume_title");
-    const employer = sessionStorage.getItem("current_employer_webid") || "https://thesis-test.solidcommunity.net/profile/card#me"; // Default for testing
+    const employerFromStorage = sessionStorage.getItem("current_employer_webid");
+    const employer = ensureWebIdHasMe(
+      employerFromStorage || "https://thesis-test.solidcommunity.net/profile/card#me"
+    ); // Default for testing
     const resumeIdFromStorage = sessionStorage.getItem("current_resume_id");
     const session = getDefaultSession();
     const studentWebIdFromSession = session.info?.webId || "";
