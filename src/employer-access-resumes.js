@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { getDefaultSession } from "@inrupt/solid-client-authn-browser";
 import "./main.css";
 
@@ -7,6 +7,7 @@ function EmployerAccessResumes() {
   const [resourceResults, setResourceResults] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const hasRun = useRef(false);
 
   const fetchResourceData = async (perms) => {
     if (!perms || perms.length === 0) {
@@ -37,23 +38,65 @@ function EmployerAccessResumes() {
               ok: false,
               status: res.status,
               contentType,
-              error: errorText
+              error: errorText,
+              grantedBy: perm.student_webid
             };
           }
 
           let body;
           if (contentType.includes("application/json") || contentType.includes("application/ld+json")) {
-            body = await res.json();
+            const jsonResponse = await res.json();
+            body = jsonResponse.body || jsonResponse; // Preserve the original body if "body" field is not present
           } else {
             body = await res.text();
           }
+
+          // Extract additional information from originalBody if it's a string
+          let additionalInfo = {};
+          if (typeof body === "string") {
+            const schemaRegex = /<([^>]+)>\s*"([^"]+)";/g;
+            let match;
+            while ((match = schemaRegex.exec(body)) !== null) {
+              const schemaKey = match[1].split("/").pop(); // Extract the last part of the schema URL
+              const schemaValue = match[2];
+              additionalInfo[schemaKey] = schemaValue;
+            }
+          }
+
+          // Merge additionalInfo into parsedData
+          const parsedData = {
+            ...{
+              fullName: body?.FullName || "N/A",
+              professionalTitle: body?.ProfessionalTitle || "N/A",
+              summary: body?.Summary || "N/A",
+              email: body?.Email || "N/A",
+              contactNumber: body?.ContactNumber || "N/A",
+              location: body?.Location || "N/A",
+              professionalSummary: body?.ProfessionalSummary || "N/A",
+              degree: body?.Degree || "N/A",
+              school: body?.School || "N/A",
+              honors: body?.Honors || "N/A",
+              program: body?.Program || "N/A",
+              startDate: body?.StartDate || "N/A",
+              endDate: body?.EndDate || "N/A",
+              relevantCourseWork: body?.RelevantCourseWork || "N/A",
+              thesisTitle: body?.ThesisTitle || "N/A",
+              skills: body?.Skills || [],
+              projects: body?.Projects || [],
+              websites: body?.Websites || [],
+              experiences: body?.Experiences || []
+            },
+            ...additionalInfo
+          };
 
           return {
             resource_url: resourceUrl,
             ok: true,
             status: res.status,
             contentType,
-            body
+            originalBody: body, // Preserve the original body
+            parsedBody: parsedData, // Store the parsed data separately
+            grantedBy: perm.student_webid
           };
         } catch (err) {
           return {
@@ -61,7 +104,8 @@ function EmployerAccessResumes() {
             ok: false,
             status: 0,
             contentType: "",
-            error: err.message
+            error: err.message,
+            grantedBy: perm.student_webid
           };
         }
       })
@@ -132,6 +176,8 @@ function EmployerAccessResumes() {
   };
 
   useEffect(() => {
+    if (hasRun.current) return;
+    hasRun.current = true;
     fetchPermissions();
   }, []);
 
@@ -149,16 +195,73 @@ function EmployerAccessResumes() {
       ) : error ? (
         <p>{error}</p>
       ) : (
-        <div className="job-listing">
-          <h3>Raw Permissions</h3>
-          <pre style={{ whiteSpace: "pre-wrap" }}>
-            {JSON.stringify(permissions, null, 2)}
-          </pre>
+        <div>
+          {resourceResults.map((resume, index) => (
+            resume.ok && resume.status !== 403 && resume.parsedBody && (
+              <div key={index} className="resume-section">
+                <h2>Resume from {resume.grantedBy}</h2>
+                <p><strong>Full Name:</strong> {resume.parsedBody.fullName}</p>
+                <p><strong>Professional Title:</strong> {resume.parsedBody.professionalTitle}</p>
+                <p><strong>Summary:</strong> {resume.parsedBody.summary}</p>
+                <p><strong>Email:</strong> {resume.parsedBody.email}</p>
+                <p><strong>Contact Number:</strong> {resume.parsedBody.contactNumber}</p>
+                <p><strong>Location:</strong> {resume.parsedBody.location}</p>
+                <p><strong>Professional Summary:</strong> {resume.parsedBody.professionalSummary}</p>
+                <p><strong>Degree:</strong> {resume.parsedBody.degree}</p>
+                <p><strong>School:</strong> {resume.parsedBody.school}</p>
+                <p><strong>Honors:</strong> {resume.parsedBody.honors}</p>
+                <p><strong>Program:</strong> {resume.parsedBody.program}</p>
+                <p><strong>Start Date:</strong> {resume.parsedBody.startDate}</p>
+                <p><strong>End Date:</strong> {resume.parsedBody.endDate}</p>
+                <p><strong>Relevant Course Work:</strong> {resume.parsedBody.relevantCourseWork}</p>
+                <p><strong>Thesis Title:</strong> {resume.parsedBody.thesisTitle}</p>
 
-          <h3>Resource Data</h3>
-          <pre style={{ whiteSpace: "pre-wrap" }}>
-            {JSON.stringify(resourceResults, null, 2)}
-          </pre>
+                {resume.parsedBody.skills.length > 0 && (
+                  <div>
+                    <h3>Skills</h3>
+                    <ul>
+                      {resume.parsedBody.skills.map((skill, i) => (
+                        <li key={i}>{skill}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {resume.parsedBody.projects.length > 0 && (
+                  <div>
+                    <h3>Projects</h3>
+                    <ul>
+                      {resume.parsedBody.projects.map((project, i) => (
+                        <li key={i}>{project}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {resume.parsedBody.websites.length > 0 && (
+                  <div>
+                    <h3>Websites</h3>
+                    <ul>
+                      {resume.parsedBody.websites.map((website, i) => (
+                        <li key={i}>{website}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {resume.parsedBody.experiences.length > 0 && (
+                  <div>
+                    <h3>Experiences</h3>
+                    <ul>
+                      {resume.parsedBody.experiences.map((experience, i) => (
+                        <li key={i}>{experience}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )
+          ))}
         </div>
       )}
     </div>
