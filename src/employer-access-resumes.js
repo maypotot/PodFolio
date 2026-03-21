@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { getDefaultSession } from "@inrupt/solid-client-authn-browser";
 import "./main.css";
 
@@ -7,6 +7,77 @@ function EmployerAccessResumes() {
   const [resourceResults, setResourceResults] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const hasRun = useRef(false);
+
+  const formatFieldLabel = (field) => {
+    if (!field) return "";
+    return field
+      .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+      .replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2")
+      .trim();
+  };
+
+  const isResumeIndexField = (field) => {
+    if (!field) return false;
+    return field.toLowerCase() === "resumeindex";
+  };
+
+  const getResumeIndexValue = (parsedBody) => {
+    if (!parsedBody || typeof parsedBody !== "object") return null;
+
+    const rawValue = parsedBody.ResumeIndex ?? parsedBody.resumeIndex ?? null;
+    if (Array.isArray(rawValue)) {
+      return rawValue.length > 0 ? String(rawValue[0]).trim() : null;
+    }
+
+    if (rawValue === null || rawValue === undefined) return null;
+    const normalized = String(rawValue).trim();
+    return normalized || null;
+  };
+
+  const mergeFieldValues = (existingValue, incomingValue) => {
+    const toArray = (value) => (Array.isArray(value) ? value : [value]);
+    const combined = [...toArray(existingValue), ...toArray(incomingValue)]
+      .map((value) => String(value).trim())
+      .filter(Boolean);
+
+    const unique = Array.from(new Set(combined));
+    if (unique.length === 1) return unique[0];
+    return unique;
+  };
+
+  const groupResumesByIndex = (resumes) => {
+    const grouped = new Map();
+
+    resumes.forEach((resume) => {
+      if (!resume.ok || resume.status === 403 || !resume.parsedBody) return;
+
+      const resumeIndex = getResumeIndexValue(resume.parsedBody) || "no-index";
+      const groupKey = `${resume.grantedBy}::${resumeIndex}`;
+
+      if (!grouped.has(groupKey)) {
+        grouped.set(groupKey, {
+          grantedBy: resume.grantedBy,
+          parsedBody: {}
+        });
+      }
+
+      const currentGroup = grouped.get(groupKey);
+
+      Object.entries(resume.parsedBody).forEach(([field, value]) => {
+        if (isResumeIndexField(field)) return;
+
+        if (currentGroup.parsedBody[field] === undefined) {
+          currentGroup.parsedBody[field] = value;
+          return;
+        }
+
+        currentGroup.parsedBody[field] = mergeFieldValues(currentGroup.parsedBody[field], value);
+      });
+    });
+
+    return Array.from(grouped.values());
+  };
 
   const fetchResourceData = async (perms) => {
     if (!perms || perms.length === 0) {
@@ -37,23 +108,108 @@ function EmployerAccessResumes() {
               ok: false,
               status: res.status,
               contentType,
-              error: errorText
+              error: errorText,
+              grantedBy: perm.student_webid
             };
           }
 
           let body;
           if (contentType.includes("application/json") || contentType.includes("application/ld+json")) {
-            body = await res.json();
+            const jsonResponse = await res.json();
+            body = jsonResponse.body || jsonResponse; // Preserve the original body if "body" field is not present
           } else {
             body = await res.text();
           }
+
+          const schemaFieldValues = (() => {
+            if (typeof body !== "string") return {};
+
+            const fieldToValues = {};
+            const schemaStatementRegex = /<https?:\/\/schema\.org\/([A-Za-z][\w-]*)>\s+([^.;]+)[.;]/gi;
+            let statementMatch;
+
+            while ((statementMatch = schemaStatementRegex.exec(body)) !== null) {
+              const field = statementMatch[1];
+              const rawValueSegment = statementMatch[2] || "";
+
+              const quotedValues = Array.from(rawValueSegment.matchAll(/"([^"]*)"/g))
+                .map((match) => match[1]?.trim())
+                .filter(Boolean);
+
+              const valuesToStore = quotedValues.length > 0
+                ? quotedValues
+                : [rawValueSegment.trim().replace(/^<|>$/g, "")].filter(Boolean);
+
+              if (!fieldToValues[field]) {
+                fieldToValues[field] = [];
+              }
+
+              fieldToValues[field].push(...valuesToStore);
+            }
+
+            return fieldToValues;
+          })();
+
+          const parsedDataFromString = Object.fromEntries(
+            Object.entries(schemaFieldValues)
+              .map(([field, values]) => {
+                const normalizedValues = (values || []).filter(
+                  (value) => typeof value === "string" && value.trim()
+                );
+
+                if (normalizedValues.length === 0) return null;
+                if (normalizedValues.length === 1) return [field, normalizedValues[0]];
+                return [field, normalizedValues];
+              })
+              .filter(Boolean)
+          );
+
+          const parsedDataFromObject = (() => {
+            if (!body || typeof body !== "object" || Array.isArray(body)) return {};
+
+            return Object.fromEntries(
+              Object.entries(body)
+                .map(([field, value]) => {
+                  if (typeof value === "string") {
+                    const trimmed = value.trim();
+                    return trimmed ? [field, trimmed] : null;
+                  }
+
+                  if (Array.isArray(value)) {
+                    const normalizedArray = value
+                      .map((item) => (typeof item === "string" ? item.trim() : String(item).trim()))
+                      .filter(Boolean);
+
+                    if (normalizedArray.length === 0) return null;
+                    if (normalizedArray.length === 1) return [field, normalizedArray[0]];
+                    return [field, normalizedArray];
+                  }
+
+                  if (value === null || value === undefined) return null;
+                  return [field, value];
+                })
+                .filter(Boolean)
+            );
+          })();
+
+          const parsedData = Object.keys(parsedDataFromString).length > 0
+            ? parsedDataFromString
+            : parsedDataFromObject;
+
+          console.log("Parsed resume data:", {
+            resource_url: resourceUrl,
+            grantedBy: perm.student_webid,
+            parsedData
+          });
 
           return {
             resource_url: resourceUrl,
             ok: true,
             status: res.status,
             contentType,
-            body
+            originalBody: body, // Preserve the original body
+            parsedBody: parsedData, // Store the parsed data separately
+            grantedBy: perm.student_webid
           };
         } catch (err) {
           return {
@@ -61,7 +217,8 @@ function EmployerAccessResumes() {
             ok: false,
             status: 0,
             contentType: "",
-            error: err.message
+            error: err.message,
+            grantedBy: perm.student_webid
           };
         }
       })
@@ -132,8 +289,12 @@ function EmployerAccessResumes() {
   };
 
   useEffect(() => {
+    if (hasRun.current) return;
+    hasRun.current = true;
     fetchPermissions();
   }, []);
+
+  const groupedResumes = groupResumesByIndex(resourceResults);
 
   return (
     <div className="main-feed">
@@ -149,16 +310,36 @@ function EmployerAccessResumes() {
       ) : error ? (
         <p>{error}</p>
       ) : (
-        <div className="job-listing">
-          <h3>Raw Permissions</h3>
-          <pre style={{ whiteSpace: "pre-wrap" }}>
-            {JSON.stringify(permissions, null, 2)}
-          </pre>
+        <div>
+          {groupedResumes.map((resume, index) => (
+              <div key={index} className="resume-section">
+                <h2>Resume from {resume.grantedBy}</h2>
+                {Object.keys(resume.parsedBody).length === 0 ? (
+                  <p>No parsed fields found.</p>
+                ) : (
+                  Object.entries(resume.parsedBody).map(([field, value]) => {
+                    if (Array.isArray(value)) {
+                      return (
+                        <div key={field}>
+                          <h3>{formatFieldLabel(field)}</h3>
+                          <ul>
+                            {value.map((item, i) => (
+                              <li key={`${field}-${i}`}>{String(item)}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      );
+                    }
 
-          <h3>Resource Data</h3>
-          <pre style={{ whiteSpace: "pre-wrap" }}>
-            {JSON.stringify(resourceResults, null, 2)}
-          </pre>
+                    return (
+                      <p key={field}>
+                        <strong>{formatFieldLabel(field)}:</strong> {String(value)}
+                      </p>
+                    );
+                  })
+                )}
+              </div>
+          ))}
         </div>
       )}
     </div>

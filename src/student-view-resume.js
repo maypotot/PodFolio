@@ -330,9 +330,9 @@ export async function loadResumeData() {
   //   }
   // }
 
+  resumeIndex = resumeIndexList.length > 0 ? resumeIndexList[0] : 1;
 
-
-
+  console.log("Pod Info List:", podInfolist);
   alert("All info loaded.");
 
 }
