@@ -21,7 +21,7 @@ import EmployerAccessResumes from "./employer-access-resumes.js";
 
 import { useNavigate } from "react-router-dom";
 
-import { login } from "./main.js";
+import { login, logout } from "./main.js";
 import { restoreSession } from "./solid.js";
 import StudentLayout from "./student-layout.js";
 

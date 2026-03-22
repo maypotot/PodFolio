@@ -193,9 +193,16 @@ function EmployerLogin() {
   // Check if returning from Solid authentication
   useEffect(() => {
     async function checkSolidSession() {
+      console.log("employer login")
       try {
         const expectedWebId = sessionStorage.getItem("employer_login_webid");
-        solidUser = await restoreSession();
+        console.log("Checking for Solid session... Expected WebID:", expectedWebId);
+        if (expectedWebId) {
+          solidUser = await restoreSession();
+        } else {
+          console.log("Skipping restoreSession: employer has not initiated Solid authentication.");
+        }
+        console.log("restoreSession returned:", solidUser);
         
         if (solidUser) {
           console.log("Detected Solid session for employer:", solidUser.url);
@@ -276,6 +283,7 @@ function EmployerLogin() {
 
     try {
       console.log("Starting Solid authentication for employer...");
+      sessionStorage.removeItem("login_webid");
       await login();
     } catch (err) {
       console.error("Solid authentication error:", err);
