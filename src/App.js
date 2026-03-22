@@ -24,6 +24,7 @@ import { useNavigate } from "react-router-dom";
 import { login, logout } from "./main.js";
 import { restoreSession } from "./solid.js";
 import StudentLayout from "./student-layout.js";
+import { apiUrl } from "./api.js";
 
 let solidUser; // Global variable to hold the authenticated Solid user
 
@@ -78,7 +79,7 @@ function Signup() {
     const webidWithoutFragment = formData.webid.split('#')[0];
 
     try {
-      const response = await fetch("http://localhost:8000/api/students/signup/", {
+      const response = await fetch(apiUrl("/api/students/signup/"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -281,7 +282,7 @@ function Login() {
 
       // Check if WebID exists in database
       const response = await fetch(
-        `http://localhost:8000/api/students/?webid=${encodeURIComponent(webidWithoutFragment)}`
+        apiUrl(`/api/students/?webid=${encodeURIComponent(webidWithoutFragment)}`)
       );
       console.log("Database response status:", response.status);
 

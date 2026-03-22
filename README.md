@@ -9,6 +9,37 @@ npm install soukai
 npm install soukai-solid
 ```
 
+## Environment variables
+
+Frontend (React):
+
+- Create a `.env` file in the project root.
+- Set `REACT_APP_API_BASE_URL`.
+
+Example local frontend value:
+
+```
+REACT_APP_API_BASE_URL=http://localhost:8000
+```
+
+Example deployed frontend value:
+
+```
+REACT_APP_API_BASE_URL=https://your-backend-service.onrender.com
+```
+
+Backend (Django / Render):
+
+- Set `ALLOWED_HOSTS` as a comma-separated list.
+- Set `CORS_ALLOWED_ORIGINS` as a comma-separated list.
+
+Example:
+
+```
+ALLOWED_HOSTS=your-backend-service.onrender.com,localhost,127.0.0.1
+CORS_ALLOWED_ORIGINS=https://your-frontend-service.onrender.com,http://localhost:3000,http://127.0.0.1:3000
+```
+
 In the project directory, you can run:
 
 ### `npm start`
