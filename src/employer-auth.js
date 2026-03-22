@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import "./employer-side.css";
 import { login } from "./main.js";
 import { restoreSession } from "./solid.js";
-import { apiUrl } from "./api.js";
 
 let solidUser; // Global variable to hold the authenticated Solid user
 
@@ -58,7 +57,7 @@ function EmployerSignup() {
     const webidWithoutFragment = formData.webid.split('#')[0];
 
     try {
-      const response = await fetch(apiUrl("/api/employers/signup/"), {
+      const response = await fetch("http://localhost:8000/api/employers/signup/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -247,7 +246,7 @@ function EmployerLogin() {
       const webidWithoutFragment = webid.split('#')[0];
       
       const response = await fetch(
-        apiUrl(`/api/employers/?webid=${encodeURIComponent(webidWithoutFragment)}`)
+        `http://localhost:8000/api/employers/?webid=${encodeURIComponent(webidWithoutFragment)}`
       );
 
       if (response.ok) {
