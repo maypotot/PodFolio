@@ -441,11 +441,6 @@ function EmployerViewResume() {
               </div>
             </div>
 
-            <div className="integration-note">
-              <p>
-                <strong>Note:</strong> Resume data will be fetched from the student's Solid Pod once Solid integration is complete.
-              </p>
-            </div>
           </div>
         </div>
       </div>
