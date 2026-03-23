@@ -3,9 +3,11 @@ import { useLocation, Link } from "react-router-dom";
 import "./employer-side.css";
 import EmployerLayout from "./employer-layout";
 
+
 function EmployerViewResume() {
   const location = useLocation();
   const { resumeUrl, studentName } = location.state || {};
+  const resumeID = sessionStorage.getItem("id");
 
   return (
       <div className="main-feed">
@@ -19,6 +21,7 @@ function EmployerViewResume() {
 
           <div className="resume-placeholder">
             <h2>{studentName || "Student"}'s Resume</h2>
+            <p>Resume ID: {resumeID}</p>
             <p className="placeholder-text">
               This is a placeholder for the resume viewer. The actual resume will be loaded from the Solid Pod.
             </p>

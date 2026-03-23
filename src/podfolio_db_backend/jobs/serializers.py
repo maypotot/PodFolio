@@ -50,9 +50,30 @@ class JobPostingSerializer(serializers.ModelSerializer):
         return [{'id': jt.tag.id, 'tag_name': jt.tag.tag_name} for jt in job_tags]
 
 class JobApplicationSerializer(serializers.ModelSerializer):
-    class Meta:
+    resume_id = serializers.SerializerMethodField()
+    
+    class Meta:  # ← Make sure this is properly indented
         model = JobApplication
-        fields = '__all__'
+        fields = ['id', 'job', 'applicant_webid', 'resume_pod_url', 'resume_id', 'submitted_at']
+        read_only_fields = ['submitted_at']
+    
+    def get_resume_id(self, obj):
+        """Return the resume ID if resume foreign key is set"""
+        return obj.resume.id if obj.resume else None
+    
+    def create(self, validated_data):
+        """Handle resume_id when creating application"""
+        # Get resume_id from the request data
+        resume_id = self.initial_data.get('resume_id')
+        
+        if resume_id:
+            try:
+                resume = Resume.objects.get(id=resume_id)
+                validated_data['resume'] = resume
+            except Resume.DoesNotExist:
+                pass  # Continue without setting resume if not found
+        
+        return super().create(validated_data)
 
 class EmployerRequestSerializer(serializers.ModelSerializer):
     job_application_id = serializers.IntegerField(write_only=True, required=False)

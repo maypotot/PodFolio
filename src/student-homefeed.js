@@ -118,10 +118,7 @@ function HomeFeed() {
 
       sessionStorage.setItem("current_resume_id", selectedResume.id);
       sessionStorage.setItem("current_resume_title", selectedResume.title);
-
       sessionStorage.setItem("current_employer_webid", selectedJob.employer_webid);
-
-
       
       const response = await fetch("http://127.0.0.1:8000/api/jobs/apply/", {
         method: "POST",
@@ -129,7 +126,8 @@ function HomeFeed() {
         body: JSON.stringify({
           job: selectedJob.id,
           applicant_webid: webidWithoutFragment,
-          resume_pod_url: selectedResume.pod_url
+          resume_pod_url: selectedResume.pod_url,
+          resume_id: selectedResume.id  // ← ADDED: Include resume_id
         }),
       });
 

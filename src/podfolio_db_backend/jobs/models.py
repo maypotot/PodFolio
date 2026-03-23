@@ -104,6 +104,7 @@ class JobApplication(models.Model):
     applicant_webid = models.TextField()
     resume_pod_url = models.TextField()
     submitted_at = models.DateTimeField(auto_now_add=True)
+    resume = models.ForeignKey(Resume, on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         unique_together = ('job', 'applicant_webid')

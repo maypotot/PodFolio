@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import "./employer-side.css";
 
 function JobApplicants() {
   const { jobId } = useParams();
+  const navigate = useNavigate();
   const [applicants, setApplicants] = useState([]);
   const [requestModal, setRequestModal] = useState({ open: false, applicant: null });
   const [summary, setSummary] = useState("");
@@ -13,6 +14,14 @@ function JobApplicants() {
       try {
         const res = await fetch(`http://127.0.0.1:8000/api/jobs/${jobId}/applicants/`);
         const data = await res.json();
+        
+        // DEBUG: Check what data we're getting
+        console.log("Applicants data:", data);
+        if (data.length > 0) {
+          console.log("First applicant:", data[0]);
+          console.log("Resume ID:", data[0].resume_id);
+        }
+        
         setApplicants(data);
       } catch (error) {
         console.error("Failed to fetch applicants:", error);
@@ -37,7 +46,7 @@ function JobApplicants() {
         summary: summary,
       };
 
-      const res = await fetch("http://127.0.0.1:8000/api/requests/create/", {  // ✅ fixed URL
+      const res = await fetch("http://127.0.0.1:8000/api/requests/create/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -57,6 +66,23 @@ function JobApplicants() {
     }
   }
 
+  // Handle view resume click
+  function handleViewResume(applicant) {
+    console.log("Applicant data:", applicant);
+    console.log("Resume ID:", applicant.resume_id);
+    
+    if (!applicant.resume_id) {
+      alert("Resume ID not found. Please make sure the application was submitted with a resume.");
+      return;
+    }
+    
+    // Store resume ID in sessionStorage with key "id"
+    sessionStorage.setItem("id", applicant.resume_id);
+    
+    // Navigate to view resume page
+    navigate("/employer-view-resume");
+  }
+
   return (
     <div className="main-feed">
       <h1 className="employer-h1">Applicants</h1>
@@ -69,12 +95,24 @@ function JobApplicants() {
           {applicants.map(app => (
             <li key={app.id} style={{ borderBottom: "1px solid #ccc", padding: "10px 0" }}>
               <p>Applicant WebID: {app.applicant_webid.split('#')[0]}</p>
-              Resume:{" "}
-                <Link 
-                  to="/employer-view-resume" 
+              <p>
+                Resume:{" "}
+                <button 
+                  className="link-button"
+                  onClick={() => handleViewResume(app)}
+                  style={{ 
+                    background: 'none', 
+                    border: 'none', 
+                    color: '#007bff', 
+                    textDecoration: 'underline', 
+                    cursor: 'pointer',
+                    padding: 0,
+                    font: 'inherit'
+                  }}
                 >
-                  View Resume
-                </Link>
+                  View Resume {app.resume_id && `(ID: ${app.resume_id})`}
+                </button>
+              </p>
               <p>Submitted At: {new Date(app.submitted_at).toLocaleString()}</p>
               <button className="employer-add-tag-button" onClick={() => setRequestModal({ open: true, applicant: app })}>
                 Request
