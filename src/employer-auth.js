@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "./employer-side.css";
 import { login } from "./main.js";
 import { restoreSession } from "./solid.js";
+import API_BASE_URL from "./config/api.js";
 
 let solidUser; // Global variable to hold the authenticated Solid user
 
@@ -57,7 +58,7 @@ function EmployerSignup() {
     const webidWithoutFragment = formData.webid.split('#')[0];
 
     try {
-      const response = await fetch("https://podfolio-b952.onrender.com/api/employers/signup/", {
+      const response = await fetch(`${API_BASE_URL}/api/employers/signup/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

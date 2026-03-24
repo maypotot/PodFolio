@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./main.css";
 import { restoreSession } from "./solid.js";
+import API_BASE_URL from "./config/api.js";
 
 function StudentLayout({ children, searchQuery, setSearchQuery, handleSearch, clearSearch }) {
   const [studentData, setStudentData] = useState(null);
@@ -20,7 +21,7 @@ function StudentLayout({ children, searchQuery, setSearchQuery, handleSearch, cl
         if (webid) {
           const webidWithoutFragment = webid.split('#')[0];
           const studentRes = await fetch(
-            `http://127.0.0.1:8000/api/students/?webid=${encodeURIComponent(webidWithoutFragment)}`
+            `${API_BASE_URL}/api/students/?webid=${encodeURIComponent(webidWithoutFragment)}`
           );
           
           if (studentRes.ok) {

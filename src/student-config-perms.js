@@ -7,6 +7,7 @@ import "./main.css";
 import { getDefaultSession } from "@inrupt/solid-client-authn-browser";
 import { universalAccess } from "@inrupt/solid-client";
 import { restoreSession } from "./solid.js";
+import API_BASE_URL from "./config/api.js";
 
 import { 
   loadInformation,
@@ -213,7 +214,7 @@ async function listPermissions(studentWebId, employerWebId) {
     if (studentWebId) params.append('student_webid', studentWebId);
     if (employerWebId) params.append('employer_webid', employerWebId);
 
-    const response = await fetch(`http://127.0.0.1:8000/api/permissions/list/?${params}`);
+    const response = await fetch(`${API_BASE_URL}/api/permissions/list/?${params}`);
     
     if (response.ok) {
       const data = await response.json();
@@ -249,7 +250,7 @@ async function requestAccessDatabase(employerWebId, resourceURL, resumeId, stude
   console.log("Stringified payload:", JSON.stringify(payload, null, 2));
   
   try {
-    const response = await fetch("http://127.0.1:8000/api/permissions/grant/", {
+    const response = await fetch(`${API_BASE_URL}/api/permissions/grant/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
@@ -289,7 +290,7 @@ async function denyAccessDatabase(employerWebId, resourceURL, resumeId, studentW
   console.log("Stringified payload:", JSON.stringify(payload, null, 2));
   
   try {
-    const response = await fetch("http://127.0.1:8000/api/permissions/revoke/", {
+    const response = await fetch(`${API_BASE_URL}/api/permissions/revoke/`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)

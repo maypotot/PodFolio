@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./main.css";
+import API_BASE_URL from "./config/api.js";
 
 function InPerms() {
   const [requests, setRequests] = useState([]);
@@ -20,7 +21,7 @@ function InPerms() {
         const webidWithoutFragment = webid.split('#')[0];
 
         const res = await fetch(
-          `http://127.0.0.1:8000/api/requests/student/?student_webid=${encodeURIComponent(webidWithoutFragment)}`
+          `${API_BASE_URL}/api/requests/student/?student_webid=${encodeURIComponent(webidWithoutFragment)}`
         );
         
         if (res.ok) {
@@ -52,7 +53,7 @@ function InPerms() {
 
       // Fetch all resumes for this student
       const resumesRes = await fetch(
-        `http://127.0.0.1:8000/api/resumes/?webid=${encodeURIComponent(webidWithoutFragment)}`
+        `${API_BASE_URL}/api/resumes/?webid=${encodeURIComponent(webidWithoutFragment)}`
       );
 
       if (!resumesRes.ok) {
@@ -74,7 +75,7 @@ function InPerms() {
 
       // Fetch job details to get job title
       const jobRes = await fetch(
-        `http://127.0.0.1:8000/api/jobs/`
+        `${API_BASE_URL}/api/jobs/`
       );
 
       let jobTitle = "Position";

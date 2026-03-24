@@ -3,9 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 import "./main.css"; 
 import StudentLayout from "./student-layout";
 import { restoreSession, loadInformation } from "./solid.js";
+import API_BASE_URL from "./config/api.js";
+
 let podInfolist = [];
 let resumeIndexList = [];
 let maxResumeIndex = 0;
+
 
 function Profile() {
   const [studentData, setStudentData] = useState(null);
@@ -71,7 +74,7 @@ function Profile() {
 
           // Fetch student account data
           const response = await fetch(
-            `http://127.0.0.1:8000/api/students/?webid=${encodeURIComponent(webidWithoutFragment)}`
+            `${API_BASE_URL}/api/students/?webid=${encodeURIComponent(webidWithoutFragment)}`
           );
           if (response.ok) {
             const data = await response.json();
@@ -84,7 +87,7 @@ function Profile() {
 
           // Fetch existing student tags
           const tagsRes = await fetch(
-            `http://127.0.0.1:8000/api/students/tags/get/?webid=${encodeURIComponent(webidWithoutFragment)}`
+            `${API_BASE_URL}/api/students/tags/get/?webid=${encodeURIComponent(webidWithoutFragment)}`
           );
           if (tagsRes.ok) {
             const tagsData = await tagsRes.json();
@@ -93,7 +96,7 @@ function Profile() {
 
           // Fetch student resumes
           const resumesRes = await fetch(
-            `http://127.0.0.1:8000/api/resumes/?webid=${encodeURIComponent(webidWithoutFragment)}`
+            `${API_BASE_URL}/api/resumes/?webid=${encodeURIComponent(webidWithoutFragment)}`
           );
           if (resumesRes.ok) {
             const resumesData = await resumesRes.json();
@@ -122,7 +125,7 @@ function Profile() {
       const webid = sessionStorage.getItem("webid");
       const webidWithoutFragment = webid.split('#')[0];
       const response = await fetch(
-        `http://127.0.0.1:8000/api/students/bio/?webid=${encodeURIComponent(webidWithoutFragment)}`,
+        `${API_BASE_URL}/api/students/bio/?webid=${encodeURIComponent(webidWithoutFragment)}`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -166,7 +169,7 @@ function Profile() {
       const webid = sessionStorage.getItem("webid");
       const webidWithoutFragment = webid.split('#')[0];
       const response = await fetch(
-        `http://127.0.0.1:8000/api/students/name/?webid=${encodeURIComponent(webidWithoutFragment)}`,
+        `${API_BASE_URL}/api/students/name/?webid=${encodeURIComponent(webidWithoutFragment)}`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -221,7 +224,7 @@ function Profile() {
       const webid = sessionStorage.getItem("webid");
       const webidWithoutFragment = webid.split('#')[0];
       const response = await fetch(
-        `http://127.0.0.1:8000/api/students/email/?webid=${encodeURIComponent(webidWithoutFragment)}`,
+        `${API_BASE_URL}/api/students/email/?webid=${encodeURIComponent(webidWithoutFragment)}`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -277,7 +280,7 @@ function Profile() {
       const webid = sessionStorage.getItem("webid");
       const webidWithoutFragment = webid.split('#')[0];
       const response = await fetch(
-        `http://127.0.0.1:8000/api/students/tags/?webid=${encodeURIComponent(webidWithoutFragment)}`,
+        `${API_BASE_URL}/api/students/tags/?webid=${encodeURIComponent(webidWithoutFragment)}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -329,7 +332,7 @@ function Profile() {
         const webidWithoutFragment = webid.split('#')[0];
 
         const response = await fetch(
-          `http://127.0.0.1:8000/api/students/picture/?webid=${encodeURIComponent(webidWithoutFragment)}`,
+          `${API_BASE_URL}/api/students/picture/?webid=${encodeURIComponent(webidWithoutFragment)}`,
           {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
@@ -377,7 +380,7 @@ function Profile() {
       const webidWithoutFragment = webid.split('#')[0];
       
       const response = await fetch(
-        `http://127.0.0.1:8000/api/resumes/create/?webid=${encodeURIComponent(webidWithoutFragment)}`,
+        `${API_BASE_URL}/api/resumes/create/?webid=${encodeURIComponent(webidWithoutFragment)}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -426,7 +429,7 @@ function Profile() {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/api/resumes/${resumeId}/`,
+        `${API_BASE_URL}/api/resumes/${resumeId}/`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -453,7 +456,7 @@ function Profile() {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/api/resumes/${resumeId}/delete/`,
+        `${API_BASE_URL}/api/resumes/${resumeId}/delete/`,
         { method: "DELETE" }
       );
 

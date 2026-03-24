@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "./main.css"; 
 import { restoreSession } from "./solid.js";
 import StudentLayout from "./student-layout.js";
+import API_BASE_URL from "./config/api.js";
 
 import { 
   updateInformation,

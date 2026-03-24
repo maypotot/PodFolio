@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import "./employer-side.css"; 
 import EmployerLayout from "./employer-layout";
+import API_BASE_URL from "./config/api.js";
 
 function EmployerProfile() {
   const [employerData, setEmployerData] = useState(null);
@@ -39,7 +40,7 @@ function EmployerProfile() {
           const webidWithoutFragment = webid.split('#')[0];
 
           const employerRes = await fetch(
-            `http://127.0.0.1:8000/api/employers/?webid=${encodeURIComponent(webidWithoutFragment)}`
+            `${API_BASE_URL}/api/employers/?webid=${encodeURIComponent(webidWithoutFragment)}`
           );
           if (employerRes.ok) {
             const data = await employerRes.json();
@@ -81,7 +82,7 @@ function EmployerProfile() {
       const webid = sessionStorage.getItem("employer_webid");
       const webidWithoutFragment = webid.split('#')[0];
       const response = await fetch(
-        `http://127.0.0.1:8000/api/employers/name/?webid=${encodeURIComponent(webidWithoutFragment)}`,
+        `${API_BASE_URL}/api/employers/name/?webid=${encodeURIComponent(webidWithoutFragment)}`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -126,7 +127,7 @@ function EmployerProfile() {
       const webid = sessionStorage.getItem("employer_webid");
       const webidWithoutFragment = webid.split('#')[0];
       const response = await fetch(
-        `http://127.0.0.1:8000/api/employers/contact/?webid=${encodeURIComponent(webidWithoutFragment)}`,
+        `${API_BASE_URL}/api/employers/contact/?webid=${encodeURIComponent(webidWithoutFragment)}`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -175,7 +176,7 @@ function EmployerProfile() {
       const webid = sessionStorage.getItem("employer_webid");
       const webidWithoutFragment = webid.split('#')[0];
       const response = await fetch(
-        `http://127.0.0.1:8000/api/employers/email/?webid=${encodeURIComponent(webidWithoutFragment)}`,
+        `${API_BASE_URL}/api/employers/email/?webid=${encodeURIComponent(webidWithoutFragment)}`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -216,7 +217,7 @@ function EmployerProfile() {
       const webid = sessionStorage.getItem("employer_webid");
       const webidWithoutFragment = webid.split('#')[0];
       const response = await fetch(
-        `http://127.0.0.1:8000/api/employers/description/?webid=${encodeURIComponent(webidWithoutFragment)}`,
+        `${API_BASE_URL}/api/employers/description/?webid=${encodeURIComponent(webidWithoutFragment)}`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -273,7 +274,7 @@ function EmployerProfile() {
         const webidWithoutFragment = webid.split('#')[0];
 
         const response = await fetch(
-          `http://127.0.0.1:8000/api/employers/picture/?webid=${encodeURIComponent(webidWithoutFragment)}`,
+          `${API_BASE_URL}/api/employers/picture/?webid=${encodeURIComponent(webidWithoutFragment)}`,
           {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },

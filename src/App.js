@@ -25,6 +25,8 @@ import { login, logout } from "./main.js";
 import { restoreSession } from "./solid.js";
 import StudentLayout from "./student-layout.js";
 
+import API_BASE_URL from "./config/api.js";
+
 let solidUser; // Global variable to hold the authenticated Solid user
 
 function Home() {
@@ -78,7 +80,7 @@ function Signup() {
     const webidWithoutFragment = formData.webid.split('#')[0];
 
     try {
-      const response = await fetch("postgresql://root:sNMXEtRpYaTGgJX1nBj1B4bp6LOLq6WF@dpg-d5vmhgh4tr6s739sld0g-a/podfoliodb_ttto:5432/api/students/signup/", {
+      const response = await fetch(`${API_BASE_URL}/api/students/signup/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -281,7 +283,7 @@ function Login() {
 
       // Check if WebID exists in database
       const response = await fetch(
-        `postgresql://root:sNMXEtRpYaTGgJX1nBj1B4bp6LOLq6WF@dpg-d5vmhgh4tr6s739sld0g-a/podfoliodb_ttto:5432/api/students/?webid=${encodeURIComponent(webidWithoutFragment)}`
+        `${API_BASE_URL}/api/students/?webid=${encodeURIComponent(webidWithoutFragment)}`
       );
       console.log("Database response status:", response.status);
 

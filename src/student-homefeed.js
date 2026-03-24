@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./main.css"; 
 import StudentLayout from "./student-layout.js";
+import API_BASE_URL from "./config/api.js";
 
 
 function HomeFeed() {
@@ -21,7 +22,7 @@ function HomeFeed() {
   useEffect(() => {
     async function fetchJobs() {
       try {
-        const res = await fetch("http://127.0.0.1:8000/api/jobs/");
+        const res = await fetch(`${API_BASE_URL}/api/jobs/`);
         const data = await res.json();
         setJobs(data);
         setFilteredJobs(data);
@@ -39,7 +40,7 @@ function HomeFeed() {
         if (webid) {
           const webidWithoutFragment = webid.split('#')[0];
           const res = await fetch(
-            `http://127.0.0.1:8000/api/resumes/?webid=${encodeURIComponent(webidWithoutFragment)}`
+            `${API_BASE_URL}/api/resumes/?webid=${encodeURIComponent(webidWithoutFragment)}`
           );
           if (res.ok) {
             const data = await res.json();
@@ -120,7 +121,7 @@ function HomeFeed() {
       sessionStorage.setItem("current_resume_title", selectedResume.title);
       sessionStorage.setItem("current_employer_webid", selectedJob.employer_webid);
       
-      const response = await fetch("http://127.0.0.1:8000/api/jobs/apply/", {
+      const response = await fetch(`${API_BASE_URL}/api/jobs/apply/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
