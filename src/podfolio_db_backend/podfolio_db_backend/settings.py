@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-ys09je9==o5j8#far(r1p6a2@uw2us51$kj35#(ed$8)hkxqt7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['podforlio-backend.onrender.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
