@@ -57,7 +57,7 @@ function EmployerSignup() {
     const webidWithoutFragment = formData.webid.split('#')[0];
 
     try {
-      const response = await fetch("https://podfolio-b952.onrender.com/api/employers/signup/", {
+      const response = await fetch("http://127.0.0.1:8000/api/employers/signup/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -253,7 +253,7 @@ function EmployerLogin() {
       const webidWithoutFragment = webid.split('#')[0];
       
       const response = await fetch(
-        `https://podfolio-b952.onrender.com/api/employers/?webid=${encodeURIComponent(webidWithoutFragment)}`
+        `http://127.0.0.1:8000/api/employers/?webid=${encodeURIComponent(webidWithoutFragment)}`
       );
 
       if (response.ok) {
