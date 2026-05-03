@@ -254,7 +254,7 @@ function EmployerLogin() {
       const webidWithoutFragment = webid.split('#')[0];
       
       const response = await fetch(
-        `https://podfolio-b952.onrender.com/api/employers/?webid=${encodeURIComponent(webidWithoutFragment)}`
+        `http://127.0.0.1:8000/api/employers/?webid=${encodeURIComponent(webidWithoutFragment)}`
       );
 
       if (response.ok) {

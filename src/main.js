@@ -192,6 +192,10 @@ export async function createInformation() {
     });
     sessionStorage.setItem("session_information", JSON.stringify(sessionInformation));
 
+    const sessionInformationIndexes = JSON.parse(sessionStorage.getItem("session_information_indexes")) || [];
+    sessionInformationIndexes.push(uniqueInformationID);
+    sessionStorage.setItem("session_information_indexes", JSON.stringify(sessionInformationIndexes));
+
     alert("Information has been created")
 }
 
@@ -230,6 +234,10 @@ export async function createExperience() {
     });
     sessionStorage.setItem("session_experiences", JSON.stringify(sessionExperiences));
 
+    const sessionExperienceIndexes = JSON.parse(sessionStorage.getItem("session_experience_indexes")) || [];
+    sessionExperienceIndexes.push(uniqueExperienceID);
+    sessionStorage.setItem("session_experience_indexes", JSON.stringify(sessionExperienceIndexes));
+
     alert("Experience has been created")
 }
 
@@ -264,6 +272,10 @@ export async function createProject() {
         ProjectIndex: uniqueProjectID
     });
     sessionStorage.setItem("session_projects", JSON.stringify(sessionProjects));
+
+    const sessionProjectIndexes = JSON.parse(sessionStorage.getItem("session_project_indexes")) || [];
+    sessionProjectIndexes.push(uniqueProjectID);
+    sessionStorage.setItem("session_project_indexes", JSON.stringify(sessionProjectIndexes));
 
     alert("Project has been created")
 }
@@ -380,6 +392,10 @@ export async function createWebsite() {
     sessionWebsites.push({ WebsiteLink, WebsiteIndex: uniqueWebsiteID });
     sessionStorage.setItem("session_websites", JSON.stringify(sessionWebsites));
 
+    const sessionWebsiteIndexes = JSON.parse(sessionStorage.getItem("session_website_indexes")) || [];
+    sessionWebsiteIndexes.push(uniqueWebsiteID);
+    sessionStorage.setItem("session_website_indexes", JSON.stringify(sessionWebsiteIndexes));
+
     alert("Website has been created")   
 }
 
@@ -404,6 +420,10 @@ export async function createSkill() {
     const sessionSkills = JSON.parse(sessionStorage.getItem("session_skills")) || [];
     sessionSkills.push({ Skill, SkillIndex: uniqueSkillID });
     sessionStorage.setItem("session_skills", JSON.stringify(sessionSkills));
+
+    const sessionSkillIndexes = JSON.parse(sessionStorage.getItem("session_skill_indexes")) || [];
+    sessionSkillIndexes.push(uniqueSkillID);
+    sessionStorage.setItem("session_skill_indexes", JSON.stringify(sessionSkillIndexes));
 
     alert("Skill has been created")   
 }
@@ -656,31 +676,82 @@ window.loadAllResumes = loadAllResumes;
 
 export async function completeResume() {
     console.log("Completing resume...");
-    const podResumeID = sessionStorage.getItem("current_resume_id");
     const podResumeTitle = sessionStorage.getItem("current_resume_title");
+    const sessionInformationIndexes = JSON.parse(sessionStorage.getItem("session_information_indexes")) || [];
+    const sessionWebsiteIndexes = JSON.parse(sessionStorage.getItem("session_website_indexes")) || [];
+    const sessionProjectIndexes = JSON.parse(sessionStorage.getItem("session_project_indexes")) || [];
+    const sessionExperienceIndexes = JSON.parse(sessionStorage.getItem("session_experience_indexes")) || [];
+    const sessionSkillIndexes = JSON.parse(sessionStorage.getItem("session_skill_indexes")) || [];
 
     if (!podResumeTitle || podResumeTitle.trim() === "") {
         alert("Resume title is missing. Please set a title before completing the resume.");
         return;
     }
 
+    const informationIndexes = sessionInformationIndexes
+        .map((index) => Number(index))
+        .filter((value) => !Number.isNaN(value));
+
+    const websiteIndexes = sessionWebsiteIndexes
+        .map((index) => Number(index))
+        .filter((value) => !Number.isNaN(value));
+
+    const projectIndexes = sessionProjectIndexes
+        .map((index) => Number(index))
+        .filter((value) => !Number.isNaN(value));
+
+    const experienceIndexes = sessionExperienceIndexes
+        .map((index) => Number(index))
+        .filter((value) => !Number.isNaN(value));
+
+    const skillIndexes = sessionSkillIndexes
+        .map((index) => Number(index))
+        .filter((value) => !Number.isNaN(value));
+
     console.log("Resume Title:", podResumeTitle);
     const consolidatedResume = {
         ResumeTitle: podResumeTitle,
-        InformationIndex: podInformation.length + 1,
-        WebsiteIndexes: sessionWebsites.map((website) => website.WebsiteIndex),
-        ProjectIndexes: podProjects.map((project) => project.ProjectIndex),
-        ExperienceIndexes: podExperiences.map((experience) => experience.ExperienceIndex),
-        SkillsIndexes: sessionSkills.map((skill) => skill.SkillIndex),
+        ResumeIndex: sessionStorage.getItem("current_resume_id") || Date.now(),
+        InformationIndex: informationIndexes.length > 0 ? informationIndexes[0] : Date.now(),
+        WebsiteIndexes: websiteIndexes,
+        ProjectIndexes: projectIndexes,
+        ExperienceIndexes: experienceIndexes,
+        SkillsIndexes: skillIndexes,
     };
 
+    // Log sessionStorage before resume creation
+    console.log("=== BEFORE RESUME CREATION ===");
+    console.log("SessionStorage state:", {
+        information_indexes: JSON.parse(sessionStorage.getItem("session_information_indexes")),
+        website_indexes: JSON.parse(sessionStorage.getItem("session_website_indexes")),
+        project_indexes: JSON.parse(sessionStorage.getItem("session_project_indexes")),
+        experience_indexes: JSON.parse(sessionStorage.getItem("session_experience_indexes")),
+        skill_indexes: JSON.parse(sessionStorage.getItem("session_skill_indexes")),
+        consolidated_resume: consolidatedResume
+    });
+
     await performResumeCreation(consolidatedResume);
+
+    // Log sessionStorage after resume creation
+    console.log("=== AFTER RESUME CREATION ===");
+    console.log("SessionStorage state:", {
+        information_indexes: JSON.parse(sessionStorage.getItem("session_information_indexes")),
+        website_indexes: JSON.parse(sessionStorage.getItem("session_website_indexes")),
+        project_indexes: JSON.parse(sessionStorage.getItem("session_project_indexes")),
+        experience_indexes: JSON.parse(sessionStorage.getItem("session_experience_indexes")),
+        skill_indexes: JSON.parse(sessionStorage.getItem("session_skill_indexes"))
+    });
 
     alert("Resume has been successfully completed and saved.");
     sessionStorage.removeItem("current_resume_id");
     sessionStorage.removeItem("current_resume_title");
     sessionStorage.removeItem("session_websites");
     sessionStorage.removeItem("session_skills");
+    sessionStorage.removeItem("session_information_indexes");
+    sessionStorage.removeItem("session_website_indexes");
+    sessionStorage.removeItem("session_project_indexes");
+    sessionStorage.removeItem("session_experience_indexes");
+    sessionStorage.removeItem("session_skill_indexes");
 }
 
 export async function setResumeTitle(title) {

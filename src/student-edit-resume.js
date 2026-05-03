@@ -10,7 +10,8 @@ import {
   updateSkill,
   updateProject,
   updateExperience,
-  updateWebsite
+  updateWebsite,
+  loadAllResumes
  } from "./main.js";
 
 import { 
@@ -19,7 +20,8 @@ import {
   loadImage,
   loadProject,
   loadWebsite,
-  loadSkill
+  loadSkill,
+  loadResume
  } from "./solid.js";
 let podInfolist = [];
 let podSkilllist = [];
@@ -28,6 +30,22 @@ let podWebsiteList = [];
 let podExperienceList = [];
 let podImageList = [];
 let resumeIndexList = [];
+let currentResumeData = null;
+
+function getCurrentResumeAttribute(attributeName) {
+  return currentResumeData?._attributes?.[attributeName] ?? currentResumeData?.[attributeName];
+}
+
+function resolveResumeItemByIndex(itemList, itemIndexKey, resumeIndexesAttributeName, itemIndex) {
+  const resumeIndexes = getCurrentResumeAttribute(resumeIndexesAttributeName) || [];
+  const normalizedItemIndex = String(itemIndex);
+
+  if (!Array.isArray(resumeIndexes) || !resumeIndexes.some((value) => String(value) === normalizedItemIndex)) {
+    return null;
+  }
+
+  return itemList.find((item) => String(item[itemIndexKey]) === normalizedItemIndex) || null;
+}
 
 export function updateInfoText(info) {
 
@@ -78,7 +96,7 @@ export function updateSkillText(skill, num) {
   const radioBtn = document.createElement('input');
   radioBtn.type = 'radio';
   radioBtn.name = 'skillSelect';
-  radioBtn.value = skill.url;
+  radioBtn.value = skill.SkillIndex;
 
   const label = document.createElement('span');
   label.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>${skill.Skill}</span>`;
@@ -97,7 +115,7 @@ export function updateProjectText(project, num) {
   const radioBtn = document.createElement('input');
   radioBtn.type = 'radio';
   radioBtn.name = 'projectSelect';
-  radioBtn.value = project.url;
+  radioBtn.value = project.ProjectIndex;
 
   const projectInfo = document.createElement('div');
   projectInfo.innerHTML = `
@@ -122,7 +140,7 @@ export function updateWebsiteText(website, num) {
   const radioBtn = document.createElement('input');
   radioBtn.type = 'radio';
   radioBtn.name = 'websiteSelect';
-  radioBtn.value = website.url;
+  radioBtn.value = website.WebsiteIndex;
 
   const label = document.createElement('span');
   label.innerHTML = `<span style='font-weight: bold; font-size: 1.2rem;'>${website.WebsiteLink}</span>`;
@@ -140,7 +158,7 @@ export function updateExperienceText(experience, num) {
   const radioBtn = document.createElement('input');
   radioBtn.type = 'radio';
   radioBtn.name = 'experienceSelect';
-  radioBtn.value = experience.url;
+  radioBtn.value = experience.ExperienceIndex;
 
   const experienceInfo = document.createElement('div');
   experienceInfo.innerHTML = `
@@ -163,10 +181,15 @@ export function updateImageText(image) {
 }
 
 export function handleUpdateInformation() {
-  const resumeId = sessionStorage.getItem("current_resume_id");
+  const informationIndex = getCurrentResumeAttribute("InformationIndex");
+  
+  if (informationIndex === undefined) {
+    alert("No information found for this resume.");
+    return;
+  }
   
   // Find the information matching the current resume
-  const info = podInfolist.find(i => i.ResumeIndex == resumeId);
+  const info = podInfolist.find((item) => String(item.InformationIndex) === String(informationIndex));
   
   if (!info) {
     alert("No information found for this resume.");
@@ -194,11 +217,16 @@ export function handleUpdateSkill() {
     return;
   }
   
-  const skillUrl = selectedSkill.value;
+  const skill = resolveResumeItemByIndex(podSkilllist, 'SkillIndex', 'SkillsIndexes', selectedSkill.value);
+  
+  if (!skill) {
+    alert("No matching skill found for this resume.");
+    return;
+  }
   
   // Call the original updateSkill function with the skill URL
-  console.log("Updating skill with URL:", skillUrl);
-  updateSkill(skillUrl);
+  console.log("Updating skill with URL:", skill.url);
+  updateSkill(skill.url);
 }
 
 export function handleUpdateProject() {
@@ -210,11 +238,16 @@ export function handleUpdateProject() {
     return;
   }
   
-  const projectUrl = selectedProject.value;
+  const project = resolveResumeItemByIndex(podProjectlist, 'ProjectIndex', 'ProjectIndexes', selectedProject.value);
+  
+  if (!project) {
+    alert("No matching project found for this resume.");
+    return;
+  }
   
   // Call the original updateProject function with the project URL
-  console.log("Updating project with URL:", projectUrl);
-  updateProject(projectUrl);
+  console.log("Updating project with URL:", project.url);
+  updateProject(project.url);
 }
 
 export function handleUpdateExperience() {
@@ -226,11 +259,16 @@ export function handleUpdateExperience() {
     return;
   }
   
-  const experienceUrl = selectedExperience.value;
+  const experience = resolveResumeItemByIndex(podExperienceList, 'ExperienceIndex', 'ExperienceIndexes', selectedExperience.value);
+  
+  if (!experience) {
+    alert("No matching experience found for this resume.");
+    return;
+  }
   
   // Call the original updateExperience function with the experience URL
-  console.log("Updating experience with URL:", experienceUrl);
-  updateExperience(experienceUrl);
+  console.log("Updating experience with URL:", experience.url);
+  updateExperience(experience.url);
 }
 
 export function handleUpdateWebsite() {
@@ -242,15 +280,27 @@ export function handleUpdateWebsite() {
     return;
   }
   
-  const websiteUrl = selectedWebsite.value;
+  const website = resolveResumeItemByIndex(podWebsiteList, 'WebsiteIndex', 'WebsiteIndexes', selectedWebsite.value);
+  
+  if (!website) {
+    alert("No matching website found for this resume.");
+    return;
+  }
   
   // Call the original updateWebsite function with the website URL
-  console.log("Updating website with URL:", websiteUrl);
-  updateWebsite(websiteUrl);
+  console.log("Updating website with URL:", website.url);
+  updateWebsite(website.url);
 }
 
-export function updateResumeText(indexToCheck) {
+export async function updateResumeText() {
+  const resumeId = sessionStorage.getItem("current_resume_id");
   
+  if (!resumeId) {
+    console.warn("No resume ID found in session storage");
+    return;
+  }
+  
+  // Clear the list elements first
   let skillsListElement = document.getElementById('SkillsList');
   skillsListElement.innerHTML = '';
   let projectsListElement = document.getElementById('ProjectsList');
@@ -260,36 +310,89 @@ export function updateResumeText(indexToCheck) {
   let experiencesListElement = document.getElementById('ExperienceList');
   experiencesListElement.innerHTML = '';
 
-  for (let i in podInfolist){
-      console.log("Index To Check:", indexToCheck);
-      console.log("Pod Info Index:", podInfolist[i].ResumeIndex);
-    if (podInfolist[i].ResumeIndex == indexToCheck){
-      updateInfoText(podInfolist[i]);
-      break
+  // Load all resumes to find the current one
+  const allResumesRelation = await loadAllResumes();
+  console.log("All resumes loaded:", allResumesRelation);
+  
+  // Extract the actual resumes from the _related array
+  const allResumes = allResumesRelation._related || [];
+  
+  // Find the resume by matching the ResumeIndex from _attributes with the stored resume ID
+  let currentResume = null;
+  for (let resume of allResumes) {
+    // Access ResumeIndex from _attributes
+    console.log("Checking resume object:", resume);
+    const resumeIndexFromAttribute = resume._attributes?.ResumeIndex;
+
+    if (resumeIndexFromAttribute === undefined) {
+      console.warn("Skipping resume with undefined ResumeIndex:", resume);
+      continue;
+    }
+
+    console.log("Checking resume ResumeIndex:", resumeIndexFromAttribute, "against stored ID:", resumeId);
+
+    if (String(resumeIndexFromAttribute) === String(resumeId)) {
+      currentResume = resume;
+      console.log("Found matching resume:", currentResume);
+      break;
+    }
+  }
+  
+  if (!currentResume) {
+    console.warn("Resume not found for ID:", resumeId);
+    console.warn("Available resume URLs:", allResumes.map(r => r._sourceDocumentUrl));
+    return;
+  }
+
+  currentResumeData = currentResume;
+  
+  // Get index arrays from the resume
+  const informationIndex = currentResume.InformationIndex;
+  const websiteIndexes = currentResume.WebsiteIndexes || [];
+  const projectIndexes = currentResume.ProjectIndexes || [];
+  const experienceIndexes = currentResume.ExperienceIndexes || [];
+  const skillIndexes = currentResume.SkillsIndexes || [];
+
+  console.log("Loaded resume indices:", {
+    informationIndex,
+    websiteIndexes,
+    projectIndexes,
+    experienceIndexes,
+    skillIndexes
+  });
+
+  // Find and display information by matching InformationIndex
+  const info = podInfolist.find(i => i.InformationIndex === informationIndex);
+  if (info) {
+    console.log("Found information with index:", informationIndex);
+    updateInfoText(info);
+  }
+
+  // Find and display websites by matching WebsiteIndex against array
+  for (let i in podWebsiteList){
+    if (websiteIndexes.includes(podWebsiteList[i].WebsiteIndex)){
+      updateWebsiteText(podWebsiteList[i], i);
     }
   }
 
-  for (let i in podSkilllist){
-    if (podSkilllist[i].ResumeIndex == indexToCheck){
-      updateSkillText(podSkilllist[i], i);
-    }
-  }
-
+  // Find and display projects by matching ProjectIndex against array
   for (let i in podProjectlist){
-    if (podProjectlist[i].ResumeIndex == indexToCheck){
+    if (projectIndexes.includes(podProjectlist[i].ProjectIndex)){
       updateProjectText(podProjectlist[i], i);
     }
   }
   
-  for (let i in podWebsiteList){
-    if (podWebsiteList[i].ResumeIndex == indexToCheck){
-      updateWebsiteText(podWebsiteList[i], i);
+  // Find and display experiences by matching ExperienceIndex against array
+  for (let i in podExperienceList){
+    if (experienceIndexes.includes(podExperienceList[i].ExperienceIndex)){
+      updateExperienceText(podExperienceList[i], i);
     }
   }
   
-  for (let i in podExperienceList){
-    if (podExperienceList[i].ResumeIndex == indexToCheck){
-      updateExperienceText(podExperienceList[i], i);
+  // Find and display skills by matching SkillIndex against array
+  for (let i in podSkilllist){
+    if (skillIndexes.includes(podSkilllist[i].SkillIndex)){
+      updateSkillText(podSkilllist[i], i);
     }
   }
   
@@ -429,8 +532,8 @@ function EditResume() {
     loadResumeData()
       .then(() => setIsLoading(false))
       .then(() => new Promise(resolve => setTimeout(resolve, 1000)))
-      .then(() => updateResumeText(sessionStorage.getItem("current_resume_id")))
-      .then(() => console.log(sessionStorage.getItem("current_resume_id")));
+      .then(() => updateResumeText())
+      .then(() => console.log("Resume text updated for ID:", sessionStorage.getItem("current_resume_id")));
   }, [navigate]);
 
   const handleEditResume = () => {
@@ -439,12 +542,15 @@ function EditResume() {
     const currentResumeId = sessionStorage.getItem("current_resume_id");
     console.log("Current Resume ID:", currentResumeId);
     console.log("Current Info List:", podInfolist);
-    const currentInfo = podInfolist.find(info => info.ResumeIndex == currentResumeId);
+    const informationIndex = getCurrentResumeAttribute("InformationIndex");
+    const currentInfo = podInfolist.find((info) => String(info.InformationIndex) === String(informationIndex));
 
     if (currentInfo) {
       console.log("Current Info URL:", currentInfo.url);
     } else {
-      console.warn("No information found for the current resume ID.");
+      console.warn("No information found for the current resume information index:", informationIndex);
+      alert("No information record was found for this resume.");
+      return;
     }
     updateInformation(currentInfo.url)
       .then(() => new Promise(resolve => setTimeout(resolve, 1000)))

@@ -34,6 +34,13 @@ function CreateResume() {
   const [selectedResume, setSelectedResume] = useState(null);
 
   useEffect(() => {
+    // Clear previous session data to prevent interference
+    sessionStorage.removeItem("session_information_indexes");
+    sessionStorage.removeItem("session_experience_indexes");
+    sessionStorage.removeItem("session_project_indexes");
+    sessionStorage.removeItem("session_website_indexes");
+    sessionStorage.removeItem("session_skill_indexes");
+
     const fetchResumes = async () => {
       const resumes = await loadAllResumes();
       setAvailableResumes(resumes);
