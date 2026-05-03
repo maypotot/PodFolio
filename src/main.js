@@ -665,6 +665,14 @@ export async function completeResume() {
     }
 
     console.log("Resume Title:", podResumeTitle);
+    
+    // Retrieve data from session storage
+    const podInformation = JSON.parse(sessionStorage.getItem("session_information")) || [];
+    const sessionWebsites = JSON.parse(sessionStorage.getItem("session_websites")) || [];
+    const podProjects = JSON.parse(sessionStorage.getItem("session_projects")) || [];
+    const podExperiences = JSON.parse(sessionStorage.getItem("session_experiences")) || [];
+    const sessionSkills = JSON.parse(sessionStorage.getItem("session_skills")) || [];
+    
     const consolidatedResume = {
         ResumeTitle: podResumeTitle,
         InformationIndex: podInformation.length + 1,

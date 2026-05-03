@@ -58,11 +58,7 @@ function EmployerSignup() {
     const webidWithoutFragment = formData.webid.split('#')[0];
 
     try {
-<<<<<<< HEAD
-      const response = await fetch("http://127.0.0.1:8000/api/employers/signup/", {
-=======
       const response = await fetch(`${API_BASE_URL}/api/employers/signup/`, {
->>>>>>> 0e53f8ca0cb435ff1a0c3682affc321a496778f2
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -258,11 +254,7 @@ function EmployerLogin() {
       const webidWithoutFragment = webid.split('#')[0];
       
       const response = await fetch(
-<<<<<<< HEAD
-        `http://127.0.0.1:8000/api/employers/?webid=${encodeURIComponent(webidWithoutFragment)}`
-=======
         `${API_BASE_URL}/api/employers/?webid=${encodeURIComponent(webidWithoutFragment)}`
->>>>>>> 0e53f8ca0cb435ff1a0c3682affc321a496778f2
       );
 
       if (response.ok) {
