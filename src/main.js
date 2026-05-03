@@ -1,7 +1,7 @@
 import { bootSolidModels, SolidEngine } from 'soukai-solid';
 import { setEngine } from 'soukai';
 import { getPodUrlAll, getSolidDataset, getFile } from "@inrupt/solid-client";
-
+import { performResumeCreation, loadResumes, performResumeUpdate, performResumeDeletion } from './solid';
 
 import {
     restoreSession,
@@ -43,9 +43,16 @@ import {
     performWebsiteDeletion,
     performUpdateWebsite,
     performUpdateSkill,
-    
+    createResume,
+    updateResume,
+    deleteResume,
+    loadAllResumes,
+    loadWebsite,
+    loadSkill
 } from './solid';
 import Website from './solid/Website';
+
+export { createResume, updateResume, deleteResume, loadAllResumes };
 
 async function main() {
     bootSolidModels();
@@ -142,11 +149,7 @@ export async function createInformation() {
     const Honors = document.getElementById('Honors').value;
     const ThesisTitle = document.getElementById('ThesisTitle').value;
 
-    
-    // const fileInput = document.getElementById('ImageFile');
-    // const imageFile = fileInput.files[0];
-    let podResumeID = sessionStorage.getItem("current_resume_id");
-    console.log("This is the podResumeID: " + podResumeID);
+    const uniqueInformationID = Date.now();
 
     const information = await performInformationCreation({
         FullName,
@@ -164,14 +167,35 @@ export async function createInformation() {
         RelevantCoursework,
         Honors,
         ThesisTitle,
-        ResumeIndex: podResumeID
-        
+        InformationIndex: uniqueInformationID
     });
+
+    // Store in session storage
+    const sessionInformation = JSON.parse(sessionStorage.getItem("session_information")) || [];
+    sessionInformation.push({
+        FullName,
+        ProfessionalTitle,
+        Summary,
+        Email,
+        ContactNumber,
+        Location,
+        ProfessionalSummary,
+        School,
+        Degree,
+        Program,
+        StartDate,
+        EndDate,
+        RelevantCoursework,
+        Honors,
+        ThesisTitle,
+        InformationIndex: uniqueInformationID
+    });
+    sessionStorage.setItem("session_information", JSON.stringify(sessionInformation));
+
     alert("Information has been created")
 }
 
 export async function createExperience() {
-    let podResumeID = sessionStorage.getItem("current_resume_id");
     const PositionTitle = document.getElementById('PositionTitle').value;
     const Organization = document.getElementById('Organization').value;
     const Duration = document.getElementById('Duration').value;
@@ -183,10 +207,7 @@ export async function createExperience() {
         return;
     }
 
-    const user = await restoreSession();
-
-    const podInformation = await loadInformation();
-    const maxResumeIndex = getHighestResumeIndex(podInformation);
+    const uniqueExperienceID = Date.now();
 
     const experience = await performExperienceCreation({
         PositionTitle,
@@ -194,13 +215,25 @@ export async function createExperience() {
         Duration,
         Description,
         ExperienceLocation,
-        ResumeIndex: podResumeID
+        ExperienceIndex: uniqueExperienceID
     });
+
+    // Store in session storage
+    const sessionExperiences = JSON.parse(sessionStorage.getItem("session_experiences")) || [];
+    sessionExperiences.push({
+        PositionTitle,
+        Organization,
+        Duration,
+        Description,
+        ExperienceLocation,
+        ExperienceIndex: uniqueExperienceID
+    });
+    sessionStorage.setItem("session_experiences", JSON.stringify(sessionExperiences));
+
     alert("Experience has been created")
 }
 
 export async function createProject() {
-    let podResumeID = sessionStorage.getItem("current_resume_id");
     const ProjectName = document.getElementById('ProjectName').value;
     const Summary = document.getElementById('ProjectSummary').value;
     const Tools = document.getElementById('Tools').value;
@@ -211,83 +244,75 @@ export async function createProject() {
         return;
     }
 
-    const user = await restoreSession();
-
-    const podInformation = await loadInformation();
-    const maxResumeIndex = getHighestResumeIndex(podInformation);
-
+    const uniqueProjectID = Date.now();
 
     const project = await performProjectCreation({
-        ProjectName: ProjectName,
-        Summary: Summary,
-        Tools: Tools,
-        ProjectLink: ProjectLink,
-        ResumeIndex: podResumeID
+        ProjectName,
+        Summary,
+        Tools,
+        ProjectLink,
+        ProjectIndex: uniqueProjectID
     });
+
+    // Store in session storage
+    const sessionProjects = JSON.parse(sessionStorage.getItem("session_projects")) || [];
+    sessionProjects.push({
+        ProjectName,
+        Summary,
+        Tools,
+        ProjectLink,
+        ProjectIndex: uniqueProjectID
+    });
+    sessionStorage.setItem("session_projects", JSON.stringify(sessionProjects));
+
     alert("Project has been created")
 }
 
 export async function createAward() {
-    let podResumeID = sessionStorage.getItem("current_resume_id");
     const AwardTitle = document.getElementById('AwardTitle').value;
-    const Date = document.getElementById('AwardDate').value;
-    const Organization = document.getElementById('AwardOrganization').value;
+    const AwardDate = document.getElementById('AwardDate').value;
+    const AwardOrganization = document.getElementById('AwardOrganization').value;
 
-    if (!AwardTitle || !Date || !Organization) {
+    if (!AwardTitle || !AwardDate || !AwardOrganization) {
         alert('Please fill in all fields');
         return;
     }
-    
-    const user = await restoreSession();
 
-    const podInformation = await loadInformation();
-
-    let podInfoLength = 0;
-    for (let podInfo in podInformation){
-        podInfoLength = podInfoLength + podInformation[podInfo].information.length;
-    }
-
+    const uniqueAwardID = Date.now();
 
     const award = await performAwardCreation({
         AwardTitle,
-        Date,
-        Organization,
-        ResumeIndex: podResumeID
+        AwardDate,
+        AwardOrganization,
+        AwardIndex: uniqueAwardID
     });
-
+    alert("Award has been created")
 }
 
-async function createTraining() {
+export async function createTraining() {
     const TrainingTitle = document.getElementById('TrainingTitle').value;
-    const Organization = document.getElementById('TrainingOrganization').value;
+    const TrainingOrganization = document.getElementById('TrainingOrganization').value;
     const YearEarned = document.getElementById('YearEarned').value;
     const YearExpire = document.getElementById('YearExpire').value;
 
-    if (!TrainingTitle || !Organization || !YearEarned) {
+    if (!TrainingTitle || !TrainingOrganization || !YearEarned) {
         alert('Please fill in all fields');
         return;
     }
 
-    const user = await restoreSession();
-
-    const podInformation = await loadInformation();
-
-    let podInfoLength = 0;
-    for (let podInfo in podInformation){
-        podInfoLength = podInfoLength + podInformation[podInfo].information.length;
-    }
-
+    const uniqueTrainingID = Date.now();
 
     const training = await performTrainingCreation({
         TrainingTitle,
-        Organization,
+        TrainingOrganization,
         YearEarned,
-        YearExpire
+        YearExpire,
+        TrainingIndex: uniqueTrainingID
     });
-
+    alert("Training has been created")
 }
 
-async function createReference() {
+export async function createReference() {
     const Name = document.getElementById('ReferenceName').value;
     const Position = document.getElementById('ReferencePosition').value;
     const Email = document.getElementById('ReferenceEmail').value;
@@ -298,23 +323,16 @@ async function createReference() {
         return;
     }
 
-    const user = await restoreSession();
-
-    const podInformation = await loadInformation();
-
-    let podInfoLength = 0;
-    for (let podInfo in podInformation){
-        podInfoLength = podInfoLength + podInformation[podInfo].information.length;
-    }
-
+    const uniqueReferenceID = Date.now();
 
     const reference = await performReferenceCreation({
         Name,
         Position,
         Email,
-        ContactNumber
+        ContactNumber,
+        ReferenceIndex: uniqueReferenceID
     });
-
+    alert("Reference has been created")
 }
 
 export async function createImage() {
@@ -349,13 +367,19 @@ export async function createWebsite() {
         return;
     }
 
-    const user = await restoreSession();
+    const uniqueWebsiteID = Date.now();
 
-    const podInformation = await loadInformation();
-    const maxResumeIndex = getHighestResumeIndex(podInformation);
+    const items = await performWebsiteCreation({
+        WebsiteLink,
+        ResumeIndex: podResumeID,
+        WebsiteIndex: uniqueWebsiteID
+    });
 
+    // Store in session storage
+    const sessionWebsites = JSON.parse(sessionStorage.getItem("session_websites")) || [];
+    sessionWebsites.push({ WebsiteLink, WebsiteIndex: uniqueWebsiteID });
+    sessionStorage.setItem("session_websites", JSON.stringify(sessionWebsites));
 
-    const items = await performWebsiteCreation({WebsiteLink, ResumeIndex: podResumeID});
     alert("Website has been created")   
 }
 
@@ -368,13 +392,19 @@ export async function createSkill() {
         return;
     }
 
-    const user = await restoreSession();
+    const uniqueSkillID = Date.now();
 
-    const podInformation = await loadInformation();
-    const maxResumeIndex = getHighestResumeIndex(podInformation);
+    const items = await performSkillCreation({
+        Skill,
+        ResumeIndex: podResumeID,
+        SkillIndex: uniqueSkillID
+    });
 
+    // Store in session storage
+    const sessionSkills = JSON.parse(sessionStorage.getItem("session_skills")) || [];
+    sessionSkills.push({ Skill, SkillIndex: uniqueSkillID });
+    sessionStorage.setItem("session_skills", JSON.stringify(sessionSkills));
 
-    const items = await performSkillCreation({Skill: Skill, ResumeIndex: podResumeID});
     alert("Skill has been created")   
 }
 
@@ -619,3 +649,41 @@ window.updateImage = updateImage;
 window.deleteImage = deleteImage;
 window.createWebsite = createWebsite;
 window.updateWebsite = updateWebsite;
+window.createResume = createResume;
+window.updateResume = updateResume;
+window.deleteResume = deleteResume;
+window.loadAllResumes = loadAllResumes;
+
+export async function completeResume() {
+    console.log("Completing resume...");
+    const podResumeID = sessionStorage.getItem("current_resume_id");
+    const podResumeTitle = sessionStorage.getItem("current_resume_title");
+
+    if (!podResumeTitle || podResumeTitle.trim() === "") {
+        alert("Resume title is missing. Please set a title before completing the resume.");
+        return;
+    }
+
+    console.log("Resume Title:", podResumeTitle);
+    const consolidatedResume = {
+        ResumeTitle: podResumeTitle,
+        InformationIndex: podInformation.length + 1,
+        WebsiteIndexes: sessionWebsites.map((website) => website.WebsiteIndex),
+        ProjectIndexes: podProjects.map((project) => project.ProjectIndex),
+        ExperienceIndexes: podExperiences.map((experience) => experience.ExperienceIndex),
+        SkillsIndexes: sessionSkills.map((skill) => skill.SkillIndex),
+    };
+
+    await performResumeCreation(consolidatedResume);
+
+    alert("Resume has been successfully completed and saved.");
+    sessionStorage.removeItem("current_resume_id");
+    sessionStorage.removeItem("current_resume_title");
+    sessionStorage.removeItem("session_websites");
+    sessionStorage.removeItem("session_skills");
+}
+
+export async function setResumeTitle(title) {
+    sessionStorage.setItem("current_resume_title", title);
+    alert(`Resume title set to: ${title}`);
+}

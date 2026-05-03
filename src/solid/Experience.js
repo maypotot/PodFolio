@@ -28,7 +28,7 @@ export default class Experience extends SolidModel {
             required: true,
             type: FieldType.String,
         },
-        ResumeIndex: {
+        ExperienceIndex: {
             required: true,
             type: FieldType.Number,
         }

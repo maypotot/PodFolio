@@ -69,13 +69,13 @@ export default class PersonalInformation extends SolidModel {
             required: false,
             type: FieldType.String,
         },
-        ResumeIndex: {
-            required: true,
-            type: FieldType.Number,
-        },
         ResumeImage: {
             required: false,
             type: FieldType.String,
+        },
+        InformationIndex: {
+            required: true,
+            type: FieldType.Number,
         }
     };
 

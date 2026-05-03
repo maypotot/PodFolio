@@ -12,7 +12,7 @@ export default class Skill extends SolidModel {
             required: true,
             type: FieldType.String,
         },
-        ResumeIndex: {
+        SkillIndex: {
             required: true,
             type: FieldType.Number,
         }
