@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import EmployerLayout from "./employer-layout";
 import "./employer-side.css";
+import API_BASE_URL from "./config/api.js";
 
 function EmployerCreateJob() {
   const [formData, setFormData] = useState({
@@ -26,7 +27,7 @@ function EmployerCreateJob() {
         if (webid) {
           const webidWithoutFragment = webid.split('#')[0];
           const response = await fetch(
-            `http://127.0.0.1:8000/api/employers/?webid=${encodeURIComponent(webidWithoutFragment)}`
+            `${API_BASE_URL}/api/employers/?webid=${encodeURIComponent(webidWithoutFragment)}`
           );
           
           if (response.ok) {
@@ -88,7 +89,7 @@ function EmployerCreateJob() {
       const webid = sessionStorage.getItem("employer_webid");
       const webidWithoutFragment = webid.split('#')[0];
 
-      const response = await fetch("http://127.0.0.1:8000/api/employer/jobs/create/", {
+      const response = await fetch(`${API_BASE_URL}/api/employer/jobs/create/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

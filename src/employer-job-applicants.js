@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import "./employer-side.css";
+import API_BASE_URL from "./config/api.js";
 
 function JobApplicants() {
   const { jobId } = useParams();
@@ -12,7 +13,7 @@ function JobApplicants() {
   useEffect(() => {
     async function fetchApplicants() {
       try {
-        const res = await fetch(`http://127.0.0.1:8000/api/jobs/${jobId}/applicants/`);
+        const res = await fetch(`${API_BASE_URL}/api/jobs/${jobId}/applicants/`);
         const data = await res.json();
         
         // DEBUG: Check what data we're getting
@@ -46,7 +47,7 @@ function JobApplicants() {
         summary: summary,
       };
 
-      const res = await fetch("http://127.0.0.1:8000/api/requests/create/", {
+      const res = await fetch(`${API_BASE_URL}/api/requests/create/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

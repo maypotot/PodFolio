@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { getDefaultSession } from "@inrupt/solid-client-authn-browser";
 import "./main.css";
+import API_BASE_URL from "./config/api.js";
 
 function EmployerAccessResumes() {
   const [permissions, setPermissions] = useState([]);
@@ -244,8 +245,8 @@ function EmployerAccessResumes() {
       const webIdWithoutFragment = employerWebId.split("#")[0];
 
       const urls = [
-        `http://127.0.0.1:8000/api/permissions/list/?employer_webid=${encodeURIComponent(webIdWithFragment)}`,
-        `http://127.0.0.1:8000/api/permissions/list/?employer_webid=${encodeURIComponent(webIdWithoutFragment)}`
+        `${API_BASE_URL}/api/permissions/list/?employer_webid=${encodeURIComponent(webIdWithFragment)}`,
+        `${API_BASE_URL}/api/permissions/list/?employer_webid=${encodeURIComponent(webIdWithoutFragment)}`
       ];
 
       const responses = await Promise.all(urls.map((url) => fetch(url)));

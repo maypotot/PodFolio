@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { restoreSession } from "./solid.js";
 import "./employer-side.css";
+import API_BASE_URL from "./config/api.js";
 
 function EmployerLayout({ children }) {
   const [employerData, setEmployerData] = useState(null);
@@ -22,7 +23,7 @@ function EmployerLayout({ children }) {
         if (webid) {
           const webidWithoutFragment = webid.split('#')[0];
           const employerRes = await fetch(
-            `http://127.0.0.1:8000/api/employers/?webid=${encodeURIComponent(webidWithoutFragment)}`
+            `${API_BASE_URL}/api/employers/?webid=${encodeURIComponent(webidWithoutFragment)}`
           );
           
           if (employerRes.ok) {

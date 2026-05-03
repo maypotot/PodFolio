@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./main.css";
+import API_BASE_URL from "./config/api.js";
 
 function EmployerHomeFeed() {
   const [jobs, setJobs] = useState([]);
@@ -34,7 +35,7 @@ function EmployerHomeFeed() {
       }
       const webidWithoutFragment = employerWebId.split('#')[0];
       const res = await fetch(
-        `http://127.0.0.1:8000/api/employer/jobs/?employer_webid=${encodeURIComponent(webidWithoutFragment)}`
+        `${API_BASE_URL}/api/employer/jobs/?employer_webid=${encodeURIComponent(webidWithoutFragment)}`
       );
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const data = await res.json();
@@ -109,7 +110,7 @@ function EmployerHomeFeed() {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/api/employer/jobs/${editingJob.id}/`,
+        `${API_BASE_URL}/api/employer/jobs/${editingJob.id}/`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -146,7 +147,7 @@ function EmployerHomeFeed() {
     setDeleteLoading(true);
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/api/employer/jobs/${editingJob.id}/delete/`,
+        `${API_BASE_URL}/api/employer/jobs/${editingJob.id}/delete/`,
         { method: "DELETE" }
       );
       if (response.ok) {

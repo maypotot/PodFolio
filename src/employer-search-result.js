@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import "./employer-side.css";
+import API_BASE_URL from "./config/api.js";
 
 function StudentSearch() {
   const [searchParams] = useSearchParams();
@@ -18,7 +19,7 @@ function StudentSearch() {
       setSearched(true);
       try {
         const res = await fetch(
-          `http://127.0.0.1:8000/api/students/search/?q=${encodeURIComponent(query)}`
+          `${API_BASE_URL}/api/students/search/?q=${encodeURIComponent(query)}`
         );
         const data = await res.json();
         setResults(data);

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./employer-side.css";
 import EmployerLayout from "./employer-layout";
+import API_BASE_URL from "./config/api.js";
+
 
 function EmployerNotifs() {
   const [applications, setApplications] = useState([]);
@@ -22,7 +24,7 @@ function EmployerNotifs() {
         const webidWithoutFragment = webid.split('#')[0];
 
         const res = await fetch(
-          `http://127.0.0.1:8000/api/employer/applications/?employer_webid=${encodeURIComponent(webidWithoutFragment)}`
+          `${API_BASE_URL}/api/employer/applications/?employer_webid=${encodeURIComponent(webidWithoutFragment)}`
         );
         
         if (res.ok) {
@@ -54,7 +56,7 @@ function EmployerNotifs() {
         summary: summary,
       };
 
-      const res = await fetch("http://127.0.0.1:8000/api/requests/create/", {
+      const res = await fetch(`${API_BASE_URL}/api/requests/create/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { getDefaultSession } from "@inrupt/solid-client-authn-browser";
 import "./employer-side.css";
+import API_BASE_URL from "./config/api.js";
 
 function EmployerViewResume() {
   const location = useLocation();
@@ -257,8 +258,8 @@ function EmployerViewResume() {
         const webIdWithoutFragment = employerWebId.split("#")[0];
 
         const urls = [
-          `http://127.0.0.1:8000/api/permissions/list/?employer_webid=${encodeURIComponent(webIdWithFragment)}`,
-          `http://127.0.0.1:8000/api/permissions/list/?employer_webid=${encodeURIComponent(webIdWithoutFragment)}`
+          `${API_BASE_URL}/api/permissions/list/?employer_webid=${encodeURIComponent(webIdWithFragment)}`,
+          `${API_BASE_URL}/api/permissions/list/?employer_webid=${encodeURIComponent(webIdWithoutFragment)}`
         ];
 
         const responses = await Promise.all(urls.map((url) => fetch(url)));
