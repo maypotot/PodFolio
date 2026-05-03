@@ -24,7 +24,7 @@ export default class Project extends SolidModel {
             required: true,
             type: FieldType.String,
         },
-        ResumeIndex: {
+        ProjectIndex: {
             required: true,
             type: FieldType.Number,
         }

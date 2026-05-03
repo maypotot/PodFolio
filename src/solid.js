@@ -18,7 +18,7 @@ import ReferenceList from './solid/ReferenceList';
 import ImageList from './solid/ImageList';
 import WebsiteList from './solid/WebsiteList';
 import SkillList from './solid/SkillList';
-
+import Resume from './solid/Resume';
 
 let list, user;
 let infoList;
@@ -30,6 +30,7 @@ let referenceList;
 let imageList;
 let websiteList;
 let skillList;
+let resumeList;
 
 
 export async function restoreSession() {
@@ -177,6 +178,19 @@ export async function performSkillCreation(skill) {
     const newSkill = skillList.relatedSkill.create(skill);
     return newSkill;
 }
+
+export async function performResumeCreation(resume) {
+    resumeList = await Resume.find(`${user.storageUrl}resumes/`);
+    if (!resumeList) {
+        resumeList = await Resume.at(user.storageUrl).create({ url: `${user.storageUrl}resumes/` });
+    }
+
+    await resumeList.loadRelation('resumes');
+    const newResume = resumeList.relatedResumes.create(resume);
+    return newResume;
+}
+
+export { performResumeCreation as createResume, performUpdateResume as updateResume, performResumeDeletion as deleteResume, loadResumes as loadAllResumes };
 
 async function uploadImage(image) {
   try {
@@ -407,6 +421,16 @@ export async function loadSkill() {
     }
 
     return podSkillList;
+}
+
+export async function loadResumes() {
+    resumeList = await Resume.find(`${user.storageUrl}resumes/`);
+    if (!resumeList) {
+        return [];
+    }
+
+    await resumeList.loadRelation('resumes');
+    return resumeList.relatedResumes;
 }
 
 // Updating Information
@@ -737,6 +761,37 @@ export async function performUpdateSkill(skillUrl, inputSkill) {
 }
 
 
+export async function performUpdateResume(resumeUrl, inputResume) {
+    let podResume;
+    let podResumeList = [];
+    const allContainers = await Resume.find(user.storageUrl);
+    resumeList = allContainers.resourceUrls.filter(c => c.includes("resumes"));
+
+    if (!resumeList) {
+        return;
+    }
+
+    for (let url in resumeList) {
+        podResume = await Resume.find(resumeList[url]);
+        podResumeList.push(podResume);
+    }
+    for (let resume in podResumeList) {
+        await podResumeList[resume].loadRelation('resumes');
+    }
+
+    for (let i in podResumeList) {
+        let resumes = podResumeList[i].resumes;
+        for (let j in resumes) {
+            console.log("Checking resume with URL:", resumes[j].url);
+            if (resumes[j].url === resumeUrl) {
+                await resumes[j].delete();
+                alert('Resume deleted successfully. Please refresh the page to see the changes.');
+                return;
+            }
+        }
+    }
+}
+
 // Deletion
 export async function performInformationDeletion(infoUrl) {
     let podInfo;
@@ -904,6 +959,37 @@ export async function performSkillDeletion(skillUrl) {
                 await skills[j].delete();
             alert('Skill deleted successfully. Please refresh the page to see the changes.');
             return;
+            }
+        }
+    }
+}
+
+export async function performResumeDeletion(resumeUrl) {
+    let podResume;
+    let podResumeList = [];
+    const allContainers = await Resume.find(user.storageUrl);
+    resumeList = allContainers.resourceUrls.filter(c => c.includes("resumes"));
+
+    if (!resumeList) {
+        return [];
+    }
+
+    for (let url in resumeList) {
+        podResume = await Resume.find(resumeList[url]);
+        podResumeList.push(podResume);
+    }
+    for (let exp in podResumeList) {
+        await podResumeList[exp].loadRelation('resumes');
+    }
+
+    for (let i in podResumeList) {
+        let resumes = podResumeList[i].resumes;
+        for (let j in resumes) {
+            console.log("Checking resume with URL:", resumes[j].url);
+            if (resumes[j].url === resumeUrl) {
+                await resumes[j].delete();
+                alert('Resume deleted successfully. Please refresh the page to see the changes.');
+                return;
             }
         }
     }

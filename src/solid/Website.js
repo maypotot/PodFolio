@@ -12,7 +12,7 @@ export default class Website extends SolidModel {
             required: true,
             type: FieldType.String,
         },
-        ResumeIndex: {
+        WebsiteIndex: {
             required: true,
             type: FieldType.Number,
         }

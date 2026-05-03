@@ -19,6 +19,9 @@ import {
   createProject,
   createExperience,
   createSkill,
+  loadAllResumes,
+  completeResume,
+  setResumeTitle
  } from "./main.js";
 
 
@@ -27,28 +30,48 @@ import {
 function CreateResume() {
   const navigate = useNavigate();
   const [resumeTitle, setResumeTitle] = useState("");
+  const [availableResumes, setAvailableResumes] = useState([]);
+  const [selectedResume, setSelectedResume] = useState(null);
 
   useEffect(() => {
-    // Get current resume title from sessionStorage
+    const fetchResumes = async () => {
+      const resumes = await loadAllResumes();
+      setAvailableResumes(resumes);
+    };
+
+    fetchResumes();
+
     const title = sessionStorage.getItem("current_resume_title");
     if (title) {
+      setResumeTitle(title); // Use setResumeTitle to store the title
       setResumeTitle(title);
     } else {
-      // If no resume title, redirect back to profile
       alert("No resume selected. Please create or select a resume from your profile.");
       navigate("/profile");
     }
   }, [navigate]);
 
+  const handleResumeSelection = (event) => {
+    const selectedId = event.target.value;
+    const resume = availableResumes.find((res) => res.id === selectedId);
+    setSelectedResume(resume);
+    if (resume) {
+      setResumeTitle(resume.ResumeTitle); // Use setResumeTitle to store the title
+      setResumeTitle(resume.ResumeTitle);
+      // Populate other fields based on selected resume
+    }
+  };
+
   const handleCompleteResume = () => {
-    // Clear current resume from session
-    console.log(sessionStorage.getItem("current_resume_id"))
     createInformation().then(() => {
-      navigate("/profile");
-    })
-    
-    sessionStorage.removeItem("current_resume_id");
-    sessionStorage.removeItem("current_resume_title");
+      alert("Personal Information has been created");   
+      completeResume().then(() => {
+        navigate("/profile");
+        sessionStorage.removeItem("current_resume_id");
+        sessionStorage.removeItem("current_resume_title");
+      });
+    });
+
     // Navigate to profile
   };
 
