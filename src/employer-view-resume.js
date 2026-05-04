@@ -400,45 +400,45 @@ function EmployerViewResume() {
             <div className="placeholder-sections">
               <div className="placeholder-section">
                 <h3>Personal Information</h3>
-                <p className="placeholder-item">Name: {getDisplayValue("FullName", "Name", "StudentName")}</p>
-                <p className="placeholder-item">Email: {getDisplayValue("Email")}</p>
-                <p className="placeholder-item">Phone: {getDisplayValue("ContactNumber", "Phone", "PhoneNumber")}</p>
-                <p className="placeholder-item">Location: {getDisplayValue("Location", "Address")}</p>
+                <p className="resume-item">Name: {getDisplayValue("FullName", "Name", "StudentName")}</p>
+                <p className="resume-item">Email: {getDisplayValue("Email")}</p>
+                <p className="resume-item">Phone: {getDisplayValue("ContactNumber", "Phone", "PhoneNumber")}</p>
+                <p className="resume-item">Location: {getDisplayValue("Location", "Address")}</p>
               </div>
 
               <div className="placeholder-section">
                 <h3>Education</h3>
-                <p className="placeholder-item">Degree: {getDisplayValue("Degree")}</p>
-                <p className="placeholder-item">Institution: {getDisplayValue("School", "Institution", "University")}</p>
-                <p className="placeholder-item">Graduation Date: {getDisplayValue("EndDate", "GraduationDate")}</p>
+                <p className="resume-item">Degree: {getDisplayValue("Degree")}</p>
+                <p className="resume-item">Institution: {getDisplayValue("School", "Institution", "University")}</p>
+                <p className="resume-item">Graduation Date: {getDisplayValue("EndDate", "GraduationDate")}</p>
               </div>
 
               <div className="placeholder-section">
                 <h3>Skills</h3>
                 {skills.length > 0 ? (
                   skills.slice(0, 3).map((skill, index) => (
-                    <p key={`${skill}-${index}`} className="placeholder-item">• {skill}</p>
+                    <p key={`${skill}-${index}`} className="resume-item">• {skill}</p>
                   ))
                 ) : (
                   <>
-                    <p className="placeholder-item">• [To be loaded from Pod]</p>
-                    <p className="placeholder-item">• [To be loaded from Pod]</p>
-                    <p className="placeholder-item">• [To be loaded from Pod]</p>
+                    <p className="resume-item">• [To be loaded from Pod]</p>
+                    <p className="resume-item">• [To be loaded from Pod]</p>
+                    <p className="resume-item">• [To be loaded from Pod]</p>
                   </>
                 )}
               </div>
 
               <div className="placeholder-section">
                 <h3>Experience</h3>
-                <p className="placeholder-item">Job Title: {getDisplayValue("PositionTitle", "JobTitle")}</p>
-                <p className="placeholder-item">Company: {getDisplayValue("Organization", "Company")}</p>
-                <p className="placeholder-item">Duration: {getDisplayValue("Duration")}</p>
+                <p className="resume-item">Job Title: {getDisplayValue("PositionTitle", "JobTitle")}</p>
+                <p className="resume-item">Company: {getDisplayValue("Organization", "Company")}</p>
+                <p className="resume-item">Duration: {getDisplayValue("Duration")}</p>
               </div>
 
               <div className="placeholder-section">
                 <h3>Projects</h3>
-                <p className="placeholder-item">Project Name: {getDisplayValue("ProjectName", "ProjectTitle")}</p>
-                <p className="placeholder-item">Description: {getDisplayValue("Summary", "Description", "ProjectDescription")}</p>
+                <p className="resume-item">Project Name: {getDisplayValue("ProjectName", "ProjectTitle")}</p>
+                <p className="resume-item">Description: {getDisplayValue("Summary", "Description", "ProjectDescription")}</p>
               </div>
             </div>
 

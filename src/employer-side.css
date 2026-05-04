@@ -1945,6 +1945,12 @@ h5 {
   padding-left: 1rem;
 }
 
+.resume-item {
+  color: #020202;
+  margin: 0.5rem 0;
+  padding-left: 1rem;
+}
+
 .integration-note {
   background-color: #e3f2fd;
   border-left: 4px solid #2196F3;
