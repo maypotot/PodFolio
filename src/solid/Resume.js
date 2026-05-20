@@ -6,11 +6,15 @@ export default class Resume extends SolidModel {
     static rdfsClass = 'schema:CreativeWork';
     static fields = {
         ResumeTitle: {
-            required: true,
+            required: false,
             type: FieldType.String,
         },
+        ResumeIndex: {
+            required: false,
+            type: FieldType.Number,
+        },
         InformationIndex: {
-            required: true,
+            required: false,
             type: FieldType.Number,
         },
         WebsiteIndexes: {

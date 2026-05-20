@@ -20,6 +20,16 @@ import WebsiteList from './solid/WebsiteList';
 import SkillList from './solid/SkillList';
 import Resume from './solid/Resume';
 
+import PersonalInformation from './solid/PersonalInformation';
+import Experience from './solid/Experience';
+import Project from './solid/Project';
+import Award from './solid/Award';
+import Training from './solid/Training';
+import Reference from './solid/Reference';
+import Image from './solid/Image';
+import Website from './solid/Website';
+import Skill from './solid/Skill';
+
 let list, user;
 let infoList;
 let experienceList;
@@ -92,102 +102,39 @@ export async function performLogout() {
 
 // Creation
 export async function performInformationCreation(info) {
-    infoList = await InformationList.find(`${user.storageUrl}information/`);
-    if (!infoList) {
-        infoList = await InformationList.at(user.storageUrl).create({ url: `${user.storageUrl}information/` });
-    }
-
-    await infoList.loadRelation('information');
-    const information = infoList.relatedInformation.create(info);
-    return information;
+    return await PersonalInformation.at(`${user.storageUrl}information/`).create(info);
 }
 
 export async function performExperienceCreation(exp) {
-    experienceList = await ExperienceList.find(`${user.storageUrl}experience/`);
-    if (!experienceList) {
-        experienceList = await ExperienceList.at(user.storageUrl).create({ url: `${user.storageUrl}experience/` });
-    }
-
-    await experienceList.loadRelation('experience');
-    const experience = experienceList.relatedExperience.create(exp);
-    return experience;
+    return await Experience.at(`${user.storageUrl}experience/`).create(exp);
 }
 
 export async function performProjectCreation(project) {
-    projectList = await ProjectList.find(`${user.storageUrl}projects/`);
-    if (!projectList) {
-        projectList = await ProjectList.at(user.storageUrl).create({ url: `${user.storageUrl}projects/` });
-    }
-
-    await projectList.loadRelation('projects');
-    const newProject = projectList.relatedProjects.create(project);
-    return newProject;
+    return await Project.at(`${user.storageUrl}projects/`).create(project);
 }
 
 export async function performAwardCreation(award) {
-    awardList = await AwardList.find(`${user.storageUrl}awards/`);
-    if (!awardList) {
-        awardList = await AwardList.at(user.storageUrl).create({ url: `${user.storageUrl}awards/` });
-    }
-
-    await awardList.loadRelation('awards');
-    const newAward = awardList.relatedAward.create(award);
-    return newAward;
+    return await Award.at(`${user.storageUrl}awards/`).create(award);
 }
 
 export async function performTrainingCreation(training) {
-    trainingList = await TrainingList.find(`${user.storageUrl}training/`);
-    if (!trainingList) {
-        trainingList = await TrainingList.at(user.storageUrl).create({ url: `${user.storageUrl}training/` });
-    }
-
-    await trainingList.loadRelation('training');
-    const newTraining = trainingList.relatedTraining.create(training);
-    return newTraining;
+    return await Training.at(`${user.storageUrl}training/`).create(training);
 }
 
 export async function performReferenceCreation(reference) {
-    referenceList = await ReferenceList.find(`${user.storageUrl}references/`);
-    if (!referenceList) {
-        referenceList = await ReferenceList.at(user.storageUrl).create({ url: `${user.storageUrl}references/` });
-    }
-
-    await referenceList.loadRelation('references');
-    const newReference = referenceList.relatedReference.create(reference);
-    return newReference;
+    return await Reference.at(`${user.storageUrl}references/`).create(reference);
 }
 
 export async function performWebsiteCreation(website) {
-    websiteList = await WebsiteList.find(`${user.storageUrl}websites/`);
-    if (!websiteList) {
-        websiteList = await WebsiteList.at(user.storageUrl).create({ url: `${user.storageUrl}websites/` });
-    }
-
-    await websiteList.loadRelation('website');
-    const newWebsite = websiteList.relatedWebsite.create(website);
-    return newWebsite;
+    return await Website.at(`${user.storageUrl}websites/`).create(website);
 }
 
 export async function performSkillCreation(skill) {
-    skillList = await SkillList.find(`${user.storageUrl}skills/`);
-    if (!skillList) {
-        skillList = await SkillList.at(user.storageUrl).create({ url: `${user.storageUrl}skills/` });
-    }
-
-    await skillList.loadRelation('skill');
-    const newSkill = skillList.relatedSkill.create(skill);
-    return newSkill;
+    return await Skill.at(`${user.storageUrl}skills/`).create(skill);
 }
 
 export async function performResumeCreation(resume) {
-    resumeList = await Resume.find(`${user.storageUrl}resumes/`);
-    if (!resumeList) {
-        resumeList = await Resume.at(user.storageUrl).create({ url: `${user.storageUrl}resumes/` });
-    }
-
-    await resumeList.loadRelation('resumes');
-    const newResume = resumeList.relatedResumes.create(resume);
-    return newResume;
+    return await Resume.at(`${user.storageUrl}resumes/`).create(resume);
 }
 
 export { performResumeCreation as createResume, performUpdateResume as updateResume, performResumeDeletion as deleteResume, loadResumes as loadAllResumes };
@@ -233,765 +180,436 @@ export async function performImageCreation(image) {
 
 // Loading
 export async function loadInformation() {
-    let podInfo;
     let podInfoList = [];
-    const allContainers = await InformationList.find(user.storageUrl);
-    infoList = allContainers.resourceUrls.filter(c => c.includes("information"));
-
-
-    if (!infoList) {
-        return [];
+    try {
+        const personalInfos = await PersonalInformation.at(`${user.storageUrl}information/`).all();
+        const podInfo = {
+            information: personalInfos,
+            url: `${user.storageUrl}information/`
+        };
+        podInfoList.push(podInfo);
+        infoList = [`${user.storageUrl}information/`];
+    } catch (error) {
+        console.warn("Error loading information:", error);
     }
-    
-    for (let url in infoList){
-        podInfo = await InformationList.find(infoList[url])
-        podInfoList.push(podInfo)
-    }
-    for (let info in podInfoList){
-        await podInfoList[info].loadRelation('information');
-    }
-
     return podInfoList;
 }
 
 export async function loadExperience() {
-    let podExperience;
     let podExperienceList = [];
-    const allContainers = await ExperienceList.find(user.storageUrl);
-    experienceList = allContainers.resourceUrls.filter(c => c.includes("experience"));
-
-    if (!experienceList) {
-        return [];
-    }
-
-    for (let url in experienceList) {
-        podExperience = await ExperienceList.find(experienceList[url]);
+    try {
+        const experiences = await Experience.at(`${user.storageUrl}experience/`).all();
+        const podExperience = {
+            experience: experiences,
+            url: `${user.storageUrl}experience/`
+        };
         podExperienceList.push(podExperience);
+        experienceList = [`${user.storageUrl}experience/`];
+    } catch (error) {
+        console.warn("Error loading experience:", error);
     }
-    for (let exp in podExperienceList) {
-        await podExperienceList[exp].loadRelation('experience');
-    }
-
     return podExperienceList;
 }
 
 export async function loadProject() {
-    let podProject;
     let podProjectList = [];
-    const allContainers = await ProjectList.find(user.storageUrl);
-    projectList = allContainers.resourceUrls.filter(c => c.includes("projects"));
-
-    
-    if (!projectList) {
-        return [];
-    }
-
-    for (let url in projectList) {
-        podProject = await ProjectList.find(projectList[url]);
+    try {
+        const projects = await Project.at(`${user.storageUrl}projects/`).all();
+        const podProject = {
+            projects: projects,
+            url: `${user.storageUrl}projects/`
+        };
         podProjectList.push(podProject);
-    }
-    for (let proj in podProjectList) {
-        await podProjectList[proj].loadRelation('projects');
+        projectList = [`${user.storageUrl}projects/`];
+    } catch (error) {
+        console.warn("Error loading projects:", error);
     }
     return podProjectList;
 }
 
 export async function loadAward() {
-    let podAward;
     let podAwardList = [];
-    const allContainers = await AwardList.find(user.storageUrl);
-    awardList = allContainers.resourceUrls.filter(c => c.includes("awards"));
-
-    if (!awardList) {
-        return [];
-    }
-
-    for (let url in awardList) {
-        podAward = await AwardList.find(awardList[url]);
+    try {
+        const awards = await Award.at(`${user.storageUrl}awards/`).all();
+        const podAward = {
+            award: awards,
+            url: `${user.storageUrl}awards/`
+        };
         podAwardList.push(podAward);
+        awardList = [`${user.storageUrl}awards/`];
+    } catch (error) {
+        console.warn("Error loading awards:", error);
     }
-    for (let award in podAwardList) {
-        await podAwardList[award].loadRelation('award');
-    }
-
     return podAwardList;
 }
 
 export async function loadTraining() {
-    let podTraining;
     let podTrainingList = [];
-    const allContainers = await TrainingList.find(user.storageUrl);
-    trainingList = allContainers.resourceUrls.filter(c => c.includes("training"));
-
-    if (!trainingList) {
-        return [];
-    }
-
-    for (let url in trainingList) {
-        podTraining = await TrainingList.find(trainingList[url]);
+    try {
+        const trainings = await Training.at(`${user.storageUrl}training/`).all();
+        const podTraining = {
+            training: trainings,
+            url: `${user.storageUrl}training/`
+        };
         podTrainingList.push(podTraining);
+        trainingList = [`${user.storageUrl}training/`];
+    } catch (error) {
+        console.warn("Error loading training:", error);
     }
-    for (let training in podTrainingList) {
-        await podTrainingList[training].loadRelation('training');
-    }
-
     return podTrainingList;
 }
 
 export async function loadReference() {
-    let podReference;
     let podReferenceList = [];
-    const allContainers = await ReferenceList.find(user.storageUrl);
-    referenceList = allContainers.resourceUrls.filter(c => c.includes("references"));
-
-    if (!referenceList) {
-        return [];
-    }
-
-    for (let url in referenceList) {
-        podReference = await ReferenceList.find(referenceList[url]);
+    try {
+        const references = await Reference.at(`${user.storageUrl}references/`).all();
+        const podReference = {
+            reference: references,
+            url: `${user.storageUrl}references/`
+        };
         podReferenceList.push(podReference);
+        referenceList = [`${user.storageUrl}references/`];
+    } catch (error) {
+        console.warn("Error loading references:", error);
     }
-    for (let reference in podReferenceList) {
-        await podReferenceList[reference].loadRelation('reference');
-    }
-
     return podReferenceList;
 }
 
 
 export async function loadImage() {
-    let podImage;
     let podImageList = [];
-    const allContainers = await ImageList.find(user.storageUrl);
-    imageList = allContainers.resourceUrls.filter(c => c.includes("images"));
-
-    if (!imageList) {
-        return [];
-    }
-
-    for (let url in imageList) {
-        podImage = await ImageList.find(imageList[url]);
+    try {
+        const images = await Image.at(`${user.storageUrl}images/`).all();
+        const podImage = {
+            image: images,
+            url: `${user.storageUrl}images/`
+        };
         podImageList.push(podImage);
+        imageList = [`${user.storageUrl}images/`];
+    } catch (error) {
+        console.warn("Error loading images:", error);
     }
-    for (let image in podImageList) {
-        await podImageList[image].loadRelation('image');
-    }
-
     return podImageList;
 }
 
 export async function loadWebsite() {
-    let podWebsite;
     let podWebsiteList = [];
-    const allContainers = await WebsiteList.find(user.storageUrl);
-    websiteList = allContainers.resourceUrls.filter(c => c.includes("websites"));
-
-    if (!websiteList) {
-        return [];
-    }
-
-    for (let url in websiteList) {
-        podWebsite = await WebsiteList.find(websiteList[url]);
+    try {
+        const websites = await Website.at(`${user.storageUrl}websites/`).all();
+        const podWebsite = {
+            website: websites,
+            url: `${user.storageUrl}websites/`
+        };
         podWebsiteList.push(podWebsite);
+        websiteList = [`${user.storageUrl}websites/`];
+    } catch (error) {
+        console.warn("Error loading websites:", error);
     }
-    for (let website in podWebsiteList) {
-        await podWebsiteList[website].loadRelation('website');
-    }
-
     return podWebsiteList;
 }
 
 export async function loadSkill() {
-    let podSkill;
     let podSkillList = [];
-    const allContainers = await SkillList.find(user.storageUrl);
-    skillList = allContainers.resourceUrls.filter(c => c.includes("skills"));
-
-    if (!skillList) {
-        return [];
-    }
-
-    for (let url in skillList) {
-        podSkill = await SkillList.find(skillList[url]);
+    try {
+        const skills = await Skill.at(`${user.storageUrl}skills/`).all();
+        const podSkill = {
+            skill: skills,
+            url: `${user.storageUrl}skills/`
+        };
         podSkillList.push(podSkill);
+        skillList = [`${user.storageUrl}skills/`];
+    } catch (error) {
+        console.warn("Error loading skills:", error);
     }
-    for (let skill in podSkillList) {
-        await podSkillList[skill].loadRelation('skill');
-    }
-
     return podSkillList;
 }
 
 export async function loadResumes() {
-    resumeList = await Resume.find(`${user.storageUrl}resumes/`);
-    if (!resumeList) {
+    try {
+        const resumes = await Resume.at(`${user.storageUrl}resumes/`).all();
+        return resumes;
+    } catch (error) {
+        console.warn("Error loading resumes:", error);
         return [];
     }
-
-    await resumeList.loadRelation('resumes');
-    return resumeList.relatedResumes;
 }
 
 // Updating Information
 export async function performUpdateInformation(infoUrl, inputInfo) {
-    let podInfo;
-    let podInformationList = [];
-    const allContainers = await InformationList.find(user.storageUrl);
-    infoList = allContainers.resourceUrls.filter(c => c.includes("information"));
-
-    if (!infoList) {
-        return;
-    }
-
-    for (let url in infoList) {
-        podInfo = await InformationList.find(infoList[url]);
-        podInformationList.push(podInfo);
-    }
-    for (let info in podInformationList) {
-        await podInformationList[info].loadRelation('information');
-    }
-
-    for (let i in podInformationList) {
-        let information = podInformationList[i].information;
-        for (let j in information) {
-            console.log("Checking information with URL:", information[j].url);
-            if (information[j].url === infoUrl) {
-                await information[j].update({ FullName: inputInfo.FullName
-                    , ProfessionalTitle: inputInfo.ProfessionalTitle
-                    , Summary: inputInfo.Summary
-                    , Email: inputInfo.Email
-                    , ContactNumber: inputInfo.ContactNumber
-                    , Location: inputInfo.Location
-                    , WebsiteLink: inputInfo.WebsiteLink
-                    , ProfessionalSummary: inputInfo.ProfessionalSummary
-                    , School: inputInfo.School
-                    , Degree: inputInfo.Degree
-                    , Program: inputInfo.Program
-                    , StartDate: inputInfo.StartDate
-                    , EndDate: inputInfo.EndDate
-                    , RelevantCoursework: inputInfo.RelevantCoursework
-                    , Honors: inputInfo.Honors
-                    , ThesisTitle: inputInfo.ThesisTitle
-                 });
+    try {
+        const information = await PersonalInformation.find(infoUrl);
+        if (information) {
+            await information.update({
+                FullName: inputInfo.FullName,
+                ProfessionalTitle: inputInfo.ProfessionalTitle,
+                Summary: inputInfo.Summary,
+                Email: inputInfo.Email,
+                ContactNumber: inputInfo.ContactNumber,
+                Location: inputInfo.Location,
+                WebsiteLink: inputInfo.WebsiteLink,
+                ProfessionalSummary: inputInfo.ProfessionalSummary,
+                School: inputInfo.School,
+                Degree: inputInfo.Degree,
+                Program: inputInfo.Program,
+                StartDate: inputInfo.StartDate,
+                EndDate: inputInfo.EndDate,
+                RelevantCoursework: inputInfo.RelevantCoursework,
+                Honors: inputInfo.Honors,
+                ThesisTitle: inputInfo.ThesisTitle
+            });
             alert('Information updated successfully. Please refresh the page to see the changes.');
-            return;
-            }
         }
+    } catch (error) {
+        console.error("Error updating information:", error);
     }
 }
 
 
 export async function performUpdateExperience(expUrl, inputExp) {
-    let podExperience;
-    let podExperienceList = [];
-    const allContainers = await ExperienceList.find(user.storageUrl);
-    experienceList = allContainers.resourceUrls.filter(c => c.includes("experience"));
-
-    if (!experienceList) {
-        return;
-    }
-
-    for (let url in experienceList) {
-        podExperience = await ExperienceList.find(experienceList[url]);
-        podExperienceList.push(podExperience);
-    }
-    for (let exp in podExperienceList) {
-        await podExperienceList[exp].loadRelation('experience');
-    }
-
-    for (let i in podExperienceList) {
-        let experiences = podExperienceList[i].experience;
-        for (let j in experiences) {
-            console.log("Checking experience with URL:", experiences[j].url);
-            if (experiences[j].url === expUrl) {
-                await experiences[j].update({ 
-                    PositionTitle: inputExp.PositionTitle,
-                    Organization: inputExp.Organization,
-                    Duration: inputExp.Duration,
-                    Description: inputExp.Description
-                 });
+    try {
+        const experience = await Experience.find(expUrl);
+        if (experience) {
+            await experience.update({ 
+                PositionTitle: inputExp.PositionTitle,
+                Organization: inputExp.Organization,
+                Duration: inputExp.Duration,
+                Description: inputExp.Description
+             });
             alert('Experience updated successfully. Please refresh the page to see the changes.');
-            return;
-            }
         }
+    } catch (error) {
+        console.error("Error updating experience:", error);
     }
 }
 
 export async function performUpdateProject(projectUrl, inputProject) {
-    let podProject;
-    let podProjectList = [];
-    const allContainers = await ProjectList.find(user.storageUrl);
-    projectList = allContainers.resourceUrls.filter(c => c.includes("projects"));
-
-    if (!projectList) {
-        return;
-    }
-
-    for (let url in projectList) {
-        podProject = await ProjectList.find(projectList[url]);
-        podProjectList.push(podProject);
-    }
-    for (let proj in podProjectList) {
-        await podProjectList[proj].loadRelation('projects');
-    }
-
-    for (let i in podProjectList) {
-        let projects = podProjectList[i].projects;
-        for (let j in projects) {
-            console.log("Checking project with URL:", projects[j].url);
-            if (projects[j].url === projectUrl) {
-                await projects[j].update({ 
-                    ProjectName: inputProject.ProjectName,
-                    Tools: inputProject.Tools,
-                    Summary: inputProject.ProjectSummary,
-                    ProjectLink: inputProject.ProjectLink
-                 });
+    try {
+        const project = await Project.find(projectUrl);
+        if (project) {
+            await project.update({ 
+                ProjectName: inputProject.ProjectName,
+                Tools: inputProject.Tools,
+                Summary: inputProject.ProjectSummary,
+                ProjectLink: inputProject.ProjectLink
+             });
             alert('Project updated successfully. Please refresh the page to see the changes.');
-            return;
-            }
         }
+    } catch (error) {
+        console.error("Error updating project:", error);
     }
 }
 
 export async function performUpdateAward(awardUrl, inputAward) {
-    let podAward;
-    let podAwardList = [];
-    const allContainers = await AwardList.find(user.storageUrl);
-    awardList = allContainers.resourceUrls.filter(c => c.includes("awards"));
-
-    if (!awardList) {
-        return;
-    }
-
-    for (let url in awardList) {
-        podAward = await AwardList.find(awardList[url]);
-        podAwardList.push(podAward);
-    }
-    for (let award in podAwardList) {
-        await podAwardList[award].loadRelation('award');
-    }
-
-    for (let i in podAwardList) {
-        let awards = podAwardList[i].award;
-        for (let j in awards) {
-            console.log("Checking award with URL:", awards[j].url);
-            if (awards[j].url === awardUrl) {
-                await awards[j].update({ 
-                    AwardTitle: inputAward.AwardTitle,
-                    Date: inputAward.Date,
-                    Organization: inputAward.Organization
-                 });
+    try {
+        const award = await Award.find(awardUrl);
+        if (award) {
+            await award.update({ 
+                AwardTitle: inputAward.AwardTitle,
+                Date: inputAward.Date,
+                Organization: inputAward.Organization
+             });
             alert('Award updated successfully. Please refresh the page to see the changes.');
-            return;
-            }
         }
+    } catch (error) {
+        console.error("Error updating award:", error);
     }
 }
 
 export async function performUpdateTraining(trainingUrl, inputTraining) {
-    let podTraining;
-    let podTrainingList = [];
-    const allContainers = await TrainingList.find(user.storageUrl);
-    trainingList = allContainers.resourceUrls.filter(c => c.includes("training"));
-
-    if (!trainingList) {
-        return;
-    }
-
-    for (let url in trainingList) {
-        podTraining = await TrainingList.find(trainingList[url]);
-        podTrainingList.push(podTraining);
-    }
-    for (let training in podTrainingList) {
-        await podTrainingList[training].loadRelation('training');
-    }
-
-    for (let i in podTrainingList) {
-        let trainings = podTrainingList[i].training;
-        for (let j in trainings) {
-            console.log("Checking training with URL:", trainings[j].url);
-            if (trainings[j].url === trainingUrl) {
-                await trainings[j].update({ 
-                    TrainingTitle: inputTraining.TrainingTitle,
-                    Organization: inputTraining.Organization,
-                    YearEarned: inputTraining.YearEarned,
-                    YearExpire: inputTraining.YearExpire
-                 });
+    try {
+        const training = await Training.find(trainingUrl);
+        if (training) {
+            await training.update({ 
+                TrainingTitle: inputTraining.TrainingTitle,
+                Organization: inputTraining.Organization,
+                YearEarned: inputTraining.YearEarned,
+                YearExpire: inputTraining.YearExpire
+             });
             alert('Training updated successfully. Please refresh the page to see the changes.');
-            return;
-            }
         }
+    } catch (error) {
+        console.error("Error updating training:", error);
     }
 }
 
 export async function performUpdateReference(referenceUrl, inputReference) {
-    let podReference;
-    let podReferenceList = [];
-    const allContainers = await ReferenceList.find(user.storageUrl);
-    referenceList = allContainers.resourceUrls.filter(c => c.includes("references"));
-
-    if (!referenceList) {
-        return;
-    }
-
-    for (let url in referenceList) {
-        podReference = await ReferenceList.find(referenceList[url]);
-        podReferenceList.push(podReference);
-    }
-    for (let reference in podReferenceList) {
-        await podReferenceList[reference].loadRelation('reference');
-    }
-
-    for (let i in podReferenceList) {
-        let references = podReferenceList[i].reference;
-        for (let j in references) {
-            console.log("Checking reference with URL:", references[j].url);
-            if (references[j].url === referenceUrl) {
-                await references[j].update({ 
-                    Name: inputReference.Name,
-                    Position: inputReference.Position,
-                    Email: inputReference.Email,
-                    ContactNumber: inputReference.ContactNumber
-                 });
+    try {
+        const reference = await Reference.find(referenceUrl);
+        if (reference) {
+            await reference.update({ 
+                Name: inputReference.Name,
+                Position: inputReference.Position,
+                Email: inputReference.Email,
+                ContactNumber: inputReference.ContactNumber
+             });
             alert('Reference updated successfully. Please refresh the page to see the changes.');
-            return;
-            }
         }
+    } catch (error) {
+        console.error("Error updating reference:", error);
     }
 }
 
 export async function performUpdateImage(imageUrl, inputImage) {
-    let podImage;
-    let podImageList = [];
-    const allContainers = await ImageList.find(user.storageUrl);
-    imageList = allContainers.resourceUrls.filter(c => c.includes("images"));
-
-    if (!imageList) {
-        return;
-    }
-
-    for (let url in imageList) {
-        podImage = await ImageList.find(imageList[url]);
-        podImageList.push(podImage);
-    }
-    for (let image in podImageList) {
-        await podImageList[image].loadRelation('image');
-    }
-
-    for (let i in podImageList) {
-        let images = podImageList[i].image;
-        for (let j in images) {
-            console.log("Checking image with URL:", images[j].url);
-            if (images[j].url === imageUrl) {
-                await images[j].update({ 
-                    Link: inputImage.Link,
-                 });
+    try {
+        const image = await Image.find(imageUrl);
+        if (image) {
+            await image.update({ 
+                Link: inputImage.Link,
+             });
             alert('Image updated successfully. Please refresh the page to see the changes.');
-            return;
-            }
         }
+    } catch (error) {
+        console.error("Error updating image:", error);
     }
 }
 
 export async function performUpdateWebsite(websiteUrl, inputWebsite) {
-    let podWebsite;
-    let podWebsiteList = [];
-    const allContainers = await WebsiteList.find(user.storageUrl);
-    websiteList = allContainers.resourceUrls.filter(c => c.includes("website"));
-
-    if (!websiteList) {
-        return;
-    }
-
-    for (let url in websiteList) {
-        podWebsite = await WebsiteList.find(websiteList[url]);
-        podWebsiteList.push(podWebsite);
-    }
-    for (let exp in podWebsiteList) {
-        await podWebsiteList[exp].loadRelation('website');
-    }
-
-    for (let i in podWebsiteList) {
-        let websites = podWebsiteList[i].website;
-        for (let j in websites) {
-            console.log("Checking website with URL:", websites[j].url);
-            if (websites[j].url === websiteUrl) {
-                await websites[j].update({ 
-                    WebsiteLink: inputWebsite.WebsiteLink,
-                });
+    try {
+        const website = await Website.find(websiteUrl);
+        if (website) {
+            await website.update({ 
+                WebsiteLink: inputWebsite.WebsiteLink,
+            });
             alert('Website updated successfully. Please refresh the page to see the changes.');
-            return;
-            }
         }
+    } catch (error) {
+        console.error("Error updating website:", error);
     }
 }
 
 export async function performUpdateSkill(skillUrl, inputSkill) {
-    let podSkill;
-    let podSkillList = [];
-    const allContainers = await SkillList.find(user.storageUrl);
-    skillList = allContainers.resourceUrls.filter(c => c.includes("skills"));
-
-    if (!skillList) {
-        return;
-    }
-
-    for (let url in skillList) {
-        podSkill = await SkillList.find(skillList[url]);
-        podSkillList.push(podSkill);
-    }
-    for (let skill in podSkillList) {
-        await podSkillList[skill].loadRelation('skill');
-    }
-
-    for (let i in podSkillList) {
-        let skills = podSkillList[i].skill;
-        for (let j in skills) {
-            console.log("Checking skill with URL:", skills[j].url);
-            if (skills[j].url === skillUrl) {
-                await skills[j].update({ 
-                    Skill: inputSkill.Skill,
-                 });
+    try {
+        const skill = await Skill.find(skillUrl);
+        if (skill) {
+            await skill.update({ 
+                Skill: inputSkill.Skill,
+             });
             alert('Skill updated successfully. Please refresh the page to see the changes.');
-            return;
-            }
         }
+    } catch (error) {
+        console.error("Error updating skill:", error);
     }
 }
 
 
 export async function performUpdateResume(resumeUrl, inputResume) {
-    let podResume;
-    let podResumeList = [];
-    const allContainers = await Resume.find(user.storageUrl);
-    resumeList = allContainers.resourceUrls.filter(c => c.includes("resumes"));
-
-    if (!resumeList) {
-        return;
-    }
-
-    for (let url in resumeList) {
-        podResume = await Resume.find(resumeList[url]);
-        podResumeList.push(podResume);
-    }
-    for (let resume in podResumeList) {
-        await podResumeList[resume].loadRelation('resumes');
-    }
-
-    for (let i in podResumeList) {
-        let resumes = podResumeList[i].resumes;
-        for (let j in resumes) {
-            console.log("Checking resume with URL:", resumes[j].url);
-            if (resumes[j].url === resumeUrl) {
-                await resumes[j].delete();
-                alert('Resume deleted successfully. Please refresh the page to see the changes.');
-                return;
-            }
+    try {
+        const resume = await Resume.find(resumeUrl);
+        if (resume) {
+            await resume.delete();
+            alert('Resume deleted successfully. Please refresh the page to see the changes.');
         }
+    } catch (error) {
+        console.error("Error updating resume:", error);
     }
 }
 
 // Deletion
 export async function performInformationDeletion(infoUrl) {
-    let podInfo;
-    let podInformationList = [];
-    const allContainers = await InformationList.find(user.storageUrl);
-    infoList = allContainers.resourceUrls.filter(c => c.includes("information"));
-
-    if (!infoList) {
-        return [];
-    }
-
-    for (let url in infoList) {
-        podInfo = await InformationList.find(infoList[url]);
-        podInformationList.push(podInfo);
-    }
-    for (let info in podInformationList) {
-        await podInformationList[info].loadRelation('information');
-    }
-
-    for (let i in podInformationList) {
-        let information = podInformationList[i].information;
-        for (let j in information) {
-            console.log("Checking information with URL:", information[j].url);
-            if (information[j].url === infoUrl) {
-                await information[j].delete();
+    try {
+        const information = await PersonalInformation.find(infoUrl);
+        if (information) {
+            await information.delete();
             alert('Information deleted successfully. Please refresh the page to see the changes.');
-            return;
-            }
         }
+    } catch (error) {
+        console.error("Error deleting information:", error);
     }
 }
 
 export async function performExperienceDeletion(expUrl) {
-    let podExperience;
-    let podExperienceList = [];
-    const allContainers = await ExperienceList.find(user.storageUrl);
-    experienceList = allContainers.resourceUrls.filter(c => c.includes("experience"));
-
-    if (!experienceList) {
-        return [];
-    }
-
-    for (let url in experienceList) {
-        podExperience = await ExperienceList.find(experienceList[url]);
-        podExperienceList.push(podExperience);
-    }
-    for (let exp in podExperienceList) {
-        await podExperienceList[exp].loadRelation('experience');
-    }
-
-    for (let i in podExperienceList) {
-        let experiences = podExperienceList[i].experience;
-        for (let j in experiences) {
-            console.log("Checking experience with URL:", experiences[j].url);
-            if (experiences[j].url === expUrl) {
-                await experiences[j].delete();
+    try {
+        const experience = await Experience.find(expUrl);
+        if (experience) {
+            await experience.delete();
             alert('Experience deleted successfully. Please refresh the page to see the changes.');
-            return;
-            }
         }
+    } catch (error) {
+        console.error("Error deleting experience:", error);
     }
 }
 
 export async function performProjectDeletion(projectUrl) {
-    let podProject;
-    let podProjectList = [];
-    const allContainers = await ProjectList.find(user.storageUrl);
-    projectList = allContainers.resourceUrls.filter(c => c.includes("project"));
-
-    if (!projectList) {
-        return [];
-    }
-
-    for (let url in projectList) {
-        podProject = await ProjectList.find(projectList[url]);
-        podProjectList.push(podProject);
-    }
-    for (let exp in podProjectList) {
-        await podProjectList[exp].loadRelation('projects');
-    }
-
-    console.log("Checking projectlist:", podProjectList)
-    for (let i in podProjectList) {
-        let projects = podProjectList[i].projects;
-        for (let j in projects) {
-            console.log("Checking project with URL:", projects[j].url);
-            if (projects[j].url === projectUrl) {
-                await projects[j].delete();
+    try {
+        const project = await Project.find(projectUrl);
+        if (project) {
+            await project.delete();
             alert('Project deleted successfully. Please refresh the page to see the changes.');
-            return;
-            }
         }
+    } catch (error) {
+        console.error("Error deleting project:", error);
     }
 }
 
 export async function performAwardDeletion(awardUrl) {
-    await awardList?.relatedAward.delete(awardUrl);
-    alert('Award deleted successfully. Please refresh the page to see the changes.');
+    try {
+        const award = await Award.find(awardUrl);
+        if (award) {
+            await award.delete();
+            alert('Award deleted successfully. Please refresh the page to see the changes.');
+        }
+    } catch (error) {
+        console.error("Error deleting award:", error);
+    }
 }
 
 export async function performTrainingDeletion(trainingUrl) {
-    await trainingList?.relatedTraining.delete(trainingUrl);
-    alert('Training deleted successfully. Please refresh the page to see the changes.');
+    try {
+        const training = await Training.find(trainingUrl);
+        if (training) {
+            await training.delete();
+            alert('Training deleted successfully. Please refresh the page to see the changes.');
+        }
+    } catch (error) {
+        console.error("Error deleting training:", error);
+    }
 }
 
 export async function performReferenceDeletion(referenceUrl) {
-    await referenceList?.relatedReference.delete(referenceUrl);
-    alert('Reference deleted successfully. Please refresh the page to see the changes.');
+    try {
+        const reference = await Reference.find(referenceUrl);
+        if (reference) {
+            await reference.delete();
+            alert('Reference deleted successfully. Please refresh the page to see the changes.');
+        }
+    } catch (error) {
+        console.error("Error deleting reference:", error);
+    }
 }
 
 export async function performWebsiteDeletion(websiteUrl) {
-    let podWebsite;
-    let podWebsiteList = [];
-    const allContainers = await WebsiteList.find(user.storageUrl);
-    websiteList = allContainers.resourceUrls.filter(c => c.includes("website"));
-
-    if (!websiteList) {
-        return [];
-    }
-
-    for (let url in websiteList) {
-        podWebsite = await WebsiteList.find(websiteList[url]);
-        podWebsiteList.push(podWebsite);
-    }
-    for (let exp in podWebsiteList) {
-        await podWebsiteList[exp].loadRelation('website');
-    }
-
-    for (let i in podWebsiteList) {
-        let websites = podWebsiteList[i].website;
-        for (let j in websites) {
-            console.log("Checking website with URL:", websites[j].url);
-            if (websites[j].url === websiteUrl) {
-                await websites[j].delete();
+    try {
+        const website = await Website.find(websiteUrl);
+        if (website) {
+            await website.delete();
             alert('Website deleted successfully. Please refresh the page to see the changes.');
-            return;
-            }
         }
+    } catch (error) {
+        console.error("Error deleting website:", error);
     }
 }
 
 export async function performSkillDeletion(skillUrl) {
-    let podSkill;
-    let podSkillList = [];
-    const allContainers = await SkillList.find(user.storageUrl);
-    skillList = allContainers.resourceUrls.filter(c => c.includes("skill"));
-
-    if (!skillList) {
-        return [];
-    }
-
-    for (let url in skillList) {
-        podSkill = await SkillList.find(skillList[url]);
-        podSkillList.push(podSkill);
-    }
-    for (let exp in podSkillList) {
-        await podSkillList[exp].loadRelation('skill');
-    }
-
-    for (let i in podSkillList) {
-        let skills = podSkillList[i].skill;
-        for (let j in skills) {
-            console.log("Checking skill with URL:", skills[j].url);
-            if (skills[j].url === skillUrl) {
-                await skills[j].delete();
+    try {
+        const skill = await Skill.find(skillUrl);
+        if (skill) {
+            await skill.delete();
             alert('Skill deleted successfully. Please refresh the page to see the changes.');
-            return;
-            }
         }
+    } catch (error) {
+        console.error("Error deleting skill:", error);
     }
 }
 
 export async function performResumeDeletion(resumeUrl) {
-    let podResume;
-    let podResumeList = [];
-    const allContainers = await Resume.find(user.storageUrl);
-    resumeList = allContainers.resourceUrls.filter(c => c.includes("resumes"));
-
-    if (!resumeList) {
-        return [];
-    }
-
-    for (let url in resumeList) {
-        podResume = await Resume.find(resumeList[url]);
-        podResumeList.push(podResume);
-    }
-    for (let exp in podResumeList) {
-        await podResumeList[exp].loadRelation('resumes');
-    }
-
-    for (let i in podResumeList) {
-        let resumes = podResumeList[i].resumes;
-        for (let j in resumes) {
-            console.log("Checking resume with URL:", resumes[j].url);
-            if (resumes[j].url === resumeUrl) {
-                await resumes[j].delete();
-                alert('Resume deleted successfully. Please refresh the page to see the changes.');
-                return;
-            }
+    try {
+        const resume = await Resume.find(resumeUrl);
+        if (resume) {
+            await resume.delete();
+            alert('Resume deleted successfully. Please refresh the page to see the changes.');
         }
+    } catch (error) {
+        console.error("Error deleting resume:", error);
     }
 }
 
