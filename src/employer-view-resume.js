@@ -14,7 +14,16 @@ function EmployerViewResume() {
   const [error, setError] = useState("");
   const hasRun = useRef(false);
 
-  const normalizeFieldName = (field) => String(field || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  const normalizeFieldName = (field) => {
+    let name = String(field || "");
+    if (name.includes("/")) {
+      name = name.substring(name.lastIndexOf("/") + 1);
+    }
+    if (name.includes("#")) {
+      name = name.substring(name.lastIndexOf("#") + 1);
+    }
+    return name.toLowerCase().replace(/[^a-z0-9]/g, "");
+  };
 
   const getResumeIndexValue = (parsedBody) => {
     if (!parsedBody || typeof parsedBody !== "object") return null;
@@ -47,6 +56,7 @@ function EmployerViewResume() {
       if (!resume.ok || resume.status === 403 || !resume.parsedBody) return;
 
       const resumeIndex =
+        resume.resume_id ||
         getResumeIndexValue(resume.parsedBody) ||
         getResumeIndexFromResourceUrl(resume.resource_url) ||
         "no-index";
@@ -172,11 +182,14 @@ function EmployerViewResume() {
 
   const fetchResourceData = async (perms) => {
     if (!perms || perms.length === 0) {
+      console.log("[Employer View] No permissions listed in the database.");
       return [];
     }
 
     const session = getDefaultSession();
     const fetcher = session.fetch;
+
+    console.log(`\n=== [Employer View] Fetching ${perms.length} resources from Solid Pod ===`);
 
     return Promise.all(
       perms.map(async (perm) => {
@@ -193,12 +206,14 @@ function EmployerViewResume() {
           const contentType = res.headers.get("content-type") || "";
 
           if (!res.ok) {
+            console.warn(`❌ [Employer View] Fetch failed for: "${resourceUrl}" | Status: ${res.status}`);
             return {
               resource_url: resourceUrl,
               ok: false,
               status: res.status,
               contentType,
-              grantedBy: perm.student_webid
+              grantedBy: perm.student_webid,
+              resume_id: perm.resume_id
             };
           }
 
@@ -216,22 +231,28 @@ function EmployerViewResume() {
             ? parsedDataFromString
             : parsedDataFromObject;
 
+          console.log(`✅ [Employer View] Successfully fetched & parsed: "${resourceUrl}"`);
+          console.log("   Parsed fields:", Object.keys(parsedData));
+
           return {
             resource_url: resourceUrl,
             ok: true,
             status: res.status,
             contentType,
             parsedBody: parsedData,
-            grantedBy: perm.student_webid
+            grantedBy: perm.student_webid,
+            resume_id: perm.resume_id
           };
         } catch (fetchErr) {
+          console.error(`❌ [Employer View] Error fetching: "${resourceUrl}" | Error: ${fetchErr.message}`);
           return {
             resource_url: resourceUrl,
             ok: false,
             status: 0,
             contentType: "",
             error: fetchErr.message,
-            grantedBy: perm.student_webid
+            grantedBy: perm.student_webid,
+            resume_id: perm.resume_id
           };
         }
       })
@@ -285,21 +306,27 @@ function EmployerViewResume() {
             )
         );
 
+        console.log("\n=== [Employer View] Database Permissions Retrieved ===");
+        uniquePermissions.forEach((perm, idx) => {
+          console.log(`[${idx + 1}] Student WebID: "${perm.student_webid}" | Resume ID: ${perm.resume_id} | Resource URL: "${perm.resource_url}"`);
+          if (idx === uniquePermissions.length - 1) {
+            const allUrls = uniquePermissions.map(p => p.resource_url);
+            console.log("[Employer View] All permission resource URLs:", allUrls);
+          }
+        });
+
         const resourceResults = await fetchResourceData(uniquePermissions);
         const groupedResumes = groupResumesByIndex(resourceResults);
-        console.log("Grouped resumes before filtering:", groupedResumes);
 
         const targetResumeId = String(resumeID || "").trim();
         const normalizedRequestedUrl = normalizeResourceUrl(resumeUrl);
 
         let selectedResume = groupedResumes.find(
-          (resume) => String(getResumeIndexValue(resume.parsedBody) || "") === targetResumeId
+          (resume) => String(resume.parsedBody?.ResumeIndex || "") === targetResumeId
         );
 
-        console.log("Retrieved filtered resume using resume ID:", {
-          resumeID: targetResumeId,
-          selectedResume
-        });
+        console.log(`\n=== [Employer View] Filtering Resume by ID: "${targetResumeId}" ===`);
+        console.log("Found resume group:", selectedResume);
 
         if (!selectedResume && normalizedRequestedUrl) {
           selectedResume = groupedResumes.find((resume) =>

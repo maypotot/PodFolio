@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import "./main.css";
 import { getDefaultSession } from "@inrupt/solid-client-authn-browser";
 import { universalAccess } from "@inrupt/solid-client";
-import { restoreSession } from "./solid.js";
+import { restoreSession, loadAllResumes } from "./solid.js";
 import API_BASE_URL from "./config/api.js";
 
 import { 
@@ -25,14 +25,42 @@ let podWebsiteList = [];
 let podExperienceList = [];
 let podImageList = [];
 let resumeIndexList = [];
+let currentResumeData = null;
 
-// Helper function to get filtered data by resume ID
+// Helper function to get filtered data by resume ID using new resume architecture
 export function getFilteredResumeData(resumeId) {
-  const filteredInfo = podInfolist.filter(info => info.ResumeIndex == resumeId);
-  const filteredSkills = podSkilllist.filter(skill => skill.ResumeIndex == resumeId);
-  const filteredProjects = podProjectlist.filter(project => project.ResumeIndex == resumeId);
-  const filteredWebsites = podWebsiteList.filter(website => website.ResumeIndex == resumeId);
-  const filteredExperiences = podExperienceList.filter(exp => exp.ResumeIndex == resumeId);
+  if (!currentResumeData) {
+    console.warn("No active resume data found (currentResumeData is null). Returning empty filtered lists.");
+    return {
+      info: [],
+      skills: [],
+      projects: [],
+      websites: [],
+      experiences: []
+    };
+  }
+
+  // Get index attributes safely from currentResumeData (InformationIndex, WebsiteIndexes, ProjectIndexes, ExperienceIndexes, SkillsIndexes)
+  const getAttr = (name) => currentResumeData._attributes?.[name] ?? currentResumeData[name];
+
+  const informationIndex = getAttr("InformationIndex");
+  const websiteIndexes = getAttr("WebsiteIndexes") || [];
+  const projectIndexes = getAttr("ProjectIndexes") || [];
+  const experienceIndexes = getAttr("ExperienceIndexes") || [];
+  const skillIndexes = getAttr("SkillsIndexes") || [];
+
+  console.log("=== getFilteredResumeData (using siphoned indexes) ===");
+  console.log("informationIndex:", informationIndex);
+  console.log("websiteIndexes:", websiteIndexes);
+  console.log("projectIndexes:", projectIndexes);
+  console.log("experienceIndexes:", experienceIndexes);
+  console.log("skillIndexes (SkillsIndexes):", skillIndexes);
+
+  const filteredInfo = podInfolist.filter(info => String(info.InformationIndex) === String(informationIndex));
+  const filteredSkills = podSkilllist.filter(skill => skillIndexes.some(idx => String(idx) === String(skill.SkillIndex)));
+  const filteredProjects = podProjectlist.filter(project => projectIndexes.some(idx => String(idx) === String(project.ProjectIndex)));
+  const filteredWebsites = podWebsiteList.filter(website => websiteIndexes.some(idx => String(idx) === String(website.WebsiteIndex)));
+  const filteredExperiences = podExperienceList.filter(exp => experienceIndexes.some(idx => String(idx) === String(exp.ExperienceIndex)));
   
   console.log(`\n=== Filtered Resume Data for ID: ${resumeId} ===`);
   console.log("Personal Information:", filteredInfo);
@@ -60,8 +88,33 @@ export async function loadResumeData() {
   podWebsiteList = [];
   podExperienceList = [];
   podImageList = [];
+  currentResumeData = null;
 
   const user = await restoreSession();
+
+  // Load resumes to find the active one matching the stored resumeId
+  const resumeId = sessionStorage.getItem("current_resume_id");
+  console.log("=== student-config-perms loadResumeData ===");
+  console.log("Stored current_resume_id is:", resumeId);
+
+  const allResumesRelation = await loadAllResumes();
+  const allResumes = Array.isArray(allResumesRelation) ? allResumesRelation : (allResumesRelation._related || []);
+  console.log("Raw resumes received from Pod:", allResumes);
+
+  for (let idx = 0; idx < allResumes.length; idx++) {
+    const resume = allResumes[idx];
+    const resumeIndexFromAttribute = resume._attributes?.ResumeIndex ?? resume.ResumeIndex;
+    if (resumeIndexFromAttribute !== undefined && resumeIndexFromAttribute !== null) {
+      if (String(resumeIndexFromAttribute) === String(resumeId)) {
+        currentResumeData = resume;
+        console.log("Matched active resume:", resume);
+        break;
+      }
+    }
+  }
+
+  resumeIndexList = allResumes.map(r => Number(r._attributes?.ResumeIndex ?? r.ResumeIndex)).filter(val => !Number.isNaN(val));
+
   const podInformation = await loadInformation();
 
   for (let i in podInformation){
@@ -69,10 +122,6 @@ export async function loadResumeData() {
           podInfolist.push(podInformation[i].information[j]);
     }
   }
-
-  resumeIndexList = Array.from(
-    new Set(podInfolist.map((info) => Number(info.ResumeIndex)).filter((value) => !Number.isNaN(value)))
-  );
 
   const podSkills = await loadSkill();
 
