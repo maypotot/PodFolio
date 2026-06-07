@@ -34,24 +34,49 @@ npm run build
 
 The compiled assets will be generated in the build/ folder.
 
-## Deployment on Render
 
-To host and deploy this static application on Render, follow these steps:
+# Render Full Stack Setup Guide
 
-    Sign in to your Render dashboard.
+This guide covers setting up the Frontend Static Site, Django API Backend, and PostgreSQL Database within your Render project.
 
-    Click New + and select Static Site.
+---
 
-    Connect your GitHub repository (maypotot/PodFolio).
+## 1. PostgreSQL Database Setup
 
-    Configure the project settings with the following parameters:
+1. In your Render Dashboard, click **New +** and select **PostgreSQL**.
+2. Configure the database settings:
+   * **Name**: `podfolio-db`
+   * **Region**: Choose the same region for all services to minimize latency.
+3. Click **Create Database**.
+4. Once active, copy the **Internal Database URL** (for backend connections) or **External Database URL** (for local development testing).
 
-        Name: podfolio (or your preferred name)
+---
 
-        Branch: main (or your default branch)
+## 2. Django API Backend Setup
 
-        Build Command: npm run build
+1. Click **New +** and select **Web Service**.
+2. Connect your repository.
+3. Configure the following deployment settings:
+   * **Name**: `podfolio-backend`
+   * **Language**: `Python`
+   * **Build Command**: `pip install -r requirements.txt && python manage.py migrate`
+   * **Start Command**: `gunicorn mysite.wsgi:application` *(Replace `mysite` with your actual Django project name configuration)*
+4. Scroll down to **Environment Variables** and add your required keys:
+   * `DATABASE_URL`: *Paste your Internal Database URL here*
+   * `SECRET_KEY`: *Your Django secret key*
+   * `DEBUG`: `False`
+5. Click **Create Web Service**. Copy the generated live URL once the deploy completes.
 
-        Publish Directory: build
+---
 
-    Click Create Static Site.
+## 3. React Frontend Static Site Setup
+
+1. Click **New +** and select **Static Site**.
+2. Connect your repository.
+3. Configure the build parameters:
+   * **Name**: `podfolio-frontend`
+   * **Build Command**: `npm run build`
+   * **Publish Directory**: `build`
+4. If your React app communicates with the Django API via an environment variable, add it to the **Environment Variables** section:
+   * `REACT_APP_API_URL`: *Paste your Render Backend Web Service URL*
+5. Click **Create Static Site**.
