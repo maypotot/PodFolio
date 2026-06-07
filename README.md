@@ -57,10 +57,10 @@ This guide covers setting up the Frontend Static Site, Django API Backend, and P
 1. Click **New +** and select **Web Service**.
 2. Connect your repository.
 3. Configure the following deployment settings:
-   * **Name**: `podfolio-backend`
+   * **Name**: `PodFolio-backend`
    * **Language**: `Python`
-   * **Build Command**: `pip install -r requirements.txt && python manage.py migrate`
-   * **Start Command**: `gunicorn mysite.wsgi:application` *(Replace `mysite` with your actual Django project name configuration)*
+   * **Build Command**: `python src\podfolio_db_backend\manage.py migrate`
+   * **Start Command**: `cd src/podfolio_db_backend && gunicorn podfolio_db_backend.wsgi:application --bind 0.0.0.0:$PORT`
 4. Scroll down to **Environment Variables** and add your required keys:
    * `DATABASE_URL`: *Paste your Internal Database URL here*
    * `SECRET_KEY`: *Your Django secret key*
@@ -74,7 +74,7 @@ This guide covers setting up the Frontend Static Site, Django API Backend, and P
 1. Click **New +** and select **Static Site**.
 2. Connect your repository.
 3. Configure the build parameters:
-   * **Name**: `podfolio-frontend`
+   * **Name**: `Podfolio-frontend`
    * **Build Command**: `npm run build`
    * **Publish Directory**: `build`
 4. If your React app communicates with the Django API via an environment variable, add it to the **Environment Variables** section:
